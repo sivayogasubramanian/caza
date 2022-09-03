@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --ext .js,.ts,.jsx,.tsx src",
-    "lint:fix": "eslint --ext .js,.ts,.jsx,.tsx --fix"
+    "lint": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx ./pages ./styles",
+    "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix ./pages ./styles"
   },
   "dependencies": {
     "next": "12.2.5",
