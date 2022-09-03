@@ -1,6 +1,7 @@
+import { Auth, GithubAuthProvider, signInWithRedirect, signOut, User } from 'firebase/auth';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
+import AuthContext from '../context/AuthContext';
 import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
@@ -17,50 +18,71 @@ const Home: NextPage = () => {
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/canary/examples" className={styles.card}>
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
+        <div className="space-y-4">
+          <AuthContext.Consumer>{({ currentUser }) => displayUserInfo(currentUser)}</AuthContext.Consumer>
+          <AuthContext.Consumer>{({ auth }) => displayLogOutOptions(auth)}</AuthContext.Consumer>
         </div>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
   );
 };
+
+function displayUserInfo(user: User | undefined) {
+  if (!user) return <>Failed to get user!</>;
+
+  const githubProviderData = user.providerData.length != 0 ? user.providerData[0] : null;
+  return (
+    <>
+      <p>Logged in as UID {user?.uid}</p>
+      {githubProviderData?.photoURL ? (
+        <div className="flex space-x-4">
+          <p>Github Provider Data:</p>
+          <img src={githubProviderData.photoURL} alt="Github Profile Photo" width="30"></img>
+          <p>{githubProviderData.email}</p>
+        </div>
+      ) : (
+        <p>Not signed in to github</p>
+      )}
+    </>
+  );
+}
+
+function displayLogOutOptions(auth: Auth | undefined) {
+  return (
+    <div className="flex space-x-4">
+      <button
+        className="rounded-full bg-indigo-500 p-2 text-white"
+        onClick={() => {
+          if (!auth) {
+            alert('Auth not found.');
+            return;
+          }
+
+          signOut(auth);
+        }}
+      >
+        <p>Log Out</p>
+      </button>
+      <button
+        className="rounded-full bg-indigo-500 p-2 text-white"
+        onClick={() => {
+          if (!auth) {
+            alert('Auth not found.');
+            return;
+          }
+
+          const provider = new GithubAuthProvider();
+          provider.setCustomParameters({
+            allow_signup: 'false',
+          });
+
+          signInWithRedirect(auth, provider);
+        }}
+      >
+        Log in with Github
+      </button>
+    </div>
+  );
+}
 
 export default Home;
