@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint --ext .js,.ts,.jsx,.tsx src",
+    "lint:fix": "eslint --ext .js,.ts,.jsx,.tsx --fix"
   },
   "dependencies": {
     "next": "12.2.5",
