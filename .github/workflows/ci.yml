@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on: [push]
 
@@ -10,3 +10,4 @@ jobs:
       - uses: actions/setup-node@v2
       - run: yarn install
       - run: yarn lint
+      - run: yarn build

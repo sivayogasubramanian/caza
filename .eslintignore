@@ -1,3 +1,8 @@
 **/public/workbox-*.js*
 **/public/sw.js*
 **/public/worker-*.js*
+*.md
+styles/**
+public/**
+yarn.lock
+*.svg
