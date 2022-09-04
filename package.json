@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx .",
-    "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix .",
+    "lint": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx './**'",
+    "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix './**'",
     "postinstall": "husky install"
   },
   "dependencies": {
