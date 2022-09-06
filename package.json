@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx './**'",
     "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix './**'",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@prisma/client": "^4.3.1",
