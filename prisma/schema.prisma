@@ -16,7 +16,7 @@ model User {
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  Application Application[]
+  applications Application[]
 
   @@map("users")
 }
@@ -29,7 +29,7 @@ model Company {
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  Role Role[]
+  roles Role[]
 
   @@map("companies")
 }
@@ -53,7 +53,7 @@ model Role {
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  Application Application[]
+  applications Application[]
 
   @@map("roles")
 }
@@ -67,9 +67,10 @@ model Application {
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  ApplicationStage ApplicationStage[]
-  Task             Task[]
+  applicationStages ApplicationStage[]
+  tasks             Task[]
 
+  @@unique([userId, roleId])
   @@map("applications")
 }
 
@@ -116,8 +117,8 @@ model Task {
   applicationId        Int         @map("application_id")
   title                String
   dueDate              DateTime    @map("due_date")
-  notificationDateTime DateTime    @map("notification_datetime")
-  isDone               Boolean     @map("is_done")
+  notificationDateTime DateTime?   @map("notification_datetime")
+  isDone               Boolean     @default(false) @map("is_done")
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
