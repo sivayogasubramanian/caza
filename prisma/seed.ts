@@ -2,9 +2,9 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({ log: ['query'] });
 
-let users: Prisma.UserCreateInput[] = [{ uid: '1' }, { uid: '2' }, { uid: '3' }, { uid: '4' }, { uid: '5' }];
+const users: Prisma.UserCreateInput[] = [{ uid: '1' }, { uid: '2' }, { uid: '3' }, { uid: '4' }, { uid: '5' }];
 
-let companies: Prisma.CompanyCreateInput[] = [
+const companies: Prisma.CompanyCreateInput[] = [
   {
     name: 'Facebook',
     companyUrl: 'facebook.com',
