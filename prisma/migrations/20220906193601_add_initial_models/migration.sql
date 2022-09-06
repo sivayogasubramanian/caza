@@ -17,7 +17,7 @@ CREATE TABLE "companies" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "company_url" TEXT NOT NULL,
-    "is_verified" BOOLEAN NOT NULL,
+    "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "companies_pkey" PRIMARY KEY ("id")
@@ -30,7 +30,7 @@ CREATE TABLE "roles" (
     "title" TEXT NOT NULL,
     "type" "RoleType" NOT NULL,
     "year" INTEGER NOT NULL,
-    "is_verified" BOOLEAN NOT NULL,
+    "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
@@ -74,12 +74,15 @@ CREATE TABLE "tasks" (
     "application_id" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "due_date" TIMESTAMP(3) NOT NULL,
-    "notification_datetime" TIMESTAMP(3) NOT NULL,
-    "is_done" BOOLEAN NOT NULL,
+    "notification_datetime" TIMESTAMP(3),
+    "is_done" BOOLEAN NOT NULL DEFAULT false,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "tasks_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "applications_user_id_role_id_key" ON "applications"("user_id", "role_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "application_stages_reaction_id_key" ON "application_stages"("reaction_id");
