@@ -1,10 +1,18 @@
 import { Auth, GithubAuthProvider, signInWithRedirect, signOut, User } from 'firebase/auth';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
+  const { auth, currentUser } = useContext(AuthContext);
+  const [jwtToken, setJwtToken] = useState<string>();
+
+  useEffect(() => {
+    currentUser?.getIdToken().then(setJwtToken);
+  }, [currentUser, setJwtToken]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -19,8 +27,17 @@ const Home: NextPage = () => {
         </h1>
 
         <div className="space-y-4">
-          <AuthContext.Consumer>{({ currentUser }) => displayUserInfo(currentUser)}</AuthContext.Consumer>
-          <AuthContext.Consumer>{({ auth }) => displayLogOutOptions(auth)}</AuthContext.Consumer>
+          {displayUserInfo(currentUser)}
+          {displayLogOutOptions(auth)}
+        </div>
+        <div className="space-y-4 p-8">
+          <div className="break-all">{jwtToken || 'JWT token not found'}</div>
+          <p>
+            Check out the JWT token at{' '}
+            <a className="text-sky-500" href="https://jwt.io">
+              jwt.io
+            </a>
+          </p>
         </div>
       </main>
     </div>
