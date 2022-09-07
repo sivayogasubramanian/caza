@@ -63,7 +63,7 @@ export function withVerifiedUser<T>(
 
     const { uid, isAnonymous } = userDetails;
     if (isAnonymous) {
-      return res.status(401).end(ANONYMOUS_USER_NOT_AUTHORIZED);
+      return res.status(403).end(ANONYMOUS_USER_NOT_AUTHORIZED);
     }
 
     return handler(uid, req, res);
