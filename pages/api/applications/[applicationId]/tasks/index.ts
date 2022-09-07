@@ -7,9 +7,9 @@ import {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_NOT_FOUND,
-  rejectHttpMethodsNotIn,
 } from '../../../../../utils/http/httpHelper';
 import { createIfPossible } from '../../../../../utils/prisma/createIfPossible';
+import { rejectHttpMethodsNotIn } from '../../../../../utils/prisma/rejectHttpMethodsNotIn';
 
 const prisma = new PrismaClient();
 
