@@ -1,5 +1,3 @@
-import { NextApiResponse } from 'next';
-
 export const HTTP_GET_METHOD = 'GET';
 export const HTTP_POST_METHOD = 'POST';
 export const HTTP_PUT_METHOD = 'PUT';
@@ -18,8 +16,3 @@ export const HTTP_STATUS_NOT_FOUND = 404;
 export const HTTP_STATUS_METHOD_NOT_ALLOWED = 405;
 export const HTTP_STATUS_CONFLICT = 409;
 export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
-
-export function rejectHttpMethodsNotIn(res: NextApiResponse, ...allowedMethods: string[]) {
-  res.setHeader('Allow', allowedMethods);
-  res.status(405).end('HTTP method not allowed!');
-}
