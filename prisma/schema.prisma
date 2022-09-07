@@ -103,7 +103,7 @@ model ApplicationStage {
 model Reaction {
   id               Int               @id @default(autoincrement())
   emojiUnicodeHex  String            @map("emoji_unicode_hex")
-  remark           String
+  remark           String?
   applicationStage ApplicationStage?
 
   updatedAt DateTime @updatedAt @map("updated_at")
