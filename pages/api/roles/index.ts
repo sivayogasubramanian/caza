@@ -1,7 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { RolePostData } from '../../../types/role';
+import { RoleData, RoleListData, RolePostData } from '../../../types/role';
 import { withAnyUser } from '../../../utils/auth/jwtHelpers';
+import {
+  HTTP_GET_METHOD,
+  HTTP_POST_METHOD,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_OK,
+  rejectHttpMethodsNotIn,
+} from '../../../utils/http/httpHelper';
+import { createIfPossible } from '../../../utils/prisma/createIfPossible';
 
 const prisma = new PrismaClient();
 
@@ -16,28 +24,41 @@ function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
       handlePost(req, res);
       break;
     default:
-      res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).end(`Method ${method} not allowed!`);
+      rejectHttpMethodsNotIn(res, HTTP_GET_METHOD, HTTP_POST_METHOD);
   }
 }
 
+// TODO: Return better error messages
 // TODO: Optional Search query
-// TODO: Make sure the shape is same as discussed
 
 async function handleGet(_: NextApiRequest, res: NextApiResponse) {
-  const roles = await prisma.role.findMany();
+  const roles: RoleListData = await prisma.role.findMany({
+    select: {
+      id: true,
+      title: true,
+      type: true,
+      year: true,
+      isVerified: true,
+      company: { select: { id: true, name: true, companyUrl: true } },
+    },
+  });
 
-  res.status(200).json(roles);
+  res.status(HTTP_STATUS_OK).json(roles);
 }
 
-// TODO: Make sure the shape is same as discussed
+// TODO: Return better error messages
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const rolePostData: RolePostData = req.body;
 
-  const newRole = await prisma.role.create({ data: rolePostData });
+  createIfPossible(res, async () => {
+    const newRole: RoleData = await prisma.role.create({
+      data: rolePostData,
+      select: { id: true, title: true, type: true, year: true },
+    });
 
-  res.status(201).json(newRole);
+    res.status(HTTP_STATUS_CREATED).json(newRole);
+  });
 }
 
 export default withAnyUser(handler);
