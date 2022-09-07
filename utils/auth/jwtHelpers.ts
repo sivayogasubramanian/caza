@@ -1,6 +1,11 @@
 import admin from 'firebase-admin';
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
+export interface UserDetailsFromRequest {
+  uid: string;
+  isAnonymous: boolean;
+}
+
 // Note: do not modify the 'firebase-admin' default import style, it triggers a known bug
 // See: https://github.com/firebase/firebase-admin-node/issues/593
 try {
@@ -68,11 +73,6 @@ export function withVerifiedUser<T>(
 
     return handler(uid, req, res);
   };
-}
-
-interface UserDetailsFromRequest {
-  uid: string;
-  isAnonymous: boolean;
 }
 
 async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
