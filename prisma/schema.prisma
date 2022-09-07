@@ -44,7 +44,7 @@ enum RoleType {
 
 model Role {
   id         Int      @id @default(autoincrement())
-  company    Company  @relation(fields: [companyId], references: [id])
+  company    Company  @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   companyId  Int      @map("company_id")
   title      String
   type       RoleType
@@ -60,9 +60,9 @@ model Role {
 
 model Application {
   id     Int    @id @default(autoincrement())
-  user   User   @relation(fields: [userId], references: [uid])
+  user   User   @relation(fields: [userId], references: [uid], onUpdate: Cascade, onDelete: Cascade)
   userId String @map("user_id")
-  role   Role   @relation(fields: [roleId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roleId Int    @map("role_id")
 
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -88,11 +88,11 @@ enum ApplicationStageType {
 
 model ApplicationStage {
   id            Int                  @id @default(autoincrement())
-  application   Application          @relation(fields: [applicationId], references: [id])
+  application   Application          @relation(fields: [applicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   applicationId Int                  @map("application_id")
   type          ApplicationStageType
   date          DateTime
-  reaction      Reaction?            @relation(fields: [reactionId], references: [id])
+  reaction      Reaction?            @relation(fields: [reactionId], references: [id], onUpdate: Cascade, onDelete: SetNull)
   reactionId    Int?                 @unique @map("reaction_id")
 
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -113,7 +113,7 @@ model Reaction {
 
 model Task {
   id                   Int         @id @default(autoincrement())
-  application          Application @relation(fields: [applicationId], references: [id])
+  application          Application @relation(fields: [applicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   applicationId        Int         @map("application_id")
   title                String
   dueDate              DateTime    @map("due_date")
