@@ -2,14 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
 import { withAnyUser } from '../../../utils/auth/jwtHelpers';
-import {
-  HTTP_GET_METHOD,
-  HTTP_POST_METHOD,
-  HTTP_STATUS_CREATED,
-  HTTP_STATUS_OK,
-  rejectHttpMethodsNotIn,
-} from '../../../utils/http/httpHelper';
+import { HTTP_GET_METHOD, HTTP_POST_METHOD, HTTP_STATUS_CREATED, HTTP_STATUS_OK } from '../../../utils/http/httpHelper';
 import { createIfPossible } from '../../../utils/prisma/createIfPossible';
+import { rejectHttpMethodsNotIn } from '../../../utils/prisma/rejectHttpMethodsNotIn';
 
 const prisma = new PrismaClient();
 
