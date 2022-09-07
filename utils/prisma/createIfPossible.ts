@@ -16,6 +16,7 @@ export function createIfPossible(res: NextApiResponse, creator: () => Promise<vo
 
     if (error instanceof Prisma.PrismaClientValidationError) {
       res.status(HTTP_STATUS_BAD_REQUEST).end();
+      return;
     }
 
     res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).end();
