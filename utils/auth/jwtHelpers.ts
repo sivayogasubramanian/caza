@@ -20,7 +20,7 @@ try {
 }
 
 const UNABLE_TO_AUTHENTICATE = 'User could not be authenticated.';
-const ANONYMOUS_USER_NOT_AUTHORIZED = 'User has not verified their identity.';
+const USER_NOT_AUTHORIZED = 'User has not verified their identity.';
 
 /**
  * Utility function that takes care of authenticating any user (anonymous / verified) and providing the UID.
