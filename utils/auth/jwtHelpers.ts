@@ -82,24 +82,16 @@ async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
 }
 
 function getBearerToken(req: NextApiRequest) {
-  // Note: NextJS appears to lower case all headers to match RFC specs.
-  const header = 'authorization';
   const bearerPrefix = 'Bearer ';
-
-  const authHeader = req.headers[header];
-  let bearerToken: string | undefined;
+  const authHeader = req.headers?.authorization;
 
   if (!authHeader) {
-    // No Authorization header.
-    bearerToken = authHeader;
-  } else if (typeof authHeader == 'string') {
-    // Single Authorization header.
-    bearerToken = authHeader.startsWith(bearerPrefix) ? authHeader : undefined;
+    throw new Error('Auth header is not present');
   }
 
-  if (!bearerToken) {
-    throw new Error('Bearer token not found in request headers.');
+  if (!authHeader.startsWith(bearerPrefix)) {
+    throw new Error('Auth header is not a bearer token.');
   }
 
-  return bearerToken.replace(bearerPrefix, '');
+  return authHeader.replace(bearerPrefix, '');
 }
