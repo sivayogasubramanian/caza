@@ -14,7 +14,7 @@ datasource db {
 model User {
   uid String @id
 
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   applications Application[]
 
@@ -27,7 +27,7 @@ model Company {
   companyUrl String  @map("company_url")
   isVerified Boolean @default(false) @map("is_verified")
 
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   roles Role[]
 
@@ -51,7 +51,7 @@ model Role {
   year       Int
   isVerified Boolean  @default(false) @map("is_verified")
 
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   applications Application[]
 
@@ -65,7 +65,7 @@ model Application {
   role   Role   @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roleId Int    @map("role_id")
 
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   applicationStages ApplicationStage[]
   tasks             Task[]
@@ -91,11 +91,11 @@ model ApplicationStage {
   application     Application          @relation(fields: [applicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   applicationId   Int                  @map("application_id")
   type            ApplicationStageType
-  date            DateTime
+  date            DateTime             @db.Timestamptz(3)
   emojiUnicodeHex String?              @map("emoji_unicode_hex")
   remark          String?
 
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("application_stages")
 }
@@ -105,11 +105,11 @@ model Task {
   application          Application @relation(fields: [applicationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   applicationId        Int         @map("application_id")
   title                String
-  dueDate              DateTime    @map("due_date")
-  notificationDateTime DateTime?   @map("notification_datetime")
+  dueDate              DateTime    @map("due_date") @db.Timestamptz(3)
+  notificationDateTime DateTime?   @map("notification_datetime") @db.Timestamptz(3)
   isDone               Boolean     @default(false) @map("is_done")
 
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("tasks")
 }
