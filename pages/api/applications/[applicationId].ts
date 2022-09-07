@@ -8,7 +8,7 @@ import {
   HTTP_STATUS_NO_CONTENT,
   HTTP_STATUS_OK,
 } from '../../../utils/http/httpHelper';
-import { rejectHttpMethodsNotIn } from '../../../utils/prisma/rejectHttpMethodsNotIn';
+import { rejectHttpMethodsNotIn } from '../../../utils/http/rejectHttpMethodsNotIn';
 
 const prisma = new PrismaClient();
 
