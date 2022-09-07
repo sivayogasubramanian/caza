@@ -58,20 +58,18 @@ const companies: Prisma.CompanyCreateInput[] = [
                     {
                       type: 'APPLIED',
                       date: new Date(2022, 8, 1),
+                      emojiUnicodeHex: '1f628', // 😨
                     },
                     {
                       type: 'ONLINE_ASSESSMENT',
                       date: new Date(2022, 8, 7),
-                      reaction: {
-                        create: {
-                          emojiUnicodeHex: '1f604', // 😄
-                          remark: 'Passed all test cases!',
-                        },
-                      },
+                      emojiUnicodeHex: '1f604', // 😄
+                      remark: 'Passed all test cases!',
                     },
                     {
                       type: 'TECHNICAL',
                       date: new Date(2022, 8, 20),
+                      remark: 'Think it went well, was able to devise and implement optimal solution.',
                     },
                   ],
                 },
