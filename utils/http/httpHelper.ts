@@ -1,5 +1,5 @@
 import { NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessage } from '../../types/apiResponse';
+import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../types/apiResponse';
 
 export const HTTP_GET_METHOD = 'GET';
 export const HTTP_POST_METHOD = 'POST';
@@ -27,7 +27,9 @@ export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
  * @param method The HTTP method that is rejected.
  */
 export function rejectHttpMethod(res: NextApiResponse, method?: string) {
-  res.status(405).end(`HTTP method ${method} not allowed!`);
+  res
+    .status(405)
+    .json(createJsonResponse({}, [{ type: StatusMessageType.Error, message: `HTTP method ${method} not allowed!` }]));
 }
 
 export function createJsonResponse<D>(payload: D | EmptyPayload, messages?: StatusMessage[]): ApiResponse<D> {
