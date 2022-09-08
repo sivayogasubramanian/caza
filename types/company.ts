@@ -3,3 +3,8 @@ export type CompanyData = {
   name: string;
   companyUrl: string;
 };
+
+export type CompanyPostData = {
+  name: string;
+  companyUrl: string;
+};
