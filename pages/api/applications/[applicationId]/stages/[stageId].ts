@@ -27,6 +27,9 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
     case HttpMethod.PATCH:
       handlePatch(userId, req, res);
       break;
+    case HttpMethod.DELETE:
+      handleDelete(userId, req, res);
+      break;
     default:
       rejectHttpMethod(res, method);
   }
@@ -44,7 +47,7 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
 
   // Note: updateMany is used to allow filter on non-unique columns.
   // This allows a check to ensure users are only editing their own application stages.
-  const updatedData = await prisma.applicationStage.updateMany({
+  const { count } = await prisma.applicationStage.updateMany({
     where: {
       id: applicationStageId,
       application: {
@@ -59,7 +62,7 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
     },
   });
 
-  if (updatedData.count < 1) {
+  if (count < 1) {
     res.status(HttpStatus.BAD_REQUEST).end();
     return;
   }
@@ -79,6 +82,26 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
   });
 
   res.status(HttpStatus.OK).json(updatedApplicationStage);
+}
+
+async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse) {
+  const applicationStageId = Number(req.query.stageId);
+
+  const { count } = await prisma.applicationStage.deleteMany({
+    where: {
+      id: applicationStageId,
+      application: {
+        userId: userId,
+      },
+    },
+  });
+
+  if (count === 0) {
+    res.status(HttpStatus.UNAUTHORIZED).end();
+    return;
+  }
+
+  res.status(HttpStatus.OK).json({ message: `Application Stage ${applicationStageId} was deleted successfully.` });
 }
 
 function validateRequest(req: NextApiRequest, res: NextApiResponse) {
