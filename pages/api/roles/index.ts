@@ -3,23 +3,24 @@ import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
-import { withAuthUser } from '../../../utils/auth/jwtHelpers';
+import { withAuth } from '../../../utils/auth/jwtHelpers';
 import {
   createJsonResponse,
   HTTP_GET_METHOD,
   HTTP_POST_METHOD,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CREATED,
+  HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
   rejectHttpMethod,
-} from '../../../utils/http/httpHelper';
+} from '../../../utils/http/httpHelpers';
 import { createIfPossible } from '../../../utils/prisma/prismaHelpers';
 
 const prisma = new PrismaClient();
 
 enum MessageType {
   INVALID_COMPANY_ID,
-  COMPANY_DOES_NOT_EXISTS,
+  COMPANY_DOES_NOT_EXIST,
   EMPTY_TITLE,
   INVALID_TYPE,
   INVALID_YEAR,
@@ -27,12 +28,9 @@ enum MessageType {
 }
 
 const messages = new Map<MessageType, StatusMessage[]>([
+  [MessageType.INVALID_COMPANY_ID, [{ type: StatusMessageType.Error, message: 'Company id must be a number' }]],
   [
-    MessageType.INVALID_COMPANY_ID,
-    [{ type: StatusMessageType.Error, message: 'The company for this role is invalid.' }],
-  ],
-  [
-    MessageType.COMPANY_DOES_NOT_EXISTS,
+    MessageType.COMPANY_DOES_NOT_EXIST,
     [{ type: StatusMessageType.Error, message: 'The company for this role does not exists.' }],
   ],
   [MessageType.EMPTY_TITLE, [{ type: StatusMessageType.Error, message: 'Role title is empty.' }]],
@@ -63,6 +61,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
   const roles: RoleListData[] = await prisma.role.findMany({
+    where: {
+      isVerified: true,
+    },
     select: {
       id: true,
       title: true,
@@ -83,6 +84,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 
   const rolePostData: RolePostData = req.body;
 
+  const company = await prisma.company.findFirst({ where: { id: rolePostData.companyId } });
+
+  if (!company) {
+    res.status(HTTP_STATUS_NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.COMPANY_DOES_NOT_EXIST)));
+    return false;
+  }
+
   createIfPossible(res, async () => {
     const newRole: RoleData = await prisma.role.create({
       data: rolePostData,
@@ -98,13 +106,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): Promise<boolean> {
   if (typeof req.body.companyId !== 'number') {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_COMPANY_ID)));
-    return false;
-  }
-
-  const company = await prisma.company.findFirst({ where: { id: req.body.companyId } });
-
-  if (!company) {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.COMPANY_DOES_NOT_EXISTS)));
     return false;
   }
 
@@ -126,4 +127,4 @@ async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiRespo
   return true;
 }
 
-export default withAuthUser(handler);
+export default withAuth(handler);

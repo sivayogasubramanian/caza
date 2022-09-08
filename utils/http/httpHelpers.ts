@@ -34,7 +34,7 @@ export function rejectHttpMethod(res: NextApiResponse, method?: string) {
 
 export function createJsonResponse<D>(payload: D | EmptyPayload, messages?: StatusMessage[]): ApiResponse<D> {
   return {
-    payload,
+    payload: payload,
     messages: messages ?? [],
   };
 }

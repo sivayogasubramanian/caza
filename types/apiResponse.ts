@@ -1,8 +1,6 @@
 export enum StatusMessageType {
-  Error = 0,
-  Warning = 1,
-  Information = 2,
-  Success = 3,
+  Error = 'ERROR',
+  Success = 'SUCCESS',
 }
 
 export interface StatusMessage {
