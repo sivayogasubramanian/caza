@@ -28,21 +28,21 @@ enum MessageType {
 }
 
 const messages = new Map<MessageType, StatusMessage[]>([
-  [MessageType.EMPTY_TITLE, [{ type: StatusMessageType.Error, message: 'Task title is empty.' }]],
-  [MessageType.INVALID_DUE_DATE, [{ type: StatusMessageType.Error, message: 'Task due date is invalid.' }]],
+  [MessageType.EMPTY_TITLE, [{ type: StatusMessageType.ERROR, message: 'Task title is empty.' }]],
+  [MessageType.INVALID_DUE_DATE, [{ type: StatusMessageType.ERROR, message: 'Task due date is invalid.' }]],
   [
     MessageType.INVALID_NOTIFICATION_DATETIME,
-    [{ type: StatusMessageType.Error, message: 'Task notification date and time is invalid.' }],
+    [{ type: StatusMessageType.ERROR, message: 'Task notification date and time is invalid.' }],
   ],
   [
     MessageType.TASK_APPLICATION_NOT_FOUND,
-    [{ type: StatusMessageType.Error, message: 'Application for this task cannot be found.' }],
+    [{ type: StatusMessageType.ERROR, message: 'Application for this task cannot be found.' }],
   ],
   [
     MessageType.TASK_APPLICATION_DOES_NOT_BELONG_TO_USER,
-    [{ type: StatusMessageType.Error, message: 'Application for this task does not belong to you.' }],
+    [{ type: StatusMessageType.ERROR, message: 'Application for this task does not belong to you.' }],
   ],
-  [MessageType.TASK_CREATED_SUCCESSFULLY, [{ type: StatusMessageType.Success, message: 'Task created succesfully.' }]],
+  [MessageType.TASK_CREATED_SUCCESSFULLY, [{ type: StatusMessageType.SUCCESS, message: 'Task created succesfully.' }]],
 ]);
 
 function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {

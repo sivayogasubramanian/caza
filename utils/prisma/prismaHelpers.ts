@@ -17,7 +17,7 @@ export function createIfPossible(res: NextApiResponse, creator: () => Promise<vo
       res.status(HTTP_STATUS_BAD_REQUEST).json(
         createJsonResponse({}, [
           {
-            type: StatusMessageType.Error,
+            type: StatusMessageType.ERROR,
             message: 'A database error has occured due to the request. Please try again.',
           },
         ]),
@@ -30,7 +30,7 @@ export function createIfPossible(res: NextApiResponse, creator: () => Promise<vo
         .status(HTTP_STATUS_BAD_REQUEST)
         .json(
           createJsonResponse({}, [
-            { type: StatusMessageType.Error, message: 'Missing fields in request. Please try again.' },
+            { type: StatusMessageType.ERROR, message: 'Missing fields in request. Please try again.' },
           ]),
         );
       return;
@@ -40,7 +40,7 @@ export function createIfPossible(res: NextApiResponse, creator: () => Promise<vo
       .status(HTTP_STATUS_INTERNAL_SERVER_ERROR)
       .json(
         createJsonResponse({}, [
-          { type: StatusMessageType.Error, message: 'Something is wrong with the server. Please try again.' },
+          { type: StatusMessageType.ERROR, message: 'Something is wrong with the server. Please try again.' },
         ]),
       );
   });

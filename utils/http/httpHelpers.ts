@@ -31,7 +31,7 @@ export function rejectHttpMethod(res: NextApiResponse, method?: string) {
     .status(HTTP_STATUS_METHOD_NOT_ALLOWED)
     .json(
       createJsonResponse({}, [
-        { type: StatusMessageType.Error, message: `HTTP method ${method ? method + ' ' : ''}not allowed!` },
+        { type: StatusMessageType.ERROR, message: `HTTP method ${method ? method + ' ' : ''}not allowed!` },
       ]),
     );
 }

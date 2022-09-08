@@ -22,14 +22,14 @@ enum MessageType {
 }
 
 const messages = new Map<MessageType, StatusMessage[]>([
-  [MessageType.APPLICATION_NOT_FOUND, [{ type: StatusMessageType.Error, message: 'Application cannot be found.' }]],
+  [MessageType.APPLICATION_NOT_FOUND, [{ type: StatusMessageType.ERROR, message: 'Application cannot be found.' }]],
   [
     MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER,
-    [{ type: StatusMessageType.Error, message: 'Application does not belong to you.' }],
+    [{ type: StatusMessageType.ERROR, message: 'Application does not belong to you.' }],
   ],
   [
     MessageType.APPLICATION_DELETED_SUCCESSFULLY,
-    [{ type: StatusMessageType.Success, message: 'Application was deleted successfully.' }],
+    [{ type: StatusMessageType.SUCCESS, message: 'Application was deleted successfully.' }],
   ],
 ]);
 
