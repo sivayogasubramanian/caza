@@ -3,7 +3,7 @@ import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
-import { withAnyUser, withAuthUser } from '../../../utils/auth/jwtHelpers';
+import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import {
   createJsonResponse,
   HTTP_GET_METHOD,
