@@ -85,6 +85,8 @@ export function withVerifiedUser<T>(
 
 /**
  * Utility function that takes care of authenticating any user (anonymous / verified).
+ * The user's UID is not returned to the handler.
+ * Use withAuthUser instead if you need the UID.
  *
  * Only calls the provided handler if the user has been successfully authenticated. Returns a 401 Unauthorized response
  * if requirements are not met.
@@ -95,17 +97,7 @@ export function withVerifiedUser<T>(
 export function withAuth<T>(
   handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => void,
 ): NextApiHandler<ApiResponse<T | EmptyPayload>> {
-  return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => {
-    try {
-      await getUserFromJwt(getBearerToken(req));
-    } catch (e) {
-      return res
-        .status(HTTP_STATUS_UNAUTHORIZED)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.Error, message: UNABLE_TO_AUTHENTICATE }]));
-    }
-
-    return handler(req, res);
-  };
+  return withAuthUser((_, req, res) => handler(req, res));
 }
 
 async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
