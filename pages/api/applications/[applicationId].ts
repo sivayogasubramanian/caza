@@ -1,13 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
 import { withVerifiedUser } from '../../../utils/auth/jwtHelpers';
 import {
   HTTP_DELETE_METHOD,
   HTTP_GET_METHOD,
   HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_NO_CONTENT,
   HTTP_STATUS_OK,
+  HTTP_STATUS_UNAUTHORIZED,
 } from '../../../utils/http/httpHelper';
 import { rejectHttpMethodsNotIn } from '../../../utils/http/rejectHttpMethodsNotIn';
 
@@ -28,9 +29,7 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// TODO: Return better error messages
-
-async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApplicationData>) {
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
   const applicationId = Number(req.query.applicationId);
 
   const application: ApplicationData | null = await prisma.application.findFirst({
@@ -65,26 +64,44 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
   });
 
   if (!application) {
-    res.status(HTTP_STATUS_NOT_FOUND).end();
+    const response: ApiResponse<ApplicationData> = {
+      payload: {},
+      messages: [{ type: StatusMessageType.Error, message: `Application ${applicationId} was not found.` }],
+    };
+
+    res.status(HTTP_STATUS_NOT_FOUND).json(response);
     return;
   }
 
-  res.status(HTTP_STATUS_OK).json(application);
+  const response: ApiResponse<ApplicationData> = {
+    payload: application,
+    messages: [],
+  };
+
+  res.status(HTTP_STATUS_OK).json(response);
 }
 
-// TODO: Return better error messages
-
-async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   const applicationId = Number(req.query.applicationId);
 
   const { count } = await prisma.application.deleteMany({ where: { id: applicationId, userId } });
 
   if (count === 0) {
-    res.status(HTTP_STATUS_NOT_FOUND).end();
+    const response: ApiResponse<EmptyPayload> = {
+      payload: {},
+      messages: [{ type: StatusMessageType.Error, message: `Application ${applicationId} does not belong to you.` }],
+    };
+
+    res.status(HTTP_STATUS_UNAUTHORIZED).json(response);
     return;
   }
 
-  res.status(HTTP_STATUS_NO_CONTENT).end();
+  const response: ApiResponse<EmptyPayload> = {
+    payload: {},
+    messages: [{ type: StatusMessageType.Success, message: `Application ${applicationId} was deleted successfully.` }],
+  };
+
+  res.status(HTTP_STATUS_OK).json(response);
 }
 
 export default withVerifiedUser(handler);
