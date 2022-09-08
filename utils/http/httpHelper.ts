@@ -1,3 +1,6 @@
+import { NextApiResponse } from 'next';
+import { ApiResponse, EmptyPayload, StatusMessage } from '../../types/apiResponse';
+
 export const HTTP_GET_METHOD = 'GET';
 export const HTTP_POST_METHOD = 'POST';
 export const HTTP_PUT_METHOD = 'PUT';
@@ -16,3 +19,20 @@ export const HTTP_STATUS_NOT_FOUND = 404;
 export const HTTP_STATUS_METHOD_NOT_ALLOWED = 405;
 export const HTTP_STATUS_CONFLICT = 409;
 export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
+
+/**
+ * Utility function that rejects all responses not in allowed methods with a 405 HTTP response.
+ *
+ * @param res The NextApiResponse object.
+ * @param method The HTTP method that is rejected.
+ */
+export function rejectHttpMethod(res: NextApiResponse, method?: string) {
+  res.status(405).end(`HTTP method ${method} not allowed!`);
+}
+
+export function createJsonResponse<D>(payload: D | EmptyPayload, messages?: StatusMessage[]): ApiResponse<D> {
+  return {
+    payload,
+    messages: messages ?? [],
+  };
+}
