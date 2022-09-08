@@ -84,7 +84,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 
   const rolePostData: RolePostData = req.body;
 
-  const company = await prisma.company.findFirst({ where: { id: rolePostData.companyId } });
+  const company = await prisma.company.findUnique({ where: { id: rolePostData.companyId } });
 
   if (!company) {
     res.status(HTTP_STATUS_NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.COMPANY_DOES_NOT_EXIST)));
@@ -114,7 +114,7 @@ async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiRespo
     return false;
   }
 
-  if (isEmpty(req.body.type) || !Object.values(RoleType).includes(req.body.type)) {
+  if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_TYPE)));
     return false;
   }

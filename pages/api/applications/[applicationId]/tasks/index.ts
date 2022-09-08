@@ -63,7 +63,7 @@ async function handlePost(
   res: NextApiResponse<ApiResponse<TaskData | EmptyPayload>>,
 ) {
   const applicationId = Number(req.query.applicationId);
-  const application = await prisma.application.findFirst({ where: { id: applicationId } });
+  const application = await prisma.application.findUnique({ where: { id: applicationId } });
 
   if (!application) {
     res
