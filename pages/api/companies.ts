@@ -36,7 +36,7 @@ function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
       handlePost(req, res);
       break;
     default:
-      rejectHttpMethodsNotIn(res, HTTP_POST_METHOD);
+      rejectHttpMethodsNotIn(res, HTTP_GET_METHOD, HTTP_POST_METHOD);
   }
 }
 
