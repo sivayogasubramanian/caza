@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
-import { withVerifiedUser } from '../../../utils/auth/jwtHelpers';
+import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import {
   createJsonResponse,
   HTTP_DELETE_METHOD,
@@ -11,7 +11,7 @@ import {
   HTTP_STATUS_OK,
   HTTP_STATUS_UNAUTHORIZED,
   rejectHttpMethod,
-} from '../../../utils/http/httpHelper';
+} from '../../../utils/http/httpHelpers';
 
 const prisma = new PrismaClient();
 
@@ -58,7 +58,7 @@ async function handleGet(
   const application: ApplicationData | null = await prisma.application.findFirst({
     where: {
       id: applicationId,
-      userId,
+      userId: userId,
     },
     select: {
       id: true,
@@ -109,4 +109,4 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   res.status(HTTP_STATUS_OK).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
 }
 
-export default withVerifiedUser(handler);
+export default withAuthUser(handler);
