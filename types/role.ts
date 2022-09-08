@@ -15,4 +15,4 @@ export type RoleData = {
   year: number;
 };
 
-export type RoleListData = (RoleData & { company: CompanyData; isVerified: boolean })[];
+export type RoleListData = RoleData & { company: CompanyData; isVerified: boolean };
