@@ -1,18 +1,37 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
+import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
 import { withVerifiedUser } from '../../../utils/auth/jwtHelpers';
 import {
+  createJsonResponse,
   HTTP_DELETE_METHOD,
   HTTP_GET_METHOD,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
   HTTP_STATUS_UNAUTHORIZED,
+  rejectHttpMethod,
 } from '../../../utils/http/httpHelper';
-import { rejectHttpMethodsNotIn } from '../../../utils/http/rejectHttpMethodsNotIn';
 
 const prisma = new PrismaClient();
+
+enum MessageType {
+  APPLICATION_NOT_FOUND,
+  APPLICATION_DOES_NOT_BELONG_TO_USER,
+  APPLICATION_DELETED_SUCCESSFULLY,
+}
+
+const messages = new Map<MessageType, StatusMessage[]>([
+  [MessageType.APPLICATION_NOT_FOUND, [{ type: StatusMessageType.Error, message: 'Application cannot be found.' }]],
+  [
+    MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER,
+    [{ type: StatusMessageType.Error, message: 'Application does not belong to you.' }],
+  ],
+  [
+    MessageType.APPLICATION_DELETED_SUCCESSFULLY,
+    [{ type: StatusMessageType.Success, message: 'Application was deleted successfully.' }],
+  ],
+]);
 
 function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
@@ -25,11 +44,15 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
       handleDelete(userId, req, res);
       break;
     default:
-      rejectHttpMethodsNotIn(res, HTTP_GET_METHOD, HTTP_DELETE_METHOD);
+      rejectHttpMethod(res, method);
   }
 }
 
-async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
+async function handleGet(
+  userId: string,
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<ApplicationData | EmptyPayload>>,
+) {
   const applicationId = Number(req.query.applicationId);
 
   const application: ApplicationData | null = await prisma.application.findFirst({
@@ -64,21 +87,13 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
   });
 
   if (!application) {
-    const response: ApiResponse<ApplicationData> = {
-      payload: {},
-      messages: [{ type: StatusMessageType.Error, message: `Application ${applicationId} was not found.` }],
-    };
-
-    res.status(HTTP_STATUS_NOT_FOUND).json(response);
+    res
+      .status(HTTP_STATUS_NOT_FOUND)
+      .json(createJsonResponse<EmptyPayload>({}, messages.get(MessageType.APPLICATION_NOT_FOUND)));
     return;
   }
 
-  const response: ApiResponse<ApplicationData> = {
-    payload: application,
-    messages: [],
-  };
-
-  res.status(HTTP_STATUS_OK).json(response);
+  res.status(HTTP_STATUS_OK).json(createJsonResponse<ApplicationData>(application));
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
@@ -87,21 +102,15 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   const { count } = await prisma.application.deleteMany({ where: { id: applicationId, userId } });
 
   if (count === 0) {
-    const response: ApiResponse<EmptyPayload> = {
-      payload: {},
-      messages: [{ type: StatusMessageType.Error, message: `Application ${applicationId} does not belong to you.` }],
-    };
-
-    res.status(HTTP_STATUS_UNAUTHORIZED).json(response);
+    res
+      .status(HTTP_STATUS_UNAUTHORIZED)
+      .json(createJsonResponse<EmptyPayload>({}, messages.get(MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER)));
     return;
   }
 
-  const response: ApiResponse<EmptyPayload> = {
-    payload: {},
-    messages: [{ type: StatusMessageType.Success, message: `Application ${applicationId} was deleted successfully.` }],
-  };
-
-  res.status(HTTP_STATUS_OK).json(response);
+  res
+    .status(HTTP_STATUS_OK)
+    .json(createJsonResponse<EmptyPayload>({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
 }
 
 export default withVerifiedUser(handler);
