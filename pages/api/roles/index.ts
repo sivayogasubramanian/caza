@@ -3,7 +3,7 @@ import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
-import { withAnyUser } from '../../../utils/auth/jwtHelpers';
+import { withAnyUser, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import {
   createJsonResponse,
   HTTP_GET_METHOD,
@@ -13,7 +13,7 @@ import {
   HTTP_STATUS_OK,
   rejectHttpMethod,
 } from '../../../utils/http/httpHelper';
-import { createIfPossible } from '../../../utils/prisma/createIfPossible';
+import { createIfPossible } from '../../../utils/prisma/prismaHelpers';
 
 const prisma = new PrismaClient();
 
@@ -44,7 +44,7 @@ const messages = new Map<MessageType, StatusMessage[]>([
   ],
 ]);
 
-function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
+function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
@@ -126,4 +126,4 @@ async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiRespo
   return true;
 }
 
-export default withAnyUser(handler);
+export default withAuthUser(handler);

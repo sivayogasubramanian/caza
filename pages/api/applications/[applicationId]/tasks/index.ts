@@ -13,7 +13,7 @@ import {
   HTTP_STATUS_NOT_FOUND,
   rejectHttpMethod,
 } from '../../../../../utils/http/httpHelper';
-import { createIfPossible } from '../../../../../utils/prisma/createIfPossible';
+import { createIfPossible } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
