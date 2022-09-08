@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { TaskPostData } from '../../../../../types/task';
+import { TaskData, TaskPostData } from '../../../../../types/task';
 import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
 import {
-  HTTP_DELETE_METHOD,
+  HTTP_POST_METHOD,
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_NOT_FOUND,
@@ -17,17 +17,17 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
-    case 'POST':
+    case HTTP_POST_METHOD:
       handlePost(userId, req, res);
       break;
     default:
-      rejectHttpMethodsNotIn(res, HTTP_DELETE_METHOD);
+      rejectHttpMethodsNotIn(res, HTTP_POST_METHOD);
   }
 }
 
 // TODO: Return better error messages
 
-async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<TaskData>) {
   const applicationId = Number(req.query.applicationId);
   const taskPostData: TaskPostData = req.body;
 
@@ -50,8 +50,8 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
       data: {
         applicationId,
         ...taskPostData,
-        dueDate: new Date(taskPostData.dueDate),
-        notificationDateTime: new Date(taskPostData.notificationDateTime),
+        dueDate: taskPostData.dueDate,
+        notificationDateTime: taskPostData.notificationDateTime,
       },
       select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
     });

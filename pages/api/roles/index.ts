@@ -12,10 +12,10 @@ function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
-    case 'GET':
+    case HTTP_GET_METHOD:
       handleGet(req, res);
       break;
-    case 'POST':
+    case HTTP_POST_METHOD:
       handlePost(req, res);
       break;
     default:
@@ -26,7 +26,7 @@ function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
 // TODO: Return better error messages
 // TODO: Optional Search query
 
-async function handleGet(_: NextApiRequest, res: NextApiResponse) {
+async function handleGet(_: NextApiRequest, res: NextApiResponse<RoleListData>) {
   const roles: RoleListData = await prisma.role.findMany({
     select: {
       id: true,
@@ -43,7 +43,7 @@ async function handleGet(_: NextApiRequest, res: NextApiResponse) {
 
 // TODO: Return better error messages
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse<RoleData>) {
   const rolePostData: RolePostData = req.body;
 
   createIfPossible(res, async () => {

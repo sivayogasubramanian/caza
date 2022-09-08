@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { ApplicationData } from '../../../types/application';
 import { withVerifiedUser } from '../../../utils/auth/jwtHelpers';
 import {
   HTTP_DELETE_METHOD,
@@ -16,10 +17,10 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
-    case 'GET':
+    case HTTP_GET_METHOD:
       handleGet(userId, req, res);
       break;
-    case 'DELETE':
+    case HTTP_DELETE_METHOD:
       handleDelete(userId, req, res);
       break;
     default:
@@ -29,10 +30,10 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
 
 // TODO: Return better error messages
 
-async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApplicationData>) {
   const applicationId = Number(req.query.applicationId);
 
-  const userApplication = await prisma.application.findFirst({
+  const application: ApplicationData | null = await prisma.application.findFirst({
     where: {
       id: applicationId,
       userId,
@@ -58,17 +59,17 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
         },
       },
       tasks: {
-        select: { id: true, dueDate: true, notificationDateTime: true, isDone: true },
+        select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
       },
     },
   });
 
-  if (!userApplication) {
+  if (!application) {
     res.status(HTTP_STATUS_NOT_FOUND).end();
     return;
   }
 
-  res.status(HTTP_STATUS_OK).json(userApplication);
+  res.status(HTTP_STATUS_OK).json(application);
 }
 
 // TODO: Return better error messages
