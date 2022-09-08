@@ -1,12 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {
+  HTTP_GET_METHOD,
   HTTP_POST_METHOD,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_CREATED,
+  HTTP_STATUS_OK,
   rejectHttpMethodsNotIn,
 } from '../../utils/http/httpHelpers';
-import { CompanyPostData } from '../../types/company';
+import { CompanyListData, CompanyPostData } from '../../types/company';
 import { isEmpty, isValidUrl } from '../../utils/strings/validations';
 import { ErrorData } from '../../types/error';
 import { withAnyUser } from '../../utils/auth/jwtHelpers';
@@ -24,18 +26,29 @@ const errorMessages = new Map<ErrorType, ErrorData>([
   [ErrorType.INVALID_URL, { message: 'Company url is invalid.' }],
 ]);
 
-function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
+function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   switch (method) {
+    case HTTP_GET_METHOD:
+      handleGet(req, res);
+      break;
     case HTTP_POST_METHOD:
-      handlePost(userId, req, res);
+      handlePost(req, res);
       break;
     default:
       rejectHttpMethodsNotIn(res, HTTP_POST_METHOD);
   }
 }
 
-async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+  const companies: CompanyListData[] = await prisma.company.findMany({
+    where: { isVerified: true },
+    select: { id: true, name: true, companyUrl: true },
+  });
+  res.status(HTTP_STATUS_OK).json(companies);
+}
+
+async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const companyPostData: CompanyPostData = req.body;
 
   if (isEmpty(companyPostData.name)) {
