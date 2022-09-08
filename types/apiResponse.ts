@@ -7,11 +7,11 @@ export enum StatusMessageType {
 
 export interface StatusMessage {
   type: StatusMessageType;
-  content: string;
+  message: string;
 }
 
 export interface ApiResponse<T> {
-  payload: T;
+  payload: T | EmptyPayload;
   messages: StatusMessage[];
 }
 
