@@ -58,7 +58,7 @@ async function handleGet(
   const application: ApplicationData | null = await prisma.application.findFirst({
     where: {
       id: applicationId,
-      userId: userId,
+      userId,
     },
     select: {
       id: true,
@@ -97,6 +97,7 @@ async function handleGet(
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   const applicationId = Number(req.query.applicationId);
 
+  // As applicationId is a primary key, count will only match 0 or 1. This is effectively 'delete if exists' behavior.
   const { count } = await prisma.application.deleteMany({ where: { id: applicationId, userId } });
 
   if (count === 0) {

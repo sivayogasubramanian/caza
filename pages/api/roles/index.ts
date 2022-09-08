@@ -1,4 +1,3 @@
-import { isEmpty } from '@firebase/util';
 import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
@@ -15,6 +14,7 @@ import {
   rejectHttpMethod,
 } from '../../../utils/http/httpHelpers';
 import { createIfPossible } from '../../../utils/prisma/prismaHelpers';
+import { isEmpty } from '../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
 
