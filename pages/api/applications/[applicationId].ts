@@ -87,13 +87,11 @@ async function handleGet(
   });
 
   if (!application) {
-    res
-      .status(HTTP_STATUS_NOT_FOUND)
-      .json(createJsonResponse<EmptyPayload>({}, messages.get(MessageType.APPLICATION_NOT_FOUND)));
+    res.status(HTTP_STATUS_NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_NOT_FOUND)));
     return;
   }
 
-  res.status(HTTP_STATUS_OK).json(createJsonResponse<ApplicationData>(application));
+  res.status(HTTP_STATUS_OK).json(createJsonResponse(application));
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
@@ -104,13 +102,11 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   if (count === 0) {
     res
       .status(HTTP_STATUS_UNAUTHORIZED)
-      .json(createJsonResponse<EmptyPayload>({}, messages.get(MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER)));
+      .json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER)));
     return;
   }
 
-  res
-    .status(HTTP_STATUS_OK)
-    .json(createJsonResponse<EmptyPayload>({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
+  res.status(HTTP_STATUS_OK).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
 }
 
 export default withVerifiedUser(handler);
