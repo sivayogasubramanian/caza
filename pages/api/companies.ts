@@ -45,6 +45,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     where: { isVerified: true },
     select: { id: true, name: true, companyUrl: true },
   });
+
   res.status(HTTP_STATUS_OK).json(companies);
 }
 
@@ -52,11 +53,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const companyPostData: CompanyPostData = req.body;
 
   if (isEmpty(companyPostData.name)) {
-    return res.status(HTTP_STATUS_BAD_REQUEST).json(errorMessages.get(ErrorType.EMPTY_NAME));
+    res.status(HTTP_STATUS_BAD_REQUEST).json(errorMessages.get(ErrorType.EMPTY_NAME));
+    return;
   }
 
   if (!isValidUrl(companyPostData.companyUrl)) {
-    return res.status(HTTP_STATUS_BAD_REQUEST).json(errorMessages.get(ErrorType.INVALID_URL));
+    res.status(HTTP_STATUS_BAD_REQUEST).json(errorMessages.get(ErrorType.INVALID_URL));
+    return;
   }
 
   const newCompany = await prisma.company.create({
