@@ -12,3 +12,8 @@ export function isValidUrl(value: string) {
 
   return patternWithProtocol.test(value) || patternWithoutProtocol.test(value);
 }
+
+export function isValidHex(value: string) {
+  const number = parseInt(value, 16);
+  return number.toString(16) === value.toLowerCase();
+}
