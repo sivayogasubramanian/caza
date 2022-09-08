@@ -62,7 +62,9 @@ async function handlePost(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<TaskData | EmptyPayload>>,
 ) {
-  validateRequest(req, res);
+  if (!isValidRequest(req, res)) {
+    return;
+  }
 
   const taskPostData: TaskPostData = {
     ...req.body,
@@ -102,23 +104,25 @@ async function handlePost(
   });
 }
 
-function validateRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): boolean {
   if (isEmpty(req.body.title)) {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.EMPTY_TITLE)));
-    return;
+    return false;
   }
 
   if (!isValidDate(req.body.dueDate)) {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_DUE_DATE)));
-    return;
+    return false;
   }
 
   if (req.body.notificationDateTime && !isValidDate(req.body.notificationDateTime)) {
     res
       .status(HTTP_STATUS_BAD_REQUEST)
       .json(createJsonResponse({}, messages.get(MessageType.INVALID_NOTIFICATION_DATETIME)));
-    return;
+    return false;
   }
+
+  return true;
 }
 
 export default withVerifiedUser(handler);
