@@ -43,7 +43,7 @@ export function withAuthUser<T>(
     } catch (e) {
       return res
         .status(HTTP_STATUS_UNAUTHORIZED)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.Error, message: UNABLE_TO_AUTHENTICATE }]));
+        .json(createJsonResponse({}, [{ type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }]));
     }
 
     return handler(userDetails.uid, req, res);
@@ -69,14 +69,14 @@ export function withVerifiedUser<T>(
     } catch (e) {
       return res
         .status(HTTP_STATUS_UNAUTHORIZED)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.Error, message: UNABLE_TO_AUTHENTICATE }]));
+        .json(createJsonResponse({}, [{ type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }]));
     }
 
     const { uid, isAnonymous } = userDetails;
     if (isAnonymous) {
       return res
         .status(HTTP_STATUS_FORBIDDEN)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.Error, message: USER_NOT_AUTHORIZED }]));
+        .json(createJsonResponse({}, [{ type: StatusMessageType.ERROR, message: USER_NOT_AUTHORIZED }]));
     }
 
     return handler(uid, req, res);

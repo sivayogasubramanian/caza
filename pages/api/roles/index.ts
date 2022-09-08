@@ -28,17 +28,17 @@ enum MessageType {
 }
 
 const messages = new Map<MessageType, StatusMessage[]>([
-  [MessageType.INVALID_COMPANY_ID, [{ type: StatusMessageType.Error, message: 'Company id must be a number' }]],
+  [MessageType.INVALID_COMPANY_ID, [{ type: StatusMessageType.ERROR, message: 'Company id must be a number' }]],
   [
     MessageType.COMPANY_DOES_NOT_EXIST,
-    [{ type: StatusMessageType.Error, message: 'The company for this role does not exists.' }],
+    [{ type: StatusMessageType.ERROR, message: 'The company for this role does not exists.' }],
   ],
-  [MessageType.EMPTY_TITLE, [{ type: StatusMessageType.Error, message: 'Role title is empty.' }]],
-  [MessageType.INVALID_TYPE, [{ type: StatusMessageType.Error, message: 'Role type is invalid.' }]],
-  [MessageType.INVALID_YEAR, [{ type: StatusMessageType.Error, message: 'Role year is invalid.' }]],
+  [MessageType.EMPTY_TITLE, [{ type: StatusMessageType.ERROR, message: 'Role title is empty.' }]],
+  [MessageType.INVALID_TYPE, [{ type: StatusMessageType.ERROR, message: 'Role type is invalid.' }]],
+  [MessageType.INVALID_YEAR, [{ type: StatusMessageType.ERROR, message: 'Role year is invalid.' }]],
   [
     MessageType.ROLE_CREATED_SUCCESSFULLY,
-    [{ type: StatusMessageType.Success, message: 'Role was created succesfully.' }],
+    [{ type: StatusMessageType.SUCCESS, message: 'Role was created succesfully.' }],
   ],
 ]);
 
