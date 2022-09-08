@@ -28,13 +28,17 @@ export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
  */
 export function rejectHttpMethod(res: NextApiResponse, method?: string) {
   res
-    .status(405)
-    .json(createJsonResponse({}, [{ type: StatusMessageType.Error, message: `HTTP method ${method} not allowed!` }]));
+    .status(HTTP_STATUS_METHOD_NOT_ALLOWED)
+    .json(
+      createJsonResponse({}, [
+        { type: StatusMessageType.Error, message: `HTTP method ${method ? method + ' ' : ''}not allowed!` },
+      ]),
+    );
 }
 
 export function createJsonResponse<D>(payload: D | EmptyPayload, messages?: StatusMessage[]): ApiResponse<D> {
   return {
-    payload: payload,
+    payload,
     messages: messages ?? [],
   };
 }
