@@ -7,8 +7,8 @@ import {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_NOT_FOUND,
+  rejectHttpMethod,
 } from '../../../../../utils/http/httpHelper';
-import { rejectHttpMethodsNotIn } from '../../../../../utils/http/rejectHttpMethodsNotIn';
 import { createIfPossible } from '../../../../../utils/prisma/createIfPossible';
 
 const prisma = new PrismaClient();
@@ -21,7 +21,7 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
       handlePost(userId, req, res);
       break;
     default:
-      rejectHttpMethodsNotIn(res, HTTP_POST_METHOD);
+      rejectHttpMethod(res, method);
   }
 }
 
