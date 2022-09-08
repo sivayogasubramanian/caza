@@ -39,6 +39,7 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
   validateRequest(req, res);
 
   const applicationStageId = Number(req.query.stageId);
+  const applicationId = Number(req.query.applicationId);
 
   const applicationStagePatchData: ApplicationStagePatchData = {
     ...req.body,
@@ -51,6 +52,7 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
     where: {
       id: applicationStageId,
       application: {
+        id: applicationId,
         userId: userId,
       },
     },
@@ -86,11 +88,13 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const applicationStageId = Number(req.query.stageId);
+  const applicationId = Number(req.query.applicationId);
 
   const { count } = await prisma.applicationStage.deleteMany({
     where: {
       id: applicationStageId,
       application: {
+        id: applicationId,
         userId: userId,
       },
     },
