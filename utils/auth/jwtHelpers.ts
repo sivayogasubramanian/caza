@@ -75,6 +75,27 @@ export function withVerifiedUser<T>(
   };
 }
 
+/**
+ * Utility function that takes care of authenticating any user (anonymous / verified).
+ *
+ * Only calls the provided handler if the user has been successfully authenticated. Returns a 401 Unauthorized response
+ * if requirements are not met.
+ *
+ * @param handler Takes in an API handler function that needs an authenticated user.
+ * @returns NextApiHandler function.
+ */
+export function withAuthUser<T>(handler: (req: NextApiRequest, res: NextApiResponse<T>) => void): NextApiHandler<T> {
+  return async (req: NextApiRequest, res: NextApiResponse<T>) => {
+    try {
+      await getUserFromJwt(getBearerToken(req));
+    } catch (e) {
+      return res.status(401).end(UNABLE_TO_AUTHENTICATE);
+    }
+
+    return handler(req, res);
+  };
+}
+
 export async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
   // If you are running this in development mode, JWT token verification and decoding can be skipped.
   // Use bearer token 'devUserFoo' to get { uid: 'devUserFoo', isAnonymous: true }
