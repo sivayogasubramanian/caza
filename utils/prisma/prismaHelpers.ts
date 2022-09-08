@@ -4,7 +4,7 @@ import { StatusMessageType } from '../../types/apiResponse';
 import { createJsonResponse, HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_INTERNAL_SERVER_ERROR } from '../http/httpHelper';
 
 /**
- * Utility function that takes care of missing fields in JSON POST Requests.
+ * Utility function that takes care of Prisma runtime errors during CREATE.
  *
  * @param res The NextApiResponse object.
  * @param creator The Prisma Creator function.
