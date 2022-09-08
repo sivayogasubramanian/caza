@@ -1,7 +1,7 @@
 import { isEmpty } from '@firebase/util';
 import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
+import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
 import { withAnyUser } from '../../../utils/auth/jwtHelpers';
 import {
@@ -23,6 +23,7 @@ enum MessageType {
   EMPTY_TITLE,
   INVALID_TYPE,
   INVALID_YEAR,
+  ROLE_CREATED_SUCCESSFULLY,
 }
 
 const messages = new Map<MessageType, StatusMessage[]>([
@@ -37,6 +38,10 @@ const messages = new Map<MessageType, StatusMessage[]>([
   [MessageType.EMPTY_TITLE, [{ type: StatusMessageType.Error, message: 'Role title is empty.' }]],
   [MessageType.INVALID_TYPE, [{ type: StatusMessageType.Error, message: 'Role type is invalid.' }]],
   [MessageType.INVALID_YEAR, [{ type: StatusMessageType.Error, message: 'Role year is invalid.' }]],
+  [
+    MessageType.ROLE_CREATED_SUCCESSFULLY,
+    [{ type: StatusMessageType.Success, message: 'Role was created succesfully.' }],
+  ],
 ]);
 
 function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
@@ -72,7 +77,9 @@ async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData | EmptyPayload>>) {
-  validateRequest(req, res);
+  if (!(await isValidRequest(req, res))) {
+    return;
+  }
 
   const rolePostData: RolePostData = req.body;
 
@@ -82,37 +89,41 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
       select: { id: true, title: true, type: true, year: true },
     });
 
-    res.status(HTTP_STATUS_CREATED).json(createJsonResponse(newRole));
+    res
+      .status(HTTP_STATUS_CREATED)
+      .json(createJsonResponse(newRole, messages.get(MessageType.ROLE_CREATED_SUCCESSFULLY)));
   });
 }
 
-async function validateRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): Promise<boolean> {
   if (typeof req.body.companyId !== 'number') {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_COMPANY_ID)));
-    return;
+    return false;
   }
 
   const company = await prisma.company.findFirst({ where: { id: req.body.companyId } });
 
   if (!company) {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.COMPANY_DOES_NOT_EXISTS)));
-    return;
+    return false;
   }
 
   if (isEmpty(req.body.title)) {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.EMPTY_TITLE)));
-    return;
+    return false;
   }
 
   if (isEmpty(req.body.type) || !Object.values(RoleType).includes(req.body.type)) {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_TYPE)));
-    return;
+    return false;
   }
 
   if (typeof req.body.year !== 'number') {
     res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_YEAR)));
-    return;
+    return false;
   }
+
+  return true;
 }
 
 export default withAnyUser(handler);

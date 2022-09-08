@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { NextApiResponse } from 'next';
-import { EmptyPayload, StatusMessageType } from '../../types/apiResponse';
+import { StatusMessageType } from '../../types/apiResponse';
 import { createJsonResponse, HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_INTERNAL_SERVER_ERROR } from '../http/httpHelper';
 
 /**
