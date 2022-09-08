@@ -1,8 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { NextApiResponse } from 'next';
-import { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_INTERNAL_SERVER_ERROR } from '../http/httpHelper';
-
-// TODO: Find if there is a better way to do this.
+import { EmptyPayload, StatusMessageType } from '../../types/apiResponse';
+import { createJsonResponse, HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_INTERNAL_SERVER_ERROR } from '../http/httpHelper';
 
 /**
  * Utility function that takes care of missing fields in JSON POST Requests.
@@ -12,13 +11,37 @@ import { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_INTERNAL_SERVER_ERROR } from '../h
  */
 export function createIfPossible(res: NextApiResponse, creator: () => Promise<void>) {
   creator().catch((error) => {
-    console.log(error);
+    console.error(error);
 
-    if (error instanceof Prisma.PrismaClientValidationError) {
-      res.status(HTTP_STATUS_BAD_REQUEST).end();
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      res.status(HTTP_STATUS_BAD_REQUEST).json(
+        createJsonResponse({}, [
+          {
+            type: StatusMessageType.Error,
+            message: 'A database error has occured due to the request. Please try again.',
+          },
+        ]),
+      );
       return;
     }
 
-    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).end();
+    if (error instanceof Prisma.PrismaClientValidationError) {
+      res
+        .status(HTTP_STATUS_BAD_REQUEST)
+        .json(
+          createJsonResponse({}, [
+            { type: StatusMessageType.Error, message: 'Missing fields in request. Please try again.' },
+          ]),
+        );
+      return;
+    }
+
+    res
+      .status(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      .json(
+        createJsonResponse({}, [
+          { type: StatusMessageType.Error, message: 'Something is wrong with the server. Please try again.' },
+        ]),
+      );
   });
 }
