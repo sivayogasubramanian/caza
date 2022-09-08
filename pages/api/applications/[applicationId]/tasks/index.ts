@@ -42,7 +42,7 @@ const messages = new Map<MessageType, StatusMessage[]>([
     MessageType.TASK_APPLICATION_DOES_NOT_BELONG_TO_USER,
     [{ type: StatusMessageType.Error, message: 'Application for this task does not belong to you.' }],
   ],
-  [MessageType.TASK_CREATE_SUCCESSFULLY, [{ type: StatusMessageType.Error, message: 'Task created succesfully.' }]],
+  [MessageType.TASK_CREATE_SUCCESSFULLY, [{ type: StatusMessageType.Success, message: 'Task created succesfully.' }]],
 ]);
 
 function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
