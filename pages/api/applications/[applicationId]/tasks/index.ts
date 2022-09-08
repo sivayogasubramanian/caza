@@ -115,7 +115,10 @@ function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<Em
     return false;
   }
 
-  if (req.body.notificationDateTime !== undefined && !isValidDate(req.body.notificationDateTime)) {
+  if (
+    (req.body.notification || req.body.notificationDateTime !== undefined) &&
+    !isValidDate(req.body.notificationDateTime)
+  ) {
     res
       .status(HTTP_STATUS_BAD_REQUEST)
       .json(createJsonResponse({}, messages.get(MessageType.INVALID_NOTIFICATION_DATETIME)));
