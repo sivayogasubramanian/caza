@@ -15,6 +15,8 @@ export type RoleData = {
   year: number;
 };
 
+export type RoleApplicationListData = RoleData & { company: CompanyData };
+
 export type RoleListData = RoleData & { company: CompanyData; isVerified: boolean };
 
 export type RoleQueryParams = {

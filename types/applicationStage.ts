@@ -17,3 +17,10 @@ export type ApplicationStagePatchData = {
   emojiUnicodeHex?: Nullable<string>;
   remark?: Nullable<string>;
 };
+
+export type ApplicationStageApplicationListData = {
+  id: number;
+  type: ApplicationStageType;
+  date: Date;
+  emojiUnicodeHex: string | null;
+};

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApplicationPostData } from '../../../types/applications';
+import { ApplicationListData, ApplicationPostData } from '../../../types/application';
 import { PrismaClient } from '@prisma/client';
 import { ErrorData } from '../../../types/error';
 import { HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
@@ -18,12 +18,74 @@ const errorMessages = new Map<ErrorType, ErrorData>([
 function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   switch (method) {
+    case HttpMethod.GET:
+      handleGet(userId, req, res);
+      break;
     case HttpMethod.POST:
       handlePost(userId, req, res);
       break;
     default:
       rejectHttpMethod(res, method);
   }
+}
+
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse) {
+  const queriedApplications = await prisma.application.findMany({
+    where: {
+      userId: userId,
+    },
+    select: {
+      id: true,
+      role: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          year: true,
+          company: {
+            select: {
+              id: true,
+              name: true,
+              companyUrl: true,
+            },
+          },
+        },
+      },
+      applicationStages: {
+        orderBy: {
+          date: 'desc',
+        },
+        take: 1,
+        select: {
+          id: true,
+          type: true,
+          date: true,
+          emojiUnicodeHex: true,
+        },
+      },
+      _count: {
+        select: {
+          tasks: {
+            where: {
+              notificationDateTime: {
+                lte: new Date(),
+              },
+              isDone: false,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const applications: ApplicationListData[] = queriedApplications.map((application) => ({
+    id: application.id,
+    role: application.role,
+    latestStage: application.applicationStages[0],
+    taskNotificationCount: application._count.tasks,
+  }));
+
+  res.status(HttpStatus.OK).json(applications);
 }
 
 async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse) {
