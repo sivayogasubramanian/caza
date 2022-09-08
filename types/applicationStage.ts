@@ -8,3 +8,10 @@ export type ApplicationStageData = {
   emojiUnicodeHex: Nullable<string>;
   remark: Nullable<string>;
 };
+
+export type ApplicationStagePatchData = {
+  type: ApplicationStageType;
+  date: Date;
+  emojiUnicodeHex: string | null;
+  remark: string | null;
+};
