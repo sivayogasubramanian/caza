@@ -2,8 +2,10 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { LinkAccountPostData } from '../../../types/user';
+import { Nullable } from '../../../types/utils';
 import { withVerifiedUser, getUserFromJwt, UserDetailsFromRequest } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 /** Limited set of data representing user and the list of user application IDs. Only for use in this endpoint. */
 interface UserData {
@@ -117,7 +119,7 @@ function isValidLinkAccountPostData(obj: object): obj is LinkAccountPostData {
 }
 
 // Returns user if present in the database with applications if exists.
-async function getUserIfExists(uid: string): Promise<UserData | null> {
+async function getUserIfExists(uid: string): Promise<Nullable<UserData>> {
   const user = await prisma.user.findUnique({
     where: { uid: uid },
     select: { uid: true, applications: { select: { id: true } } },
@@ -130,4 +132,4 @@ function hasUserData(user: UserData): boolean {
   return user.applications.length > 0;
 }
 
-export default withVerifiedUser(handler);
+export default withPrismaErrorHandling(withVerifiedUser(handler));
