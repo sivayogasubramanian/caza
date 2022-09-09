@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
 import { TaskData, TaskPostData } from '../../../../../types/task';
+import { Nullable } from '../../../../../types/utils';
 import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
@@ -79,7 +80,9 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return;
   }
 
-  if (!isValidRequest(req, res)) {
+  const errorMessageType = validateRequest(req);
+  if (errorMessageType) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
   }
 
@@ -100,28 +103,23 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
   res.status(HttpStatus.CREATED).json(createJsonResponse(newTask, messages[MessageType.TASK_CREATED_SUCCESSFULLY]));
 }
 
-function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): boolean {
+function validateRequest(req: NextApiRequest): Nullable<MessageType> {
   if (isEmpty(req.body.title)) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.EMPTY_TITLE]));
-    return false;
+    return MessageType.EMPTY_TITLE;
   }
 
   if (!isValidDate(req.body.dueDate)) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.INVALID_DUE_DATE]));
-    return false;
+    return MessageType.INVALID_DUE_DATE;
   }
 
   if (
     (req.body.notification || req.body.notificationDateTime !== undefined) &&
     !isValidDate(req.body.notificationDateTime)
   ) {
-    res
-      .status(HttpStatus.BAD_REQUEST)
-      .json(createJsonResponse({}, messages[MessageType.INVALID_NOTIFICATION_DATETIME]));
-    return false;
+    return MessageType.INVALID_NOTIFICATION_DATETIME;
   }
 
-  return true;
+  return null;
 }
 
 export default withPrismaErrorHandling(withVerifiedUser(handler));

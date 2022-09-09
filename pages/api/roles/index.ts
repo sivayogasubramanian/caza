@@ -1,7 +1,8 @@
 import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
+import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
+import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
@@ -71,12 +72,13 @@ async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData>>) {
-  if (!(await isValidRequest(req, res))) {
+  const errorMessageType = validateRequest(req);
+  if (errorMessageType) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
   }
 
   const rolePostData: RolePostData = req.body;
-
   const company = await prisma.company.findUnique({ where: { id: rolePostData.companyId } });
 
   if (!company) {
@@ -92,33 +94,28 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
 }
 
-async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): Promise<boolean> {
+function validateRequest(req: NextApiRequest): Nullable<MessageType> {
   if (typeof req.body.companyId !== 'number') {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.INVALID_COMPANY_ID]));
-    return false;
+    return MessageType.INVALID_COMPANY_ID;
   }
 
   if (isEmpty(req.body.title)) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.EMPTY_TITLE]));
-    return false;
+    return MessageType.EMPTY_TITLE;
   }
 
   if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.ROLE_TYPE_INVALID]));
-    return false;
+    return MessageType.ROLE_TYPE_INVALID;
   }
 
   if (typeof req.body.year !== 'number') {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.ROLE_YEAR_NAN]));
-    return false;
+    return MessageType.ROLE_YEAR_NAN;
   }
 
   if (req.body.year < 1970) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.ROLE_YEAR_INVALID]));
-    return false;
+    return MessageType.ROLE_YEAR_INVALID;
   }
 
-  return true;
+  return null;
 }
 
 export default withPrismaErrorHandling(withAuth(handler));
