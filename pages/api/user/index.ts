@@ -1,10 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
-import { LinkAccountPostData } from '../../../types/user';
 import { Nullable } from '../../../types/utils';
 import { withVerifiedUser, getUserFromJwt, UserDetailsFromRequest } from '../../../utils/auth/jwtHelpers';
-import { createJsonResponse, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 /** Limited set of data representing user and the list of user application IDs. Only for use in this endpoint. */
@@ -13,7 +12,7 @@ interface UserData {
   applications: { id: number }[];
 }
 
-enum Result {
+enum LinkAccountResult {
   OLD_USER_DELETED,
   NEW_USER_HAS_DATA,
   NEW_USER_LINKED,
@@ -22,21 +21,38 @@ enum Result {
 const { ERROR, INFORMATION, SUCCESS } = StatusMessageType;
 const prisma = new PrismaClient();
 
-async function handler(newVerifiedUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
-  if (req.method != 'POST') {
-    return rejectHttpMethod(res, req.method);
+async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+  switch (req.method) {
+    case HttpMethod.POST:
+      return handlePost(currentUid, req, res);
+    case HttpMethod.DELETE:
+      return handleDelete(currentUid, req, res);
+    default:
+      return rejectHttpMethod(res, req.method);
   }
+}
 
-  const { body } = req;
-  if (!isValidLinkAccountPostData(body)) {
+async function handlePost(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+  const oldUserToken = req.body?.old_token;
+
+  // If old_token is not supplied.
+  if (!oldUserToken) {
+    const isExisting = (await getUserIfExists(currentUid)) !== null;
+    if (isExisting) {
+      return res
+        .status(HttpStatus.CONFLICT)
+        .json(createJsonResponse({}, { type: ERROR, message: `UID ${currentUid} already exists` }));
+    }
+
+    await prisma.user.create({ data: { uid: currentUid } });
     return res
-      .status(HttpStatus.BAD_REQUEST)
-      .json(createJsonResponse({}, { type: ERROR, message: 'Expected old_token as parameter' }));
+      .status(HttpStatus.OK)
+      .json(createJsonResponse({}, { type: SUCCESS, message: 'New user with UID ${currentUid} added.' }));
   }
 
   let oldUserDetails: UserDetailsFromRequest;
   try {
-    oldUserDetails = await getUserFromJwt(body.old_token);
+    oldUserDetails = await getUserFromJwt(oldUserToken);
   } catch (error) {
     return res
       .status(HttpStatus.UNAUTHORIZED)
@@ -50,72 +66,81 @@ async function handler(newVerifiedUid: string, req: NextApiRequest, res: NextApi
       .json(createJsonResponse({}, { type: ERROR, message: `UID ${oldUid} is already linked` }));
   }
 
-  const result = await linkAccount(oldUid, newVerifiedUid);
+  const result = await linkAccount(oldUid, currentUid);
 
   switch (result) {
-    case Result.OLD_USER_DELETED:
+    case LinkAccountResult.OLD_USER_DELETED:
       return res.status(HttpStatus.OK).json(
         createJsonResponse(
           {},
           {
             type: INFORMATION,
-            message: `Old UID ${oldUid} is no longer in database. New user ${newVerifiedUid} has been linked.`,
+            message: `Old UID ${oldUid} is no longer in database. New user ${currentUid} has been linked.`,
           },
         ),
       );
 
-    case Result.NEW_USER_HAS_DATA:
+    case LinkAccountResult.NEW_USER_HAS_DATA:
       return res
         .status(HttpStatus.CONFLICT)
         .json(createJsonResponse({}, { type: ERROR, message: 'New UID already has user data and cannot be linked.' }));
 
-    case Result.NEW_USER_LINKED:
+    case LinkAccountResult.NEW_USER_LINKED:
       return res
         .status(HttpStatus.OK)
         .json(
           createJsonResponse(
             {},
-            { type: SUCCESS, message: `Old UID ${oldUid} has been replaced with new UID ${newVerifiedUid}.` },
+            { type: SUCCESS, message: `Old UID ${oldUid} has been replaced with new UID ${currentUid}.` },
           ),
         );
   }
 }
 
-async function linkAccount(oldUid: string, newVerifiedUid: string): Promise<Result> {
-  const newUser = await getUserIfExists(newVerifiedUid);
+async function linkAccount(oldUid: string, newUid: string): Promise<LinkAccountResult> {
+  const newUser = await getUserIfExists(newUid);
   const oldUser = await getUserIfExists(oldUid);
 
   // If old user has already been removed from the database. This can happen if the API was called twice or if the new user
   // creation process failed and the API was retried.
   if (!oldUser) {
     if (!newUser) {
-      await prisma.user.create({ data: { uid: newVerifiedUid } });
+      await prisma.user.create({ data: { uid: newUid } });
     }
 
-    return Result.OLD_USER_DELETED;
+    return LinkAccountResult.OLD_USER_DELETED;
   }
 
   // Handle situation where new user exists already with data.
   if (newUser && hasUserData(newUser)) {
-    return Result.NEW_USER_HAS_DATA;
+    return LinkAccountResult.NEW_USER_HAS_DATA;
   }
 
   // New user exists but has no data (linking should continue as if new user does not exist).
   if (newUser) {
-    await prisma.user.delete({ where: { uid: newVerifiedUid } });
+    await prisma.user.delete({ where: { uid: newUid } });
   }
 
   // Update UID to new (foreign key references to UID will cascade on update)
   await prisma.user.update({
     where: { uid: oldUid },
-    data: { uid: newVerifiedUid },
+    data: { uid: newUid },
   });
 
-  return Result.NEW_USER_LINKED;
+  return LinkAccountResult.NEW_USER_LINKED;
 }
 
-function isValidLinkAccountPostData(obj: object): obj is LinkAccountPostData {
-  return obj && 'old_token' in obj && typeof (obj as { old_token: object }).old_token == 'string';
+async function handleDelete(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+  // UID is a primary key, so the count will either be 0 (UID does not exist in database) or 1 (successful delete).
+  const { count } = await prisma.user.deleteMany({ where: { uid } });
+
+  if (count === 0) {
+    return res
+      .status(HttpStatus.NOT_FOUND)
+      .json(createJsonResponse({}, { type: SUCCESS, message: `Could not find UID ${uid}.` }));
+  }
+
+  return res.status(HttpStatus.OK).json(createJsonResponse({}, { type: SUCCESS, message: `Deleted UID ${uid}.` }));
 }
 
 // Returns user if present in the database with applications if exists.

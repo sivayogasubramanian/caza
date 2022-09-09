@@ -5,6 +5,6 @@
  * The details of the new (current) account will be provided by the Authorization header (Bearer type) in the request
  * as per normal.
  */
-export interface LinkAccountPostData {
-  old_token: string;
+export interface AccountPostData {
+  old_token?: string;
 }
