@@ -5,6 +5,7 @@ import { TaskData, TaskPostData } from '../../../../../types/task';
 import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
+import { isInteger } from '../../../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 
@@ -14,6 +15,7 @@ enum MessageType {
   EMPTY_TITLE,
   INVALID_DUE_DATE,
   INVALID_NOTIFICATION_DATETIME,
+  TASK_APPLICATION_ID_INVALID,
   TASK_APPLICATION_NOT_FOUND,
   TASK_APPLICATION_DOES_NOT_BELONG_TO_USER,
   TASK_CREATED_SUCCESSFULLY,
@@ -28,6 +30,10 @@ const messages = Object.freeze({
   [MessageType.INVALID_NOTIFICATION_DATETIME]: {
     type: StatusMessageType.ERROR,
     message: 'Task notification date and time is invalid.',
+  },
+  [MessageType.TASK_APPLICATION_ID_INVALID]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application id for this task is invalid.',
   },
   [MessageType.TASK_APPLICATION_NOT_FOUND]: {
     type: StatusMessageType.ERROR,
@@ -53,6 +59,11 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
+  if (!isInteger(req.query.applicationId as string)) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.TASK_APPLICATION_ID_INVALID]));
+    return;
+  }
+
   const applicationId = Number(req.query.applicationId);
   const application = await prisma.application.findUnique({ where: { id: applicationId } });
 

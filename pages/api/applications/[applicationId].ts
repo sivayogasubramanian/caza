@@ -5,17 +5,20 @@ import { ApplicationData } from '../../../types/application';
 import { Nullable } from '../../../types/utils';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import { isInteger } from '../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 const prisma = new PrismaClient();
 
 enum MessageType {
+  APPLICATION_ID_INVALID,
   APPLICATION_NOT_FOUND,
   APPLICATION_DOES_NOT_BELONG_TO_USER,
   APPLICATION_DELETED_SUCCESSFULLY,
 }
 
 const messages = Object.freeze({
+  [MessageType.APPLICATION_ID_INVALID]: { type: StatusMessageType.ERROR, message: 'Application id is invalid.' },
   [MessageType.APPLICATION_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Application cannot be found.' },
   [MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER]: {
     type: StatusMessageType.ERROR,
@@ -43,6 +46,11 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
+  if (!isInteger(req.query.applicationId as string)) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.APPLICATION_ID_INVALID]));
+    return;
+  }
+
   const applicationId = Number(req.query.applicationId);
 
   const application: Nullable<ApplicationData> = await prisma.application.findFirst({
@@ -85,6 +93,11 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+  if (!isInteger(req.query.applicationId as string)) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.APPLICATION_ID_INVALID]));
+    return;
+  }
+
   const applicationId = Number(req.query.applicationId);
 
   // As applicationId is a primary key, count will only match 0 or 1. This is effectively 'delete if exists' behavior.
