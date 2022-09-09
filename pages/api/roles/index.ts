@@ -4,7 +4,7 @@ import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/api
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
-import { createIfPossible } from '../../../utils/prisma/prismaHelpers';
+import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
@@ -82,14 +82,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
     return false;
   }
 
-  createIfPossible(res, async () => {
-    const newRole: RoleData = await prisma.role.create({
-      data: rolePostData,
-      select: { id: true, title: true, type: true, year: true },
-    });
-
-    res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+  const newRole: RoleData = await prisma.role.create({
+    data: rolePostData,
+    select: { id: true, title: true, type: true, year: true },
   });
+
+  res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
 }
 
 async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): Promise<boolean> {
@@ -116,4 +114,4 @@ async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiRespo
   return true;
 }
 
-export default withAuth(handler);
+export default withPrismaErrorHandling(withAuth(handler));

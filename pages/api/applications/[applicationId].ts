@@ -5,6 +5,7 @@ import { ApplicationData } from '../../../types/application';
 import { Nullable } from '../../../types/utils';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 const prisma = new PrismaClient();
 
@@ -99,4 +100,4 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.APPLICATION_DELETED_SUCCESSFULLY]));
 }
 
-export default withAuthUser(handler);
+export default withPrismaErrorHandling(withAuthUser(handler));
