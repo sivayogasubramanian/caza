@@ -87,7 +87,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
   }
 
   const taskPostData: TaskPostData = {
-    ...req.body,
+    title: req.body.title,
     dueDate: new Date(req.body.dueDate),
     notificationDateTime: req.body.notificationDateTime ? new Date(req.body.notificationDateTime) : null,
   };

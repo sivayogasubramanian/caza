@@ -78,7 +78,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
     return;
   }
 
-  const rolePostData: RolePostData = req.body;
+  const rolePostData: RolePostData = {
+    companyId: req.body.companyId,
+    title: req.body.title,
+    type: req.body.type,
+    year: req.body.year,
+  };
   const company = await prisma.company.findUnique({ where: { id: rolePostData.companyId } });
 
   if (!company) {
