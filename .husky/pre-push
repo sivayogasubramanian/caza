@@ -3,3 +3,6 @@
 
 echo 'Running linter...'
 yarn lint
+
+echo 'Trying to build...'
+yarn build
