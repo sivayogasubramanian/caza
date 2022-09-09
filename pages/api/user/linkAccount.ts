@@ -1,75 +1,133 @@
+import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
+import { LinkAccountPostData } from '../../../types/user';
 import { withVerifiedUser, getUserFromJwt, UserDetailsFromRequest } from '../../../utils/auth/jwtHelpers';
+import { createJsonResponse, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 
-async function handler(newVerifiedUid: string, req: NextApiRequest, res: NextApiResponse) {
+/** Limited set of data representing user and the list of user application IDs. Only for use in this endpoint. */
+interface UserData {
+  uid: string;
+  applications: { id: number }[];
+}
+
+enum Result {
+  OLD_USER_DELETED,
+  NEW_USER_HAS_DATA,
+  NEW_USER_LINKED,
+}
+
+const { ERROR, INFORMATION, SUCCESS } = StatusMessageType;
+const prisma = new PrismaClient();
+
+async function handler(newVerifiedUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   if (req.method != 'POST') {
-    return res.status(400).send('Expected POST call');
+    return rejectHttpMethod(res, req.method);
   }
 
-  const body = validateRequestBodyType(req.body);
-  if (!body) {
-    return res.status(400).send('Expected old_token as parameter');
+  const { body } = req;
+  if (!isValidLinkAccountPostData(body)) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json(createJsonResponse({}, { type: ERROR, message: 'Expected old_token as parameter' }));
   }
 
   let oldUserDetails: UserDetailsFromRequest;
   try {
     oldUserDetails = await getUserFromJwt(body.old_token);
   } catch (error) {
-    return res.status(400).json({});
+    return res
+      .status(HttpStatus.UNAUTHORIZED)
+      .json(createJsonResponse({}, { type: ERROR, message: `Could not validate and decode 'old_token'.` }));
   }
 
   const oldUid = oldUserDetails.uid;
   if (!oldUserDetails.isAnonymous) {
-    return res.status(400).send(`UID ${oldUid} is already linked`);
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json(createJsonResponse({}, { type: ERROR, message: `UID ${oldUid} is already linked` }));
   }
 
-  const newUser = getUserIfExists(newVerifiedUid);
-  const oldUser = getUserIfExists(oldUid);
+  const result = await linkAccount(oldUid, newVerifiedUid);
 
-  // If old user has already been removed from the database.
-  if (!oldUser && newUser) {
-    return res.status(205).send(`Old UID does not exist. New user exists.`);
-  } else if (!oldUser && !newUser) {
-    // TODO: Create the new user.
-    return res.status(201).send(`Old UID does not exist. New user created.`);
+  switch (result) {
+    case Result.OLD_USER_DELETED:
+      return res.status(HttpStatus.OK).json(
+        createJsonResponse(
+          {},
+          {
+            type: INFORMATION,
+            message: `Old UID ${oldUid} is no longer in database. New user ${newVerifiedUid} has been linked.`,
+          },
+        ),
+      );
+
+    case Result.NEW_USER_HAS_DATA:
+      return res
+        .status(HttpStatus.CONFLICT)
+        .json(createJsonResponse({}, { type: ERROR, message: 'New UID already has user data and cannot be linked.' }));
+
+    case Result.NEW_USER_LINKED:
+      return res
+        .status(HttpStatus.OK)
+        .json(
+          createJsonResponse(
+            {},
+            { type: SUCCESS, message: `Old UID ${oldUid} has been replaced with new UID ${newVerifiedUid}.` },
+          ),
+        );
+  }
+}
+
+async function linkAccount(oldUid: string, newVerifiedUid: string): Promise<Result> {
+  const newUser = await getUserIfExists(newVerifiedUid);
+  const oldUser = await getUserIfExists(oldUid);
+
+  // If old user has already been removed from the database. This can happen if the API was called twice or if the new user
+  // creation process failed and the API was retried.
+  if (!oldUser) {
+    if (!newUser) {
+      await prisma.user.create({ data: { uid: newVerifiedUid } });
+    }
+
+    return Result.OLD_USER_DELETED;
   }
 
-  // If both old and new user exists.
+  // Handle situation where new user exists already with data.
   if (newUser && hasUserData(newUser)) {
-    return res.status(205).send(`New UID exists with user data and cannot be linked.`);
-  } else if (newUser) {
-    // new user exists but has no data.
-    // TODO: Delete new user.
+    return Result.NEW_USER_HAS_DATA;
   }
 
-  // Just update UID to new (foreign key references to UID will cascade on update)
-  res.status(200).send(`Request sent to ${req.url}\n`);
+  // New user exists but has no data (linking should continue as if new user does not exist).
+  if (newUser) {
+    await prisma.user.delete({ where: { uid: newVerifiedUid } });
+  }
+
+  // Update UID to new (foreign key references to UID will cascade on update)
+  await prisma.user.update({
+    where: { uid: oldUid },
+    data: { uid: newVerifiedUid },
+  });
+
+  return Result.NEW_USER_LINKED;
 }
 
-type UserOrm = string; // TODO: Remove this placeholder type
-
-interface LinkAccountRequestJsonBody {
-  old_token: string;
+function isValidLinkAccountPostData(obj: object): obj is LinkAccountPostData {
+  return obj && 'old_token' in obj && typeof (obj as { old_token: object }).old_token == 'string';
 }
 
-function validateRequestBodyType(body: any) {
-  if (!body) return;
-  if (!('old_token' in body)) return;
-  if (typeof body.old_token != 'string') return;
-
-  return body as LinkAccountRequestJsonBody;
-}
-
-// Returns user if present in the database.
-function getUserIfExists(uid: string): UserOrm | undefined {
-  // TODO: implement this part.
-  return;
+// Returns user if present in the database with applications if exists.
+async function getUserIfExists(uid: string): Promise<UserData | null> {
+  const user = await prisma.user.findUnique({
+    where: { uid: uid },
+    select: { uid: true, applications: { select: { id: true } } },
+  });
+  return user;
 }
 
 // Returns true iff there is at least one application for this User.
-function hasUserData(user: UserOrm) {
-  // TODO: implement this part.
-  return true;
+function hasUserData(user: UserData): boolean {
+  return user.applications.length > 0;
 }
 
 export default withVerifiedUser(handler);
