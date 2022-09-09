@@ -104,7 +104,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function validateRequest(req: NextApiRequest): Nullable<MessageType> {
-  if (isEmpty(req.body.title)) {
+  if (req.body.title && isEmpty(req.body.title)) {
     return MessageType.EMPTY_TITLE;
   }
 
