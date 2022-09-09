@@ -75,7 +75,14 @@ export function withVerifiedUser<T>(
   };
 }
 
-async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
+export async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
+  // If you are running this in development mode, JWT token verification and decoding can be skipped.
+  // Use bearer token 'devUserFoo' to get { uid: 'devUserFoo', isAnonymous: true }
+  // Use bearer token 'devUserVerifiedFoo' to get { uid: 'devUserVerifiedFoo', isAnonymous: false }
+  if (process.env.NODE_ENV == 'development' && /devUser/u.test(token)) {
+    return { uid: token, isAnonymous: !/Verified/u.test(token) };
+  }
+
   const { uid, firebase } = await admin.auth().verifyIdToken(token);
   const { sign_in_provider } = firebase;
   return { uid, isAnonymous: sign_in_provider == 'anonymous' };
