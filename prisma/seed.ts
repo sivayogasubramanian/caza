@@ -2,15 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({ log: ['query'] });
 
-// TODO: REVERT CHANGES HERE
-
-const users: Prisma.UserCreateInput[] = [
-  { uid: 'BrlE1KRjGpeq8rO15jrETWnSafL2' },
-  { uid: '2' },
-  { uid: '3' },
-  { uid: '4' },
-  { uid: '5' },
-];
+const users: Prisma.UserCreateInput[] = [{ uid: '1' }, { uid: '2' }, { uid: '3' }, { uid: '4' }, { uid: '5' }];
 
 const companies: Prisma.CompanyCreateInput[] = [
   {
@@ -62,7 +54,7 @@ const companies: Prisma.CompanyCreateInput[] = [
           applications: {
             create: [
               {
-                userId: 'BrlE1KRjGpeq8rO15jrETWnSafL2',
+                userId: '1',
                 applicationStages: {
                   create: [
                     {
