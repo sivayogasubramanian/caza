@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
+import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { TaskData, TaskPostData } from '../../../../../types/task';
 import { Nullable } from '../../../../../types/utils';
 import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
