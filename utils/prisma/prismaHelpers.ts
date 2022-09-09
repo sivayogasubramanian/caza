@@ -78,9 +78,7 @@ type PrismaErrors =
   | PrismaClientInitializationError
   | PrismaClientValidationError;
 
-export function withPrismaErrorHandling<T>(
-  handler: NextApiHandler<ApiResponse<T | EmptyPayload>>,
-): NextApiHandler<ApiResponse<T | EmptyPayload>> {
+export function withPrismaErrorHandling<D>(handler: NextApiHandler<ApiResponse<D>>): NextApiHandler<ApiResponse<D>> {
   return (req, res) => {
     try {
       handler(req, res);
