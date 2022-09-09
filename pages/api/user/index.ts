@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { Nullable } from '../../../types/utils';
-import { withVerifiedUser, getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
+import { getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
@@ -47,14 +47,14 @@ async function handlePost(currentUid: string, req: NextApiRequest, res: NextApiR
     await prisma.user.create({ data: { uid: currentUid } });
     return res
       .status(HttpStatus.OK)
-      .json(createJsonResponse({}, { type: SUCCESS, message: 'New user with UID ${currentUid} added.' }));
+      .json(createJsonResponse({}, { type: SUCCESS, message: `New user with UID ${currentUid} added.` }));
   }
 
   // getAuthUser Middleware ensures authenticated token is valid and can be decoded.
   const currentIsAnonymous = (await getUserFromJwt(req.headers.authorization as string)).isAnonymous;
   if (currentIsAnonymous) {
     return res
-      .status(HttpStatus.BAD_REQUEST)
+      .status(HttpStatus.UNAUTHORIZED)
       .json(createJsonResponse({}, { type: ERROR, message: 'An unverified account cannot be the target of link.' }));
   }
 
@@ -140,15 +140,19 @@ async function linkAccount(oldUid: string, newUid: string): Promise<LinkAccountR
 
 async function handleDelete(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   // UID is a primary key, so the count will either be 0 (UID does not exist in database) or 1 (successful delete).
-  const { count } = await prisma.user.deleteMany({ where: { uid } });
-
-  if (count === 0) {
+  const user = await getUserIfExists(uid);
+  if (!user) {
     return res
       .status(HttpStatus.NOT_FOUND)
-      .json(createJsonResponse({}, { type: SUCCESS, message: `Could not find UID ${uid}.` }));
+      .json(createJsonResponse({}, { type: ERROR, message: `Could not find UID ${uid}.` }));
   }
 
-  return res.status(HttpStatus.OK).json(createJsonResponse({}, { type: SUCCESS, message: `Deleted UID ${uid}.` }));
+  await prisma.application.deleteMany({ where: { userId: uid } });
+  await prisma.user.delete({ where: { uid } });
+
+  return res
+    .status(HttpStatus.OK)
+    .json(createJsonResponse({}, { type: SUCCESS, message: `Deleted UID ${uid} and their data.` }));
 }
 
 // Returns user if present in the database with applications if exists.
