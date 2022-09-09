@@ -52,11 +52,7 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function handlePost(
-  userId: string,
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<TaskData | EmptyPayload>>,
-) {
+async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
   const applicationId = Number(req.query.applicationId);
   const application = await prisma.application.findUnique({ where: { id: applicationId } });
 

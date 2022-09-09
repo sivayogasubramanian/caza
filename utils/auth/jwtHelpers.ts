@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessageType } from '../../types/apiResponse';
-import { createJsonResponse, HTTP_STATUS_FORBIDDEN, HTTP_STATUS_UNAUTHORIZED } from '../http/httpHelpers';
+import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
+import { createJsonResponse, HttpStatus } from '../http/httpHelpers';
 
 export interface UserDetailsFromRequest {
   uid: string;
@@ -33,17 +33,17 @@ const USER_NOT_AUTHORIZED = 'User has not verified their identity.';
  * @param handler Takes in an API handler function that needs an authenticated user.
  * @returns NextApiHandler function.
  */
-export function withAuthUser<T>(
-  handler: (uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => void,
-): NextApiHandler<ApiResponse<T | EmptyPayload>> {
-  return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => {
+export function withAuthUser<D>(
+  handler: (uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
+): NextApiHandler<ApiResponse<D>> {
+  return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => {
     let userDetails: UserDetailsFromRequest;
     try {
       userDetails = await getUserFromJwt(getBearerToken(req));
     } catch (e) {
       return res
-        .status(HTTP_STATUS_UNAUTHORIZED)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }]));
+        .status(HttpStatus.UNAUTHORIZED)
+        .json(createJsonResponse({}, { type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }));
     }
 
     return handler(userDetails.uid, req, res);
@@ -59,24 +59,24 @@ export function withAuthUser<T>(
  * @param handler Takes in an API handler function that needs a verified user.
  * @returns NextApiHandler function.
  */
-export function withVerifiedUser<T>(
-  handler: (uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => void,
-): NextApiHandler<ApiResponse<T | EmptyPayload>> {
-  return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => {
+export function withVerifiedUser<D>(
+  handler: (uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
+): NextApiHandler<ApiResponse<D>> {
+  return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => {
     let userDetails: UserDetailsFromRequest;
     try {
       userDetails = await getUserFromJwt(getBearerToken(req));
     } catch (e) {
       return res
-        .status(HTTP_STATUS_UNAUTHORIZED)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }]));
+        .status(HttpStatus.UNAUTHORIZED)
+        .json(createJsonResponse({}, { type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }));
     }
 
     const { uid, isAnonymous } = userDetails;
     if (isAnonymous) {
       return res
-        .status(HTTP_STATUS_FORBIDDEN)
-        .json(createJsonResponse({}, [{ type: StatusMessageType.ERROR, message: USER_NOT_AUTHORIZED }]));
+        .status(HttpStatus.FORBIDDEN)
+        .json(createJsonResponse({}, { type: StatusMessageType.ERROR, message: USER_NOT_AUTHORIZED }));
     }
 
     return handler(uid, req, res);
@@ -94,9 +94,9 @@ export function withVerifiedUser<T>(
  * @param handler Takes in an API handler function that needs an authenticated user.
  * @returns NextApiHandler function.
  */
-export function withAuth<T>(
-  handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<T | EmptyPayload>>) => void,
-): NextApiHandler<ApiResponse<T | EmptyPayload>> {
+export function withAuth<D>(
+  handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
+): NextApiHandler<ApiResponse<D>> {
   return withAuthUser((_, req, res) => handler(req, res));
 }
 
