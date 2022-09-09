@@ -4,6 +4,7 @@ import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
 import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
+import { MIN_ROLE_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../utils/strings/validations';
@@ -29,7 +30,10 @@ const messages = Object.freeze({
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is empty.' },
   [MessageType.ROLE_TYPE_INVALID]: { type: StatusMessageType.ERROR, message: 'Role type is invalid.' },
   [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
-  [MessageType.ROLE_YEAR_INVALID]: { type: StatusMessageType.ERROR, message: 'Role year must be after 1970.' },
+  [MessageType.ROLE_YEAR_INVALID]: {
+    type: StatusMessageType.ERROR,
+    message: `Role year must be after ${MIN_ROLE_YEAR}.`,
+  },
   [MessageType.ROLE_CREATED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
     message: 'Role was created successfully.',
@@ -116,7 +120,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.ROLE_YEAR_NAN;
   }
 
-  if (req.body.year < 1970) {
+  if (req.body.year < MIN_ROLE_YEAR) {
     return MessageType.ROLE_YEAR_INVALID;
   }
 
