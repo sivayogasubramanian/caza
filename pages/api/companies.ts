@@ -1,25 +1,35 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { CompanyListData, CompanyPostData } from '../../types/company';
+import { CompanyData, CompanyListData, CompanyPostData } from '../../types/company';
 import { isEmpty, isValidUrl } from '../../utils/strings/validations';
-import { ErrorData } from '../../types/error';
 import { removeProtocolAndWwwIfPresent } from '../../utils/strings/formatters';
-import { HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
-import { withAuthUser } from '../../utils/auth/jwtHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
+import { withAuth } from '../../utils/auth/jwtHelpers';
+import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
+import { Nullable } from '../../types/utils';
 
 enum MessageType {
+  COMPANY_CREATED_SUCCESSFULLY,
   EMPTY_NAME,
   INVALID_COMPANY_URL,
+  MISSING_NAME,
+  MISSING_COMPANY_URL,
 }
 
 const prisma = new PrismaClient();
 
-const errorMessages = new Map<MessageType, ErrorData>([
-  [MessageType.EMPTY_NAME, { message: 'Company name must not be empty.' }],
-  [MessageType.INVALID_COMPANY_URL, { message: 'Company url is invalid.' }],
-]);
+const messages = Object.freeze({
+  [MessageType.COMPANY_CREATED_SUCCESSFULLY]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Company created successfully.',
+  },
+  [MessageType.EMPTY_NAME]: { type: StatusMessageType.ERROR, message: 'Company name is empty.' },
+  [MessageType.INVALID_COMPANY_URL]: { type: StatusMessageType.ERROR, message: 'Company url is invalid.' },
+  [MessageType.MISSING_NAME]: { type: StatusMessageType.ERROR, message: 'Company name is missing.' },
+  [MessageType.MISSING_COMPANY_URL]: { type: StatusMessageType.ERROR, message: 'Company url is missing.' },
+});
 
-function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
+function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
@@ -34,36 +44,54 @@ function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
   const companies: CompanyListData[] = await prisma.company.findMany({
     where: { isVerified: true },
     select: { id: true, name: true, companyUrl: true },
   });
 
-  res.status(HttpStatus.OK).json(companies);
+  res.status(HttpStatus.OK).json(createJsonResponse(companies));
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyData>>) {
+  const errorMessageType = validateRequest(req);
+  if (errorMessageType !== null) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
+    return;
+  }
   const companyPostData: CompanyPostData = req.body;
-
-  if (isEmpty(companyPostData.name)) {
-    res.status(HttpStatus.BAD_REQUEST).json(errorMessages.get(MessageType.EMPTY_NAME));
-    return;
-  }
-
-  if (!isValidUrl(companyPostData.companyUrl)) {
-    res.status(HttpStatus.BAD_REQUEST).json(errorMessages.get(MessageType.INVALID_COMPANY_URL));
-    return;
-  }
 
   const newCompany = await prisma.company.create({
     data: {
       name: companyPostData.name,
       companyUrl: removeProtocolAndWwwIfPresent(companyPostData.companyUrl),
     },
+    select: { id: true, name: true, companyUrl: true },
   });
 
-  res.status(HttpStatus.CREATED).json(newCompany);
+  res
+    .status(HttpStatus.CREATED)
+    .json(createJsonResponse(newCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
 }
 
-export default withAuthUser(handler);
+function validateRequest(req: NextApiRequest): Nullable<MessageType> {
+  if (!req.body.name) {
+    return MessageType.MISSING_NAME;
+  }
+
+  if (isEmpty(req.body.name)) {
+    return MessageType.EMPTY_NAME;
+  }
+
+  if (!req.body.companyUrl) {
+    return MessageType.MISSING_COMPANY_URL;
+  }
+
+  if (!isValidUrl(req.body.companyUrl)) {
+    return MessageType.INVALID_COMPANY_URL;
+  }
+
+  return null;
+}
+
+export default withAuth(handler);
