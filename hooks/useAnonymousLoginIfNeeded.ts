@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { initializeApp, getApps } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import { Auth, getAuth, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
+import { useCallback, useEffect, useState } from 'react';
 import { Nullable } from '../types/utils';
 
 /**
