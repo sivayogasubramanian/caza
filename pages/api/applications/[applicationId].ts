@@ -70,6 +70,9 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
         },
       },
       applicationStages: {
+        orderBy: {
+          date: 'desc',
+        },
         select: {
           id: true,
           type: true,
@@ -79,6 +82,9 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
         },
       },
       tasks: {
+        orderBy: {
+          dueDate: 'desc',
+        },
         select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
       },
     },
