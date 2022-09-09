@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
+import { Nullable } from '../../../types/utils';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 
@@ -43,7 +44,7 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
 async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
   const applicationId = Number(req.query.applicationId);
 
-  const application: ApplicationData | null = await prisma.application.findFirst({
+  const application: Nullable<ApplicationData> = await prisma.application.findFirst({
     where: {
       id: applicationId,
       userId,

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { initializeApp, getApps } from 'firebase/app';
 import { Auth, getAuth, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
+import { Nullable } from '../types/utils';
 
 /**
  * Hook that handles anonymous log in / register if not already logged in. This will also handle firebase
@@ -26,7 +27,7 @@ export default function useAnonymousLoginIfNeeded() {
   const [auth, setAuth] = useState<Auth>();
 
   const handleAuthStateChanged = useCallback(
-    async (user: User | null) => {
+    async (user: Nullable<User>) => {
       if (user) {
         setCurrentUser(user);
       } else {
