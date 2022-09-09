@@ -2,13 +2,14 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CompanyData, CompanyListData, CompanyPostData } from '../../types/company';
 import { isEmpty, isValidUrl } from '../../utils/strings/validations';
-import { removeProtocolAndWwwIfPresent } from '../../utils/strings/formatters';
+import { capitalizeEveryWord, removeProtocolAndWwwIfPresent } from '../../utils/strings/formatters';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
 import { withAuth } from '../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
 import { Nullable } from '../../types/utils';
 
 enum MessageType {
+  COMPANY_ALREADY_EXISTS,
   COMPANY_CREATED_SUCCESSFULLY,
   EMPTY_NAME,
   INVALID_COMPANY_URL,
@@ -19,6 +20,7 @@ enum MessageType {
 const prisma = new PrismaClient();
 
 const messages = Object.freeze({
+  [MessageType.COMPANY_ALREADY_EXISTS]: { type: StatusMessageType.SUCCESS, message: 'Company already exists.' },
   [MessageType.COMPANY_CREATED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
     message: 'Company created successfully.',
@@ -59,12 +61,29 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
   }
-  const companyPostData: CompanyPostData = req.body;
+
+  const companyPostData: CompanyPostData = {
+    name: capitalizeEveryWord(req.body.name),
+    companyUrl: removeProtocolAndWwwIfPresent(req.body.companyUrl),
+  };
+
+  const duplicateCompany = await prisma.company.findFirst({
+    where: {
+      name: companyPostData.name,
+      companyUrl: companyPostData.companyUrl,
+    },
+    select: { id: true, name: true, companyUrl: true },
+  });
+
+  if (duplicateCompany) {
+    res.status(HttpStatus.OK).json(createJsonResponse(duplicateCompany, messages[MessageType.COMPANY_ALREADY_EXISTS]));
+    return;
+  }
 
   const newCompany = await prisma.company.create({
     data: {
       name: companyPostData.name,
-      companyUrl: removeProtocolAndWwwIfPresent(companyPostData.companyUrl),
+      companyUrl: companyPostData.companyUrl,
     },
     select: { id: true, name: true, companyUrl: true },
   });
