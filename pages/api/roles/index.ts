@@ -13,8 +13,9 @@ enum MessageType {
   INVALID_COMPANY_ID,
   COMPANY_DOES_NOT_EXIST,
   EMPTY_TITLE,
-  INVALID_TYPE,
-  INVALID_YEAR,
+  ROLE_TYPE_INVALID,
+  ROLE_YEAR_NAN,
+  ROLE_YEAR_INVALID,
   ROLE_CREATED_SUCCESSFULLY,
 }
 
@@ -25,8 +26,9 @@ const messages = Object.freeze({
     message: 'The company for this role does not exists.',
   },
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is empty.' },
-  [MessageType.INVALID_TYPE]: { type: StatusMessageType.ERROR, message: 'Role type is invalid.' },
-  [MessageType.INVALID_YEAR]: { type: StatusMessageType.ERROR, message: 'Role year is invalid.' },
+  [MessageType.ROLE_TYPE_INVALID]: { type: StatusMessageType.ERROR, message: 'Role type is invalid.' },
+  [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
+  [MessageType.ROLE_YEAR_INVALID]: { type: StatusMessageType.ERROR, message: 'Role year must be after 1970.' },
   [MessageType.ROLE_CREATED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
     message: 'Role was created successfully.',
@@ -102,12 +104,17 @@ async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiRespo
   }
 
   if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.INVALID_TYPE]));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.ROLE_TYPE_INVALID]));
     return false;
   }
 
   if (typeof req.body.year !== 'number') {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.INVALID_YEAR]));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.ROLE_YEAR_NAN]));
+    return false;
+  }
+
+  if (req.body.year < 1970) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.ROLE_YEAR_INVALID]));
     return false;
   }
 
