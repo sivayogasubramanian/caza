@@ -1,5 +1,5 @@
 import { NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../types/apiResponse';
+import { ApiResponse, StatusMessage, StatusMessageType } from '../../types/apiResponse';
 
 export enum HttpMethod {
   GET = 'GET',
@@ -37,6 +37,6 @@ export function rejectHttpMethod(res: NextApiResponse, method?: string) {
     );
 }
 
-export function createJsonResponse<D>(payload: D | EmptyPayload, ...messages: StatusMessage[]): ApiResponse<D> {
+export function createJsonResponse<D>(payload: D, ...messages: StatusMessage[]): ApiResponse<D> {
   return { payload, messages };
 }

@@ -68,7 +68,7 @@ async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
   res.status(HttpStatus.OK).json(createJsonResponse(roles));
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData | EmptyPayload>>) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData>>) {
   if (!(await isValidRequest(req, res))) {
     return;
   }

@@ -8,9 +8,11 @@ export interface StatusMessage {
   message: string;
 }
 
-export interface ApiResponse<T> {
-  payload: T | EmptyPayload;
+export interface Response<D> {
+  payload: D;
   messages: StatusMessage[];
 }
 
 export type EmptyPayload = Record<string, never>;
+
+export type ApiResponse<D> = Response<D | EmptyPayload>;
