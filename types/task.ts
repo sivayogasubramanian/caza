@@ -6,6 +6,13 @@ export type TaskPostData = {
   notificationDateTime: Nullable<Date>;
 };
 
+export type TaskPatchData = {
+  title?: string;
+  dueDate?: Date;
+  notificationDateTime?: Nullable<Date>;
+  isDone?: boolean;
+};
+
 export type TaskData = {
   id: number;
   title: string;
