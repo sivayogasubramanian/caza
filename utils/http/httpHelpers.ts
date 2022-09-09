@@ -30,15 +30,13 @@ export function rejectHttpMethod(res: NextApiResponse, method?: string) {
   res
     .status(HttpStatus.NOT_ALLOWED)
     .json(
-      createJsonResponse({}, [
+      createJsonResponse(
+        {},
         { type: StatusMessageType.ERROR, message: `HTTP method ${method ? method + ' ' : ''}not allowed!` },
-      ]),
+      ),
     );
 }
 
-export function createJsonResponse<D>(payload: D | EmptyPayload, messages?: StatusMessage[]): ApiResponse<D> {
-  return {
-    payload,
-    messages: messages ?? [],
-  };
+export function createJsonResponse<D>(payload: D | EmptyPayload, ...messages: StatusMessage[]): ApiResponse<D> {
+  return { payload, messages };
 }
