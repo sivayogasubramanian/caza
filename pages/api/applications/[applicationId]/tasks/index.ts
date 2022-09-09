@@ -26,11 +26,11 @@ const messages = Object.freeze({
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Task title is empty.' },
   [MessageType.INVALID_DUE_DATE]: {
     type: StatusMessageType.ERROR,
-    message: 'Task notification date and time is invalid.',
+    message: 'Task due date is invalid.',
   },
   [MessageType.INVALID_NOTIFICATION_DATETIME]: {
     type: StatusMessageType.ERROR,
-    message: 'Task notification date and time is invalid.',
+    message: 'Task notification date and/or time is invalid.',
   },
   [MessageType.TASK_APPLICATION_ID_INVALID]: {
     type: StatusMessageType.ERROR,
@@ -42,7 +42,7 @@ const messages = Object.freeze({
   },
   [MessageType.TASK_APPLICATION_DOES_NOT_BELONG_TO_USER]: {
     type: StatusMessageType.ERROR,
-    message: 'Application for this task cannot be found.',
+    message: 'Application for this task does not belong to you.',
   },
   [MessageType.TASK_CREATED_SUCCESSFULLY]: { type: StatusMessageType.SUCCESS, message: 'Task created successfully.' },
 });
