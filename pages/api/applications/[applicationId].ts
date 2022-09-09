@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
+import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
@@ -13,17 +13,17 @@ enum MessageType {
   APPLICATION_DELETED_SUCCESSFULLY,
 }
 
-const messages = new Map<MessageType, StatusMessage[]>([
-  [MessageType.APPLICATION_NOT_FOUND, [{ type: StatusMessageType.ERROR, message: 'Application cannot be found.' }]],
-  [
-    MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER,
-    [{ type: StatusMessageType.ERROR, message: 'Application does not belong to you.' }],
-  ],
-  [
-    MessageType.APPLICATION_DELETED_SUCCESSFULLY,
-    [{ type: StatusMessageType.SUCCESS, message: 'Application was deleted successfully.' }],
-  ],
-]);
+const messages = Object.freeze({
+  [MessageType.APPLICATION_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Application cannot be found.' },
+  [MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application does not belong to you.',
+  },
+  [MessageType.APPLICATION_DELETED_SUCCESSFULLY]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Application was deleted successfully.',
+  },
+});
 
 function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
@@ -79,7 +79,7 @@ async function handleGet(
   });
 
   if (!application) {
-    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_NOT_FOUND)));
+    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_NOT_FOUND]));
     return;
   }
 
@@ -95,11 +95,11 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   if (count === 0) {
     res
       .status(HttpStatus.UNAUTHORIZED)
-      .json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER)));
+      .json(createJsonResponse({}, messages[MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER]));
     return;
   }
 
-  res.status(HttpStatus.OK).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
+  res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.APPLICATION_DELETED_SUCCESSFULLY]));
 }
 
 export default withAuthUser(handler);
