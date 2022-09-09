@@ -3,16 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
-import {
-  createJsonResponse,
-  HTTP_GET_METHOD,
-  HTTP_POST_METHOD,
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_CREATED,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_OK,
-  rejectHttpMethod,
-} from '../../../utils/http/httpHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { createIfPossible } from '../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../utils/strings/validations';
 
@@ -46,10 +37,10 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
-    case HTTP_GET_METHOD:
+    case HttpMethod.GET:
       handleGet(req, res);
       break;
-    case HTTP_POST_METHOD:
+    case HttpMethod.POST:
       handlePost(req, res);
       break;
     default:
@@ -74,7 +65,7 @@ async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
     },
   });
 
-  res.status(HTTP_STATUS_OK).json(createJsonResponse(roles));
+  res.status(HttpStatus.OK).json(createJsonResponse(roles));
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData | EmptyPayload>>) {
@@ -87,7 +78,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   const company = await prisma.company.findUnique({ where: { id: rolePostData.companyId } });
 
   if (!company) {
-    res.status(HTTP_STATUS_NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.COMPANY_DOES_NOT_EXIST)));
+    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.COMPANY_DOES_NOT_EXIST)));
     return false;
   }
 
@@ -98,29 +89,29 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
     });
 
     res
-      .status(HTTP_STATUS_CREATED)
+      .status(HttpStatus.CREATED)
       .json(createJsonResponse(newRole, messages.get(MessageType.ROLE_CREATED_SUCCESSFULLY)));
   });
 }
 
 async function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): Promise<boolean> {
   if (typeof req.body.companyId !== 'number') {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_COMPANY_ID)));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_COMPANY_ID)));
     return false;
   }
 
   if (isEmpty(req.body.title)) {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.EMPTY_TITLE)));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.EMPTY_TITLE)));
     return false;
   }
 
   if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_TYPE)));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_TYPE)));
     return false;
   }
 
   if (typeof req.body.year !== 'number') {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_YEAR)));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_YEAR)));
     return false;
   }
 
