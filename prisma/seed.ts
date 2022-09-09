@@ -2,7 +2,17 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({ log: ['query'] });
 
-const users: Prisma.UserCreateInput[] = [{ uid: '1' }, { uid: '2' }, { uid: '3' }, { uid: '4' }, { uid: '5' }];
+const users: Prisma.UserCreateInput[] = [
+  { uid: '1' },
+  { uid: '2' },
+  { uid: '3' },
+  { uid: '4' },
+  { uid: '5' },
+  { uid: 'devUserWithData' },
+  { uid: 'devUserWithoutData' },
+  { uid: 'devUserVerifiedWithData' },
+  { uid: 'devUserVerifiedWithoutData' },
+];
 
 const companies: Prisma.CompanyCreateInput[] = [
   {
@@ -140,6 +150,36 @@ const companies: Prisma.CompanyCreateInput[] = [
                     {
                       type: 'APPLIED',
                       date: new Date(2022, 7, 28),
+                    },
+                  ],
+                },
+              },
+              {
+                userId: 'devUserWithData',
+                applicationStages: {
+                  create: [
+                    {
+                      type: 'APPLIED',
+                      date: new Date(2022, 5, 28),
+                    },
+                    {
+                      type: 'ONLINE_ASSESSMENT',
+                      date: new Date(2022, 6, 7),
+                    },
+                  ],
+                },
+              },
+              {
+                userId: 'devUserVerifiedWithData',
+                applicationStages: {
+                  create: [
+                    {
+                      type: 'APPLIED',
+                      date: new Date(2022, 6, 28),
+                    },
+                    {
+                      type: 'ONLINE_ASSESSMENT',
+                      date: new Date(2022, 6, 30),
                     },
                   ],
                 },
