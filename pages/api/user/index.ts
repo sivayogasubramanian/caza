@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { Nullable } from '../../../types/utils';
-import { withVerifiedUser, getUserFromJwt, UserDetailsFromRequest } from '../../../utils/auth/jwtHelpers';
+import { withVerifiedUser, getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
@@ -48,6 +48,14 @@ async function handlePost(currentUid: string, req: NextApiRequest, res: NextApiR
     return res
       .status(HttpStatus.OK)
       .json(createJsonResponse({}, { type: SUCCESS, message: 'New user with UID ${currentUid} added.' }));
+  }
+
+  // getAuthUser Middleware ensures authenticated token is valid and can be decoded.
+  const currentIsAnonymous = (await getUserFromJwt(req.headers.authorization as string)).isAnonymous;
+  if (currentIsAnonymous) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json(createJsonResponse({}, { type: ERROR, message: 'An unverified account cannot be the target of link.' }));
   }
 
   let oldUserDetails: UserDetailsFromRequest;
@@ -157,4 +165,4 @@ function hasUserData(user: UserData): boolean {
   return user.applications.length > 0;
 }
 
-export default withPrismaErrorHandling(withVerifiedUser(handler));
+export default withPrismaErrorHandling(withAuthUser(handler));
