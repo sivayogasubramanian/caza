@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { TaskData, TaskPostData } from '../../../../../types/task';
 import { Nullable } from '../../../../../types/utils';
-import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
+import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { isInteger } from '../../../../../utils/numbers/validations';
@@ -122,4 +122,4 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
   return null;
 }
 
-export default withPrismaErrorHandling(withVerifiedUser(handler));
+export default withPrismaErrorHandling(withAuthUser(handler));
