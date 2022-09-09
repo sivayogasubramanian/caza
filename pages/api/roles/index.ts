@@ -108,11 +108,11 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.INVALID_COMPANY_ID;
   }
 
-  if (isEmpty(req.body.title)) {
+  if (req.body.title && isEmpty(req.body.title)) {
     return MessageType.EMPTY_TITLE;
   }
 
-  if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
+  if ((req.body.type && isEmpty(req.body.type)) || !(req.body.type in RoleType)) {
     return MessageType.ROLE_TYPE_INVALID;
   }
 
