@@ -7,6 +7,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { withAuth } from '../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
 import { Nullable } from '../../types/utils';
+import { withPrismaErrorHandling } from '../../utils/prisma/prismaHelpers';
 
 enum MessageType {
   COMPANY_ALREADY_EXISTS,
@@ -126,4 +127,4 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
   return null;
 }
 
-export default withAuth(handler);
+export default withPrismaErrorHandling(withAuth(handler));
