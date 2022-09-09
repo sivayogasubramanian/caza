@@ -23,11 +23,13 @@ const companies: Prisma.CompanyCreateInput[] = [
           title: 'Software Engineer Intern',
           type: 'SUMMER_INTERNSHIP',
           year: 2023,
+          isVerified: true,
         },
         {
           title: 'Enterprise Engineer Intern',
           type: 'SUMMER_INTERNSHIP',
           year: 2023,
+          isVerified: true,
         },
       ],
     },
