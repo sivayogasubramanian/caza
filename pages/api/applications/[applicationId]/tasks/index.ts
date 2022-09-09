@@ -5,7 +5,7 @@ import { TaskData, TaskPostData } from '../../../../../types/task';
 import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
-import { createIfPossible } from '../../../../../utils/prisma/prismaHelpers';
+import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
@@ -78,17 +78,15 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     notificationDateTime: req.body.notificationDateTime ? new Date(req.body.notificationDateTime) : null,
   };
 
-  createIfPossible(res, async () => {
-    const newTask = await prisma.task.create({
-      data: {
-        applicationId,
-        ...taskPostData,
-      },
-      select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
-    });
-
-    res.status(HttpStatus.CREATED).json(createJsonResponse(newTask, messages[MessageType.TASK_CREATED_SUCCESSFULLY]));
+  const newTask = await prisma.task.create({
+    data: {
+      applicationId,
+      ...taskPostData,
+    },
+    select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
   });
+
+  res.status(HttpStatus.CREATED).json(createJsonResponse(newTask, messages[MessageType.TASK_CREATED_SUCCESSFULLY]));
 }
 
 function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): boolean {
@@ -115,4 +113,4 @@ function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<Em
   return true;
 }
 
-export default withVerifiedUser(handler);
+export default withPrismaErrorHandling(withVerifiedUser(handler));
