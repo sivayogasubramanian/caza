@@ -4,15 +4,7 @@ import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../
 import { TaskData, TaskPostData } from '../../../../../types/task';
 import { withVerifiedUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
-import {
-  createJsonResponse,
-  HTTP_POST_METHOD,
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_CREATED,
-  HTTP_STATUS_FORBIDDEN,
-  HTTP_STATUS_NOT_FOUND,
-  rejectHttpMethod,
-} from '../../../../../utils/http/httpHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { createIfPossible } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 
@@ -49,7 +41,7 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
-    case HTTP_POST_METHOD:
+    case HttpMethod.POST:
       handlePost(userId, req, res);
       break;
     default:
@@ -66,15 +58,13 @@ async function handlePost(
   const application = await prisma.application.findUnique({ where: { id: applicationId } });
 
   if (!application) {
-    res
-      .status(HTTP_STATUS_NOT_FOUND)
-      .json(createJsonResponse({}, messages.get(MessageType.TASK_APPLICATION_NOT_FOUND)));
+    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.TASK_APPLICATION_NOT_FOUND)));
     return;
   }
 
   if (application.userId !== userId) {
     res
-      .status(HTTP_STATUS_FORBIDDEN)
+      .status(HttpStatus.FORBIDDEN)
       .json(createJsonResponse({}, messages.get(MessageType.TASK_APPLICATION_DOES_NOT_BELONG_TO_USER)));
     return;
   }
@@ -99,19 +89,19 @@ async function handlePost(
     });
 
     res
-      .status(HTTP_STATUS_CREATED)
+      .status(HttpStatus.CREATED)
       .json(createJsonResponse(newTask, messages.get(MessageType.TASK_CREATED_SUCCESSFULLY)));
   });
 }
 
 function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>): boolean {
   if (isEmpty(req.body.title)) {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.EMPTY_TITLE)));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.EMPTY_TITLE)));
     return false;
   }
 
   if (!isValidDate(req.body.dueDate)) {
-    res.status(HTTP_STATUS_BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_DUE_DATE)));
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages.get(MessageType.INVALID_DUE_DATE)));
     return false;
   }
 
@@ -120,7 +110,7 @@ function isValidRequest(req: NextApiRequest, res: NextApiResponse<ApiResponse<Em
     !isValidDate(req.body.notificationDateTime)
   ) {
     res
-      .status(HTTP_STATUS_BAD_REQUEST)
+      .status(HttpStatus.BAD_REQUEST)
       .json(createJsonResponse({}, messages.get(MessageType.INVALID_NOTIFICATION_DATETIME)));
     return false;
   }

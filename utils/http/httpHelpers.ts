@@ -1,24 +1,24 @@
 import { NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../types/apiResponse';
 
-export const HTTP_GET_METHOD = 'GET';
-export const HTTP_POST_METHOD = 'POST';
-export const HTTP_PUT_METHOD = 'PUT';
-export const HTTP_DELETE_METHOD = 'DELETE';
-export const HTTP_PATCH_METHOD = 'PATCH';
-export const HTTP_HEAD_METHOD = 'HEAD';
+export enum HttpMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
+}
 
-export const HTTP_STATUS_OK = 200;
-export const HTTP_STATUS_CREATED = 201;
-export const HTTP_STATUS_ACCEPTED = 202;
-export const HTTP_STATUS_NO_CONTENT = 204;
-export const HTTP_STATUS_BAD_REQUEST = 400;
-export const HTTP_STATUS_UNAUTHORIZED = 401;
-export const HTTP_STATUS_FORBIDDEN = 403;
-export const HTTP_STATUS_NOT_FOUND = 404;
-export const HTTP_STATUS_METHOD_NOT_ALLOWED = 405;
-export const HTTP_STATUS_CONFLICT = 409;
-export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
+export enum HttpStatus {
+  OK = 200,
+  CREATED = 201,
+  NO_CONTENT = 204,
+  BAD_REQUEST = 400,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  NOT_ALLOWED = 405,
+  INTERNAL_SERVER_ERROR = 500,
+}
 
 /**
  * Utility function that rejects all responses not in allowed methods with a 405 HTTP response.
@@ -28,7 +28,7 @@ export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
  */
 export function rejectHttpMethod(res: NextApiResponse, method?: string) {
   res
-    .status(HTTP_STATUS_METHOD_NOT_ALLOWED)
+    .status(HttpStatus.NOT_ALLOWED)
     .json(
       createJsonResponse({}, [
         { type: StatusMessageType.ERROR, message: `HTTP method ${method ? method + ' ' : ''}not allowed!` },

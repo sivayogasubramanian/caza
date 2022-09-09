@@ -3,15 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessage, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
-import {
-  createJsonResponse,
-  HTTP_DELETE_METHOD,
-  HTTP_GET_METHOD,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_OK,
-  HTTP_STATUS_UNAUTHORIZED,
-  rejectHttpMethod,
-} from '../../../utils/http/httpHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 
 const prisma = new PrismaClient();
 
@@ -37,10 +29,10 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
-    case HTTP_GET_METHOD:
+    case HttpMethod.GET:
       handleGet(userId, req, res);
       break;
-    case HTTP_DELETE_METHOD:
+    case HttpMethod.DELETE:
       handleDelete(userId, req, res);
       break;
     default:
@@ -87,11 +79,11 @@ async function handleGet(
   });
 
   if (!application) {
-    res.status(HTTP_STATUS_NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_NOT_FOUND)));
+    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_NOT_FOUND)));
     return;
   }
 
-  res.status(HTTP_STATUS_OK).json(createJsonResponse(application));
+  res.status(HttpStatus.OK).json(createJsonResponse(application));
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
@@ -102,12 +94,12 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
 
   if (count === 0) {
     res
-      .status(HTTP_STATUS_UNAUTHORIZED)
+      .status(HttpStatus.UNAUTHORIZED)
       .json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER)));
     return;
   }
 
-  res.status(HTTP_STATUS_OK).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
+  res.status(HttpStatus.OK).json(createJsonResponse({}, messages.get(MessageType.APPLICATION_DELETED_SUCCESSFULLY)));
 }
 
 export default withAuthUser(handler);
