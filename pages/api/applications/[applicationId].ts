@@ -40,11 +40,7 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function handleGet(
-  userId: string,
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<ApplicationData | EmptyPayload>>,
-) {
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
   const applicationId = Number(req.query.applicationId);
 
   const application: ApplicationData | null = await prisma.application.findFirst({
