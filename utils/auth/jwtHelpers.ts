@@ -104,7 +104,7 @@ export async function getUserFromJwt(token: string): Promise<UserDetailsFromRequ
   // If you are running this in development mode, JWT token verification and decoding can be skipped.
   // Use bearer token 'devUserFoo' to get { uid: 'devUserFoo', isAnonymous: true }
   // Use bearer token 'devUserVerifiedFoo' to get { uid: 'devUserVerifiedFoo', isAnonymous: false }
-  if (process.env.NODE_ENV == 'development' && /devUser/u.test(token)) {
+  if (['development', 'test'].includes(process.env.NODE_ENV) && /devUser/u.test(token)) {
     return { uid: token, isAnonymous: !/Verified/u.test(token) };
   }
 
