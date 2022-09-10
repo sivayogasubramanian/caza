@@ -8,7 +8,7 @@ import { MIN_ROLE_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { isInteger } from '../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
-import { capitalizeEveryWord, trim } from '../../../utils/strings/formatters';
+import { capitalizeEveryWord } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
@@ -82,9 +82,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
       },
     }));
 
-  console.log(queryWords);
-
-  if (!queryCompanyId) {
+  if (!queryCompanyId || !searchWords.length) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
