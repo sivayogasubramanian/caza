@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
+import { AccountPostData } from '../../../types/user';
 import { Nullable } from '../../../types/utils';
 import { getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
@@ -50,7 +51,7 @@ const messages = Object.freeze({
 async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   switch (req.method) {
     case HttpMethod.POST:
-      const { oldToken } = req.body;
+      const { oldToken } = req.body as AccountPostData;
       const oldUserToken = oldToken && typeof oldToken == 'string' ? oldToken.trim() : oldToken;
       return oldUserToken /* if null, undefined, empty or contains only whitespace */
         ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
