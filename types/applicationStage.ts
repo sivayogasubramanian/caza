@@ -12,8 +12,8 @@ export type ApplicationStageApplicationData = {
 export type ApplicationStageData = ApplicationStageApplicationData & { applicationId: number };
 
 export type ApplicationStagePatchData = {
-  type: ApplicationStageType;
-  date: Date;
-  emojiUnicodeHex: string | null;
-  remark: string | null;
+  type?: ApplicationStageType;
+  date?: Date;
+  emojiUnicodeHex?: Nullable<string>;
+  remark?: Nullable<string>;
 };

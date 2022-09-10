@@ -85,7 +85,7 @@ async function handlePatch(
   res: NextApiResponse<ApiResponse<ApplicationStageData>>,
 ) {
   const errorMessageType = validatePatchRequest(req);
-  if (errorMessageType != null) {
+  if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
   }
@@ -94,8 +94,10 @@ async function handlePatch(
   const applicationId = Number(req.query.applicationId);
 
   const applicationStagePatchData: ApplicationStagePatchData = {
-    ...req.body,
+    type: req.body.type,
     date: new Date(req.body.date),
+    emojiUnicodeHex: req.body.emojiUnicodeHex,
+    remark: req.body.remark,
   };
 
   // Note: updateMany is used to allow filter on non-unique columns.
@@ -181,7 +183,7 @@ function validatePatchRequest(req: NextApiRequest) {
     return MessageType.INVALID_APPLICATION_ID;
   }
 
-  if (req.body.type !== undefined && !Object.values(ApplicationStageType).includes(req.body.type)) {
+  if (req.body.type !== undefined && !(req.body.type in ApplicationStageType)) {
     return MessageType.INVALID_APPLICATION_STAGE_TYPE;
   }
 
