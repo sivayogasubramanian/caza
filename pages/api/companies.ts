@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CompanyData, CompanyListData, CompanyPostData } from '../../types/company';
 import { isEmpty, isValidUrl } from '../../utils/strings/validations';
-import {capitalizeEveryWord, removeProtocolAndWwwIfPresent, trim} from '../../utils/strings/formatters';
+import { capitalizeEveryWord, removeProtocolAndWwwIfPresent, trim } from '../../utils/strings/formatters';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
 import { withAuth } from '../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
@@ -14,8 +14,9 @@ enum MessageType {
   COMPANY_CREATED_SUCCESSFULLY,
   EMPTY_NAME,
   INVALID_COMPANY_URL,
-  MISSING_NAME,
+  INVALID_NAME,
   MISSING_COMPANY_URL,
+  MISSING_NAME,
 }
 
 const prisma = new PrismaClient();
@@ -23,6 +24,7 @@ const prisma = new PrismaClient();
 const messages = Object.freeze({
   [MessageType.EMPTY_NAME]: { type: StatusMessageType.ERROR, message: 'Company name is empty.' },
   [MessageType.INVALID_COMPANY_URL]: { type: StatusMessageType.ERROR, message: 'Company url is invalid.' },
+  [MessageType.INVALID_NAME]: { type: StatusMessageType.ERROR, message: 'Company name is invalid.' },
   [MessageType.MISSING_NAME]: { type: StatusMessageType.ERROR, message: 'Company name is missing.' },
   [MessageType.MISSING_COMPANY_URL]: { type: StatusMessageType.ERROR, message: 'Company url is missing.' },
   [MessageType.COMPANY_ALREADY_EXISTS]: { type: StatusMessageType.SUCCESS, message: 'Company already exists.' },
@@ -112,19 +114,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 }
 
 function validateRequest(req: NextApiRequest): Nullable<MessageType> {
-  if (!req.body.name) {
+  if (req.body.name === undefined) {
     return MessageType.MISSING_NAME;
+  }
+
+  if (req.body.name === null) {
+    return MessageType.INVALID_NAME;
   }
 
   if (isEmpty(req.body.name)) {
     return MessageType.EMPTY_NAME;
   }
 
-  if (!req.body.companyUrl) {
+  if (req.body.companyUrl === undefined) {
     return MessageType.MISSING_COMPANY_URL;
   }
 
-  if (!isValidUrl(req.body.companyUrl)) {
+  if (req.body.companyUrl === null || !isValidUrl(req.body.companyUrl)) {
     return MessageType.INVALID_COMPANY_URL;
   }
 
