@@ -21,6 +21,7 @@ export function removeProtocolAndWwwIfPresent(url: string) {
 }
 
 export function capitalizeEveryWord(phrase: string) {
+  // Safely handles words with length 0 or 1 as well.
   return phrase
     .toLowerCase()
     .split(' ')
