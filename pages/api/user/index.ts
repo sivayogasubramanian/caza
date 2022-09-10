@@ -18,7 +18,7 @@ interface UserData {
 enum MessageType {
   // POST link accounts.
   NEW_USER_UNVERIFIED,
-  OLD_USER_DELETED,
+  OLD_USER_NOT_FOUND,
   NEW_USER_HAS_DATA,
   NEW_USER_LINKED,
   INVALID_OLD_TOKEN,
@@ -27,7 +27,7 @@ enum MessageType {
   USER_ALREADY_EXISTS,
   USER_CREATED,
   // DELETE accounts
-  USER_NOT_FOUND,
+  DELETE_TARGET_NOT_FOUND,
   USER_DELETED,
 }
 
@@ -49,16 +49,13 @@ const messages = Object.freeze({
     type: StatusMessageType.ERROR,
     message: 'New UID already has user data and cannot be linked.',
   },
-  [MessageType.OLD_USER_DELETED]: {
-    type: StatusMessageType.SUCCESS,
-    message: 'Old UID not found. New UID has been linked.',
-  },
+  [MessageType.OLD_USER_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Old UID not found.' },
   [MessageType.NEW_USER_LINKED]: {
     type: StatusMessageType.SUCCESS,
     message: 'Old UID has been replaced with new UID.',
   },
   // DELETE messages.
-  [MessageType.USER_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
+  [MessageType.DELETE_TARGET_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
   [MessageType.USER_DELETED]: { type: StatusMessageType.SUCCESS, message: 'Deleted UID and their data.' },
 });
 
@@ -84,7 +81,7 @@ async function handlePostWithoutOldToken(currentUid: string, res: NextApiRespons
   }
 
   await prisma.user.create({ data: { uid: currentUid } });
-  return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.USER_CREATED]));
+  return res.status(HttpStatus.CREATED).json(createJsonResponse({}, messages[MessageType.USER_CREATED]));
 }
 
 async function handlePostWithOldToken(
@@ -116,8 +113,9 @@ async function handlePostWithOldToken(
     case MessageType.NEW_USER_HAS_DATA:
       return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.NEW_USER_HAS_DATA]));
 
-    case MessageType.OLD_USER_DELETED:
-    // fallthrough
+    case MessageType.OLD_USER_NOT_FOUND:
+      return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.OLD_USER_NOT_FOUND]));
+
     case MessageType.NEW_USER_LINKED:
       return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[result]));
 
@@ -131,7 +129,7 @@ async function handleDelete(uid: string, res: NextApiResponse<ApiResponse<EmptyP
   // UID is a primary key, so the count will either be 0 (UID does not exist in database) or 1 (successful delete).
   const user = await getUserIfExists(uid);
   if (!user) {
-    return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.USER_NOT_FOUND]));
+    return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.DELETE_TARGET_NOT_FOUND]));
   }
 
   await prisma.application.deleteMany({ where: { userId: uid } });
@@ -144,14 +142,8 @@ async function linkAccount(oldUid: string, newUid: string): Promise<MessageType>
   const newUser = await getUserIfExists(newUid);
   const oldUser = await getUserIfExists(oldUid);
 
-  // If old user has already been removed from the database. This can happen if the API was called twice or if the new user
-  // creation process failed and the API was retried.
   if (!oldUser) {
-    if (!newUser) {
-      await prisma.user.create({ data: { uid: newUid } });
-    }
-
-    return MessageType.OLD_USER_DELETED;
+    return MessageType.OLD_USER_NOT_FOUND;
   }
 
   // Handle situation where new user exists already with data.
