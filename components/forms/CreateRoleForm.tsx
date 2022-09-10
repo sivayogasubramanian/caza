@@ -1,5 +1,5 @@
 import { Form, InputNumber, Input, Select, Button } from 'antd';
-import api from '../../api/api';
+import rolesApi from '../../api/rolesApi';
 import { RolePostData } from '../../types/role';
 
 const { Option } = Select;
@@ -8,9 +8,9 @@ function CreateRoleForm() {
   const [form] = Form.useForm();
 
   const onSubmit = (values: RolePostData) => {
-    api.post('roles', values).then(() => {
+    rolesApi.createRole(values).then(() => {
       form.resetFields();
-      alert('Role created successfully.');
+      alert('Role created successfully!');
     });
   };
 
