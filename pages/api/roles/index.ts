@@ -72,7 +72,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
 
   const queryCompanyId = isInteger(companyId as string) ? Number(companyId) : undefined;
 
-  const searchWords = (searchQuery as string) ? (searchQuery as string).split(' ') : [];
+  const searchWords = typeof searchQuery === 'string' ? (searchQuery as string).split(' ') : [];
   const queryYear = searchWords.filter(isInteger).map(Number)[0];
   const queryWords = searchWords
     .filter((word) => !isInteger(word))
