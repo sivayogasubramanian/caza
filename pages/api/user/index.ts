@@ -58,7 +58,7 @@ const messages = Object.freeze({
   [MessageType.DELETE_TARGET_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
 });
 
-async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<UserData>>) {
   switch (req.method) {
     case HttpMethod.POST:
       return handlePost(currentUid, req, res);
@@ -69,7 +69,7 @@ async function handler(currentUid: string, req: NextApiRequest, res: NextApiResp
   }
 }
 
-function handlePost(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+function handlePost(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<UserData>>) {
   const { oldToken } = req.body as AccountPostData;
   const oldUserToken = oldToken && typeof oldToken == 'string' ? oldToken.trim() : oldToken;
   return oldUserToken /* if null, undefined, empty or contains only whitespace */
@@ -91,7 +91,7 @@ async function handlePostWithOldToken(
   currentUid: string,
   oldUserToken: string,
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<EmptyPayload>>,
+  res: NextApiResponse<ApiResponse<UserData>>,
 ) {
   const currentIsAnonymous = (await getUserFromJwt(req.headers.authorization as string)).isAnonymous;
   if (currentIsAnonymous) {
@@ -120,11 +120,7 @@ async function handlePostWithOldToken(
       return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.OLD_USER_NOT_FOUND]));
 
     case MessageType.NEW_USER_LINKED:
-      return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[result]));
-
-    default:
-      // This is unreachable.
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+      return res.status(HttpStatus.OK).json(createJsonResponse({ uid: currentUid }, messages[result]));
   }
 }
 
@@ -141,7 +137,10 @@ async function handleDelete(uid: string, res: NextApiResponse<ApiResponse<EmptyP
   return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.USER_DELETED]));
 }
 
-async function linkAccount(oldUid: string, newUid: string): Promise<MessageType> {
+async function linkAccount(
+  oldUid: string,
+  newUid: string,
+): Promise<MessageType.NEW_USER_EXISTS | MessageType.OLD_USER_NOT_FOUND | MessageType.NEW_USER_LINKED> {
   const newUser = await getUserIfExists(newUid);
   const oldUser = await getUserIfExists(oldUid);
 
