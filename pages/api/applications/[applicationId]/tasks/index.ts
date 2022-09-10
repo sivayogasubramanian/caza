@@ -117,7 +117,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_TITLE;
   }
 
-  if (req.body.title === null) {
+  if (req.body.title === null || typeof req.body.title !== 'string') {
     return MessageType.INVALID_TITLE;
   }
 
@@ -129,14 +129,11 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_DUE_DATE;
   }
 
-  if (req.body.dueDate === null || !isValidDate(req.body.dueDate)) {
+  if (req.body.dueDate === null || typeof req.body.dueDate !== 'string' || !isValidDate(req.body.dueDate)) {
     return MessageType.INVALID_DUE_DATE;
   }
 
-  if (
-    (req.body.notification === null || req.body.notificationDateTime !== undefined) &&
-    !isValidDate(req.body.notificationDateTime)
-  ) {
+  if (req.body.notificationDateTime != null && !isValidDate(req.body.notificationDateTime)) {
     return MessageType.INVALID_NOTIFICATION_DATETIME;
   }
 
