@@ -1,11 +1,12 @@
-**/public/workbox-*.js*
+**/public/workbox-_.js_
 **/public/sw.js*
-**/public/worker-*.js*
-*.md
+\*\*/public/worker-*.js\*
+_.md
 styles/**
 public/**
 yarn.lock
-*.svg
+_.svg
 prisma/migrations/
 prisma/schema.prisma
 coverage/
+**tests**/
