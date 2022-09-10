@@ -8,3 +8,4 @@ yarn.lock
 *.svg
 prisma/migrations/
 prisma/schema.prisma
+coverage/
