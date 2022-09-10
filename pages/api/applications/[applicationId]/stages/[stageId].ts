@@ -6,11 +6,13 @@ import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
-import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
+import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
 import { Nullable } from '../../../../../types/utils';
 import { isInteger } from '../../../../../utils/numbers/validations';
 
 enum MessageType {
+  APPLICATION_STAGE_DELETE_UNAUTHORIZED,
+  APPLICATION_STAGE_DELETED_SUCCESSFULLY,
   APPLICATION_STAGE_NOT_FOUND,
   APPLICATION_STAGE_UPDATE_UNAUTHORIZED,
   APPLICATION_STAGE_UPDATED_SUCCESSFULLY,
@@ -24,6 +26,14 @@ enum MessageType {
 const prisma = new PrismaClient();
 
 const messages = Object.freeze({
+  [MessageType.APPLICATION_STAGE_DELETE_UNAUTHORIZED]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage cannot be deleted by the user.',
+  },
+  [MessageType.APPLICATION_STAGE_DELETED_SUCCESSFULLY]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Application stage deleted successfully.',
+  },
   [MessageType.APPLICATION_STAGE_NOT_FOUND]: {
     type: StatusMessageType.ERROR,
     message: 'Application stage cannot be found.',
@@ -130,7 +140,13 @@ async function handlePatch(
     .json(createJsonResponse(updatedApplicationStage, messages[MessageType.APPLICATION_STAGE_UPDATED_SUCCESSFULLY]));
 }
 
-async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+  const errorMessageType = validateDeleteRequest(req);
+  if (errorMessageType != null) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
+    return;
+  }
+
   const applicationStageId = Number(req.query.stageId);
   const applicationId = Number(req.query.applicationId);
 
@@ -145,11 +161,13 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   });
 
   if (count === 0) {
-    res.status(HttpStatus.UNAUTHORIZED).end();
+    res
+      .status(HttpStatus.UNAUTHORIZED)
+      .json(createJsonResponse({}, messages[MessageType.APPLICATION_STAGE_DELETE_UNAUTHORIZED]));
     return;
   }
 
-  res.status(HttpStatus.OK).json({ message: `Application Stage ${applicationStageId} was deleted successfully.` });
+  res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.APPLICATION_STAGE_DELETED_SUCCESSFULLY]));
 }
 
 function validatePatchRequest(req: NextApiRequest) {
@@ -176,6 +194,20 @@ function validatePatchRequest(req: NextApiRequest) {
   ) {
     return MessageType.INVALID_EMOJI_UNICODE_HEX;
   }
+
+  return null;
+}
+
+function validateDeleteRequest(req: NextApiRequest) {
+  if (!isInteger(req.query.applicationStageId as string)) {
+    return MessageType.INVALID_APPLICATION_STAGE_ID;
+  }
+
+  if (!isInteger(req.query.applicationId as string)) {
+    return MessageType.INVALID_APPLICATION_ID;
+  }
+
+  return null;
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
