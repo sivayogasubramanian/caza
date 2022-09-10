@@ -49,9 +49,9 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
   const { name } = req.query;
-  const trimmedNameKeyword = name && name.toString().trim();
+  const trimmedName = name && name.toString().trim();
 
-  if (!trimmedNameKeyword) {
+  if (!trimmedName) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
@@ -60,7 +60,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<C
     where: {
       isVerified: true,
       name: {
-        contains: trimmedNameKeyword,
+        contains: trimmedName,
         mode: 'insensitive',
       },
     },
