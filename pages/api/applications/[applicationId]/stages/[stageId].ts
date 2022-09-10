@@ -70,17 +70,15 @@ const messages = Object.freeze({
   },
 });
 
-function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   switch (method) {
     case HttpMethod.PATCH:
-      handlePatch(userId, req, res);
-      break;
+      return handlePatch(userId, req, res);
     case HttpMethod.DELETE:
-      handleDelete(userId, req, res);
-      break;
+      return handleDelete(userId, req, res);
     default:
-      rejectHttpMethod(res, method);
+      return rejectHttpMethod(res, method);
   }
 }
 
