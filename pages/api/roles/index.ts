@@ -1,4 +1,4 @@
-import { PrismaClient, RoleType } from '@prisma/client';
+import { PrismaClient, Role, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData } from '../../../types/role';
@@ -6,8 +6,9 @@ import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { MIN_ROLE_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import { isInteger } from '../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
-import { capitalizeEveryWord } from '../../../utils/strings/formatters';
+import { capitalizeEveryWord, trim } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
@@ -66,12 +67,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// TODO: Optional Search query. Will be done in another PR to unblock others.
-
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
+  const { companyId, title, type, year } = req.query;
+
+  const queryCompanyId = isInteger(companyId as string) ? Number(companyId) : undefined;
+  const queryTitle = title ? trim(title) : undefined;
+  const queryType = type && (type as string) in RoleType ? (trim(type) as RoleType) : undefined;
+  const queryYear = isInteger(year as string) ? Number(year) : undefined;
+
+  if (!queryCompanyId && !queryTitle && !queryType && !queryYear) {
+    res.status(HttpStatus.OK).json(createJsonResponse([]));
+    return;
+  }
+
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
       isVerified: true,
+      companyId: queryCompanyId,
+      title: { contains: queryTitle },
+      type: queryType,
+      year: queryYear,
     },
     select: {
       id: true,
