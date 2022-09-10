@@ -48,20 +48,24 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
-  if (req.body.searchKeyword === undefined || req.body.searchKeyword === null) {
+  const { nameKeyword } = req.query;
+  const trimmedNameKeyword = nameKeyword && nameKeyword.toString().trim();
+
+  if (!trimmedNameKeyword) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
-
-  const searchKeyword = req.body.searchKeyword.trim();
 
   const companies: CompanyListData[] = await prisma.company.findMany({
     where: {
       isVerified: true,
       name: {
-        contains: searchKeyword,
+        contains: trimmedNameKeyword,
         mode: 'insensitive',
       },
+    },
+    orderBy: {
+      name: 'asc',
     },
     select: { id: true, name: true, companyUrl: true },
   });
