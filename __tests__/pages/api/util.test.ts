@@ -16,7 +16,7 @@ export function getPrismaClientForTests() {
 }
 
 export function createMocks<D>(
-  handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
+  _handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
   // eslint-disable-next-line
   { uid, method, query, body }: { uid: string; method: HttpMethod; query?: Record<string, string>; body?: any },
 ) {
