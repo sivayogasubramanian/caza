@@ -32,30 +32,27 @@ enum MessageType {
 
 const messages = Object.freeze({
   // POST messages (without oldToken)
-  [MessageType.USER_CREATED]: { type: StatusMessageType.SUCCESS, message: 'New user with UID added.' },
-  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.ERROR, message: 'User with UID already exists.' },
+  [MessageType.USER_CREATED]: { type: StatusMessageType.SUCCESS, message: 'New user added.' },
+  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.ERROR, message: 'User already exists.' },
   // POST messages (with oldToken)
-  [MessageType.NEW_USER_LINKED]: {
-    type: StatusMessageType.SUCCESS,
-    message: 'Old UID has been replaced with new UID.',
-  },
-  [MessageType.NEW_USER_UNVERIFIED]: {
-    type: StatusMessageType.ERROR,
-    message: 'An unverified account cannot be the target of link.',
-  },
+  [MessageType.NEW_USER_LINKED]: { type: StatusMessageType.SUCCESS, message: 'Account was linked successfully.' },
+  [MessageType.NEW_USER_UNVERIFIED]: { type: StatusMessageType.ERROR, message: 'Account could not be linked.' },
   [MessageType.INVALID_OLD_TOKEN]: {
     type: StatusMessageType.ERROR,
-    message: 'Could not validate and decode "oldToken".',
+    message: 'There was an error while retrieving user info.',
   },
-  [MessageType.OLD_USER_VERIFIED]: { type: StatusMessageType.ERROR, message: 'Old UID is already linked.' },
+  [MessageType.OLD_USER_VERIFIED]: { type: StatusMessageType.ERROR, message: 'Account is already linked.' },
   [MessageType.NEW_USER_EXISTS]: {
     type: StatusMessageType.ERROR,
-    message: 'New UID already exists and cannot be linked.',
+    message: 'There is already an account associated with this Github profile.',
   },
-  [MessageType.OLD_USER_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Old UID not found.' },
+  [MessageType.OLD_USER_NOT_FOUND]: {
+    type: StatusMessageType.ERROR,
+    message: 'There was an error while retrieving user info.',
+  },
   // DELETE messages.
-  [MessageType.USER_DELETED]: { type: StatusMessageType.SUCCESS, message: 'Deleted UID and their data.' },
-  [MessageType.DELETE_TARGET_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
+  [MessageType.USER_DELETED]: { type: StatusMessageType.SUCCESS, message: 'Deleted user and their data.' },
+  [MessageType.DELETE_TARGET_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find user to delete.' },
 });
 
 async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<UserData>>) {
@@ -77,14 +74,16 @@ function handlePost(currentUid: string, req: NextApiRequest, res: NextApiRespons
     : handlePostWithoutOldToken(currentUid, res);
 }
 
-async function handlePostWithoutOldToken(currentUid: string, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+async function handlePostWithoutOldToken(currentUid: string, res: NextApiResponse<ApiResponse<UserData>>) {
   const isExisting = (await getUserIfExists(currentUid)) !== null;
   if (isExisting) {
     return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.USER_ALREADY_EXISTS]));
   }
 
   await prisma.user.create({ data: { uid: currentUid } });
-  return res.status(HttpStatus.CREATED).json(createJsonResponse({}, messages[MessageType.USER_CREATED]));
+  return res
+    .status(HttpStatus.CREATED)
+    .json(createJsonResponse({ uid: currentUid }, messages[MessageType.USER_CREATED]));
 }
 
 async function handlePostWithOldToken(
