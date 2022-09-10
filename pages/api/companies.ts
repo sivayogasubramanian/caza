@@ -76,7 +76,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<C
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyData>>) {
-  const errorMessageType = validateRequest(req);
+  const errorMessageType = validatePostRequest(req);
   if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
@@ -113,7 +113,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
     .json(createJsonResponse(newCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
 }
 
-function validateRequest(req: NextApiRequest): Nullable<MessageType> {
+function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   if (req.body.name === undefined) {
     return MessageType.MISSING_NAME;
   }
