@@ -129,7 +129,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_TITLE;
   }
 
-  if (req.body.title === null) {
+  if (req.body.title === null || typeof req.body.companyId !== 'string') {
     return MessageType.INVALID_TITLE;
   }
 
@@ -141,7 +141,12 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_ROLE_TYPE;
   }
 
-  if (req.body.type === null || isEmpty(req.body.type) || !(req.body.type in RoleType)) {
+  if (
+    req.body.type === null ||
+    typeof req.body.type !== 'string' ||
+    isEmpty(req.body.type) ||
+    !(req.body.type in RoleType)
+  ) {
     return MessageType.ROLE_TYPE_INVALID;
   }
 
