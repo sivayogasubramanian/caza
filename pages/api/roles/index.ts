@@ -68,14 +68,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
-  const { companyId, title, type, year } = req.query;
+  const { companyId, searchQuery } = req.query;
 
   const queryCompanyId = isInteger(companyId as string) ? Number(companyId) : undefined;
-  const queryTitle = title ? trim(title) : undefined;
-  const queryType = type && (type as string) in RoleType ? (trim(type) as RoleType) : undefined;
-  const queryYear = isInteger(year as string) ? Number(year) : undefined;
 
-  if (!queryCompanyId && !queryTitle && !queryType && !queryYear) {
+  const searchWords = (searchQuery as string) ? (searchQuery as string).split(' ') : [];
+  const queryYear = searchWords.filter(isInteger).map(Number)[0];
+  const queryWords = searchWords
+    .filter((word) => !isInteger(word))
+    .map((word) => ({
+      title: {
+        contains: word,
+      },
+    }));
+
+  console.log(queryWords);
+
+  if (!queryCompanyId) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
@@ -84,9 +93,8 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
     where: {
       isVerified: true,
       companyId: queryCompanyId,
-      title: { contains: queryTitle },
-      type: queryType,
-      year: queryYear,
+      AND: [{ year: { equals: queryYear } }],
+      OR: [...queryWords],
     },
     select: {
       id: true,
