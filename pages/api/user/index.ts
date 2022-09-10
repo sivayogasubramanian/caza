@@ -7,7 +7,6 @@ import { getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../u
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
-const { ERROR, INFORMATION, SUCCESS } = StatusMessageType;
 const prisma = new PrismaClient();
 
 /** Limited set of data representing user and the list of user application IDs. Only for use in this endpoint. */
@@ -34,18 +33,33 @@ enum MessageType {
 
 const messages = Object.freeze({
   // POST messages (without oldToken)
-  [MessageType.USER_ALREADY_EXISTS]: { type: ERROR, message: 'User with UID already exists.' },
-  [MessageType.USER_CREATED]: { type: SUCCESS, message: 'New user with UID added.' },
+  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.ERROR, message: 'User with UID already exists.' },
+  [MessageType.USER_CREATED]: { type: StatusMessageType.SUCCESS, message: 'New user with UID added.' },
   // POST messages (with oldToken)
-  [MessageType.NEW_USER_UNVERIFIED]: { type: ERROR, message: 'An unverified account cannot be the target of link.' },
-  [MessageType.INVALID_OLD_TOKEN]: { type: ERROR, message: 'Could not validate and decode "oldToken".' },
-  [MessageType.OLD_USER_VERIFIED]: { type: ERROR, message: 'Old UID is already linked.' },
-  [MessageType.NEW_USER_HAS_DATA]: { type: ERROR, message: 'New UID already has user data and cannot be linked.' },
-  [MessageType.OLD_USER_DELETED]: { type: SUCCESS, message: 'Old UID not found. New UID has been linked.' },
-  [MessageType.NEW_USER_LINKED]: { type: SUCCESS, message: 'Old UID has been replaced with new UID.' },
+  [MessageType.NEW_USER_UNVERIFIED]: {
+    type: StatusMessageType.ERROR,
+    message: 'An unverified account cannot be the target of link.',
+  },
+  [MessageType.INVALID_OLD_TOKEN]: {
+    type: StatusMessageType.ERROR,
+    message: 'Could not validate and decode "oldToken".',
+  },
+  [MessageType.OLD_USER_VERIFIED]: { type: StatusMessageType.ERROR, message: 'Old UID is already linked.' },
+  [MessageType.NEW_USER_HAS_DATA]: {
+    type: StatusMessageType.ERROR,
+    message: 'New UID already has user data and cannot be linked.',
+  },
+  [MessageType.OLD_USER_DELETED]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Old UID not found. New UID has been linked.',
+  },
+  [MessageType.NEW_USER_LINKED]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Old UID has been replaced with new UID.',
+  },
   // DELETE messages.
-  [MessageType.USER_NOT_FOUND]: { type: ERROR, message: 'Could not find UID to delete.' },
-  [MessageType.USER_DELETED]: { type: SUCCESS, message: 'Deleted UID and their data.' },
+  [MessageType.USER_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
+  [MessageType.USER_DELETED]: { type: StatusMessageType.SUCCESS, message: 'Deleted UID and their data.' },
 });
 
 async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
