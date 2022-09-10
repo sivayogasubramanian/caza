@@ -16,25 +16,29 @@ interface UserData {
 
 enum MessageType {
   // POST link accounts.
+  NEW_USER_LINKED,
   NEW_USER_UNVERIFIED,
   OLD_USER_NOT_FOUND,
   NEW_USER_EXISTS,
-  NEW_USER_LINKED,
   INVALID_OLD_TOKEN,
   OLD_USER_VERIFIED,
   // POST account creation only.
-  USER_ALREADY_EXISTS,
   USER_CREATED,
+  USER_ALREADY_EXISTS,
   // DELETE accounts
-  DELETE_TARGET_NOT_FOUND,
   USER_DELETED,
+  DELETE_TARGET_NOT_FOUND,
 }
 
 const messages = Object.freeze({
   // POST messages (without oldToken)
-  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.ERROR, message: 'User with UID already exists.' },
   [MessageType.USER_CREATED]: { type: StatusMessageType.SUCCESS, message: 'New user with UID added.' },
+  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.ERROR, message: 'User with UID already exists.' },
   // POST messages (with oldToken)
+  [MessageType.NEW_USER_LINKED]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Old UID has been replaced with new UID.',
+  },
   [MessageType.NEW_USER_UNVERIFIED]: {
     type: StatusMessageType.ERROR,
     message: 'An unverified account cannot be the target of link.',
@@ -49,13 +53,9 @@ const messages = Object.freeze({
     message: 'New UID already exists and cannot be linked.',
   },
   [MessageType.OLD_USER_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Old UID not found.' },
-  [MessageType.NEW_USER_LINKED]: {
-    type: StatusMessageType.SUCCESS,
-    message: 'Old UID has been replaced with new UID.',
-  },
   // DELETE messages.
-  [MessageType.DELETE_TARGET_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
   [MessageType.USER_DELETED]: { type: StatusMessageType.SUCCESS, message: 'Deleted UID and their data.' },
+  [MessageType.DELETE_TARGET_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Could not find UID to delete.' },
 });
 
 async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
