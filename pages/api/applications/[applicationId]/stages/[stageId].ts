@@ -39,10 +39,6 @@ const messages = Object.freeze({
     type: StatusMessageType.ERROR,
     message: 'Application stage cannot be found.',
   },
-  [MessageType.EMPTY_UPDATE]: {
-    type: StatusMessageType.ERROR,
-    message: 'At least one field must be provided for an update.',
-  },
   [MessageType.APPLICATION_STAGE_UPDATE_UNAUTHORIZED]: {
     type: StatusMessageType.ERROR,
     message: 'Application stage cannot be updated by the user.',
@@ -179,10 +175,6 @@ function validatePatchRequest(req: NextApiRequest) {
 
   if (!isInteger(req.query.applicationId as string)) {
     return MessageType.INVALID_APPLICATION_ID;
-  }
-
-  if (!req.body || Object.keys(req.body).length == 0) {
-    return MessageType.EMPTY_UPDATE;
   }
 
   if (req.body.type !== undefined && !(req.body.type in ApplicationStageType)) {
