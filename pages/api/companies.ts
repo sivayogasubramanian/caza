@@ -48,8 +48,8 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
-  const { nameKeyword } = req.query;
-  const trimmedNameKeyword = nameKeyword && nameKeyword.toString().trim();
+  const { name } = req.query;
+  const trimmedNameKeyword = name && name.toString().trim();
 
   if (!trimmedNameKeyword) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
