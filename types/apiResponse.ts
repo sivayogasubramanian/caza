@@ -17,3 +17,5 @@ export interface Response<D> {
 export type EmptyPayload = Record<string, never>;
 
 export type ApiResponse<D> = Response<D | EmptyPayload>;
+
+export type ApiPromise<D> = Promise<ApiResponse<D>>;
