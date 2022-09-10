@@ -24,7 +24,7 @@ enum MessageType {
   MISSING_ROLE_YEAR,
   ROLE_YEAR_INVALID,
   ROLE_YEAR_NAN,
-  ROLE_YEAR_TOO_LARGE,
+  ROLE_YEAR_TOO_SMALL,
   ROLE_CREATED_SUCCESSFULLY,
 }
 
@@ -43,7 +43,7 @@ const messages = Object.freeze({
   [MessageType.MISSING_ROLE_YEAR]: { type: StatusMessageType.ERROR, message: 'Role year is missing.' },
   [MessageType.ROLE_YEAR_INVALID]: { type: StatusMessageType.ERROR, message: 'Role year is invalid.' },
   [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
-  [MessageType.ROLE_YEAR_TOO_LARGE]: {
+  [MessageType.ROLE_YEAR_TOO_SMALL]: {
     type: StatusMessageType.ERROR,
     message: `Role year must be after ${MIN_ROLE_YEAR}.`,
   },
@@ -158,7 +158,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
   }
 
   if (req.body.year < MIN_ROLE_YEAR) {
-    return MessageType.ROLE_YEAR_TOO_LARGE;
+    return MessageType.ROLE_YEAR_TOO_SMALL;
   }
 
   return null;
