@@ -1,6 +1,7 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/AuthContext';
+import api from './api';
 
 type Props = {
   children: ReactElement;
@@ -28,10 +29,10 @@ const AxiosInterceptor = ({ children }: Props) => {
       return config;
     };
 
-    const interceptor = axios.interceptors.request.use(requestInterceptor);
+    const interceptor = api.interceptors.request.use(requestInterceptor);
     setIsIntercepted(true);
 
-    return () => axios.interceptors.request.eject(interceptor);
+    return () => api.interceptors.request.eject(interceptor);
   }, [jwtToken]);
 
   if (!isIntercepted) return null;
