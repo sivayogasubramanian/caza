@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { AccountPostData } from '../../../types/user';
 import { Nullable } from '../../../types/utils';
-import { getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
+import { getBearerToken, getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
@@ -92,7 +92,7 @@ async function handlePostWithOldToken(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<UserData>>,
 ) {
-  const currentIsAnonymous = (await getUserFromJwt(req.headers.authorization as string)).isAnonymous;
+  const currentIsAnonymous = (await getUserFromJwt(getBearerToken(req))).isAnonymous;
   if (currentIsAnonymous) {
     return res.status(HttpStatus.UNAUTHORIZED).json(createJsonResponse({}, messages[MessageType.NEW_USER_UNVERIFIED]));
   }

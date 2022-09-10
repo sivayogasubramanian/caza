@@ -113,7 +113,7 @@ export async function getUserFromJwt(token: string): Promise<UserDetailsFromRequ
   return { uid, isAnonymous: sign_in_provider == 'anonymous' };
 }
 
-function getBearerToken(req: NextApiRequest) {
+export function getBearerToken(req: NextApiRequest) {
   const bearerPrefix = 'Bearer ';
   const authHeader = req.headers?.authorization;
 
