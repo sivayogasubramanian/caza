@@ -150,6 +150,8 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   const applicationStageId = Number(req.query.stageId);
   const applicationId = Number(req.query.applicationId);
 
+  // Note: deleteMany is used to allow filter on non-unique columns.
+  // This allows a check to ensure users are only deleting their own application stages.
   const { count } = await prisma.applicationStage.deleteMany({
     where: {
       id: applicationStageId,
