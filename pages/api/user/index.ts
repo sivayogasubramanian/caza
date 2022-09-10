@@ -61,16 +61,20 @@ const messages = Object.freeze({
 async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   switch (req.method) {
     case HttpMethod.POST:
-      const { oldToken } = req.body as AccountPostData;
-      const oldUserToken = oldToken && typeof oldToken == 'string' ? oldToken.trim() : oldToken;
-      return oldUserToken /* if null, undefined, empty or contains only whitespace */
-        ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
-        : handlePostWithoutOldToken(currentUid, res);
+      return handlePost(currentUid, req, res);
     case HttpMethod.DELETE:
       return handleDelete(currentUid, res);
     default:
       return rejectHttpMethod(res, req.method);
   }
+}
+
+function handlePost(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+  const { oldToken } = req.body as AccountPostData;
+  const oldUserToken = oldToken && typeof oldToken == 'string' ? oldToken.trim() : oldToken;
+  return oldUserToken /* if null, undefined, empty or contains only whitespace */
+    ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
+    : handlePostWithoutOldToken(currentUid, res);
 }
 
 async function handlePostWithoutOldToken(currentUid: string, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
