@@ -171,7 +171,7 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
 }
 
 function validatePatchRequest(req: NextApiRequest) {
-  if (!isInteger(req.query.applicationStageId as string)) {
+  if (!isInteger(req.query.stageId as string)) {
     return MessageType.INVALID_APPLICATION_STAGE_ID;
   }
 
@@ -199,7 +199,7 @@ function validatePatchRequest(req: NextApiRequest) {
 }
 
 function validateDeleteRequest(req: NextApiRequest) {
-  if (!isInteger(req.query.applicationStageId as string)) {
+  if (!isInteger(req.query.stageId as string)) {
     return MessageType.INVALID_APPLICATION_STAGE_ID;
   }
 
