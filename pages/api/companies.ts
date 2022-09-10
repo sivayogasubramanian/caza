@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CompanyData, CompanyListData, CompanyPostData } from '../../types/company';
 import { isEmpty, isValidUrl } from '../../utils/strings/validations';
-import { capitalizeEveryWord, removeProtocolAndWwwIfPresent } from '../../utils/strings/formatters';
+import {capitalizeEveryWord, removeProtocolAndWwwIfPresent, trim} from '../../utils/strings/formatters';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
 import { withAuth } from '../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
@@ -49,7 +49,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
   const { name } = req.query;
-  const trimmedName = name && name.toString().trim();
+  const trimmedName = name && trim(name);
 
   if (!trimmedName) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));

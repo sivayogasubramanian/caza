@@ -28,3 +28,7 @@ export function capitalizeEveryWord(phrase: string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
+
+export function trim(value: string | string[]) {
+  return value.toString().trim();
+}
