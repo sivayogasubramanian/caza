@@ -32,9 +32,9 @@ type PrismaErrors =
   | PrismaClientValidationError;
 
 export function withPrismaErrorHandling<D>(handler: NextApiHandler<ApiResponse<D>>): NextApiHandler<ApiResponse<D>> {
-  return (req, res) => {
+  return async (req, res) => {
     try {
-      handler(req, res);
+      await Promise.resolve(handler(req, res));
     } catch (err) {
       // Could be a PrismaError, Error or something that does not conform to the interface.
       // eslint-disable-next-line

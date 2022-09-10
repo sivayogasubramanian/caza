@@ -46,7 +46,7 @@ export function withAuthUser<D>(
         .json(createJsonResponse({}, { type: StatusMessageType.ERROR, message: UNABLE_TO_AUTHENTICATE }));
     }
 
-    return handler(userDetails.uid, req, res);
+    return await Promise.resolve(handler(userDetails.uid, req, res));
   };
 }
 
@@ -79,7 +79,7 @@ export function withVerifiedUser<D>(
         .json(createJsonResponse({}, { type: StatusMessageType.ERROR, message: USER_NOT_AUTHORIZED }));
     }
 
-    return handler(uid, req, res);
+    return await Promise.resolve(handler(uid, req, res));
   };
 }
 
