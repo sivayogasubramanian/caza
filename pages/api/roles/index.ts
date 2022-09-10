@@ -16,12 +16,14 @@ enum MessageType {
   INVALID_COMPANY_ID,
   COMPANY_DOES_NOT_EXIST,
   MISSING_TITLE,
+  INVALID_TITLE,
   EMPTY_TITLE,
   MISSING_ROLE_TYPE,
   ROLE_TYPE_INVALID,
   MISSING_ROLE_YEAR,
-  ROLE_YEAR_NAN,
   ROLE_YEAR_INVALID,
+  ROLE_YEAR_NAN,
+  ROLE_YEAR_TOO_LARGE,
   ROLE_CREATED_SUCCESSFULLY,
 }
 
@@ -33,12 +35,14 @@ const messages = Object.freeze({
     message: 'The company for this role does not exists.',
   },
   [MessageType.MISSING_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is missing.' },
+  [MessageType.INVALID_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is invalid.' },
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is empty.' },
   [MessageType.MISSING_ROLE_TYPE]: { type: StatusMessageType.ERROR, message: 'Role type is missing.' },
   [MessageType.ROLE_TYPE_INVALID]: { type: StatusMessageType.ERROR, message: 'Role type is invalid.' },
   [MessageType.MISSING_ROLE_YEAR]: { type: StatusMessageType.ERROR, message: 'Role year is missing.' },
+  [MessageType.ROLE_YEAR_INVALID]: { type: StatusMessageType.ERROR, message: 'Role year is invalid.' },
   [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
-  [MessageType.ROLE_YEAR_INVALID]: {
+  [MessageType.ROLE_YEAR_TOO_LARGE]: {
     type: StatusMessageType.ERROR,
     message: `Role year must be after ${MIN_ROLE_YEAR}.`,
   },
@@ -116,12 +120,16 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_COMPANY_ID;
   }
 
-  if (typeof req.body.companyId !== 'number') {
+  if (req.body.companyId === null || typeof req.body.companyId !== 'number') {
     return MessageType.INVALID_COMPANY_ID;
   }
 
   if (req.body.title === undefined) {
     return MessageType.MISSING_TITLE;
+  }
+
+  if (req.body.title === null) {
+    return MessageType.INVALID_TITLE;
   }
 
   if (isEmpty(req.body.title)) {
@@ -132,7 +140,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_ROLE_TYPE;
   }
 
-  if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
+  if (req.body.type === null || isEmpty(req.body.type) || !(req.body.type in RoleType)) {
     return MessageType.ROLE_TYPE_INVALID;
   }
 
@@ -140,12 +148,16 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_ROLE_YEAR;
   }
 
+  if (req.body.year === null) {
+    return MessageType.ROLE_YEAR_INVALID;
+  }
+
   if (typeof req.body.year !== 'number') {
     return MessageType.ROLE_YEAR_NAN;
   }
 
   if (req.body.year < MIN_ROLE_YEAR) {
-    return MessageType.ROLE_YEAR_INVALID;
+    return MessageType.ROLE_YEAR_TOO_LARGE;
   }
 
   return null;

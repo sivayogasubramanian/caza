@@ -14,6 +14,7 @@ const prisma = new PrismaClient();
 
 enum MessageType {
   MISSING_TITLE,
+  INVALID_TITLE,
   EMPTY_TITLE,
   MISSING_DUE_DATE,
   INVALID_DUE_DATE,
@@ -26,6 +27,7 @@ enum MessageType {
 
 const messages = Object.freeze({
   [MessageType.MISSING_TITLE]: { type: StatusMessageType.ERROR, message: 'Task title is missing.' },
+  [MessageType.INVALID_TITLE]: { type: StatusMessageType.ERROR, message: 'Task title is invalid.' },
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Task title is empty.' },
   [MessageType.MISSING_DUE_DATE]: {
     type: StatusMessageType.ERROR,
@@ -115,6 +117,10 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_TITLE;
   }
 
+  if (req.body.title === null) {
+    return MessageType.INVALID_TITLE;
+  }
+
   if (isEmpty(req.body.title)) {
     return MessageType.EMPTY_TITLE;
   }
@@ -123,11 +129,14 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_DUE_DATE;
   }
 
-  if (!isValidDate(req.body.dueDate)) {
+  if (req.body.dueDate === null || !isValidDate(req.body.dueDate)) {
     return MessageType.INVALID_DUE_DATE;
   }
 
-  if (req.body.notificationDateTime !== undefined && !isValidDate(req.body.notificationDateTime)) {
+  if (
+    (req.body.notification === null || req.body.notificationDateTime !== undefined) &&
+    !isValidDate(req.body.notificationDateTime)
+  ) {
     return MessageType.INVALID_NOTIFICATION_DATETIME;
   }
 
