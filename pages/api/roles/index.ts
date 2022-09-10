@@ -129,7 +129,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_TITLE;
   }
 
-  if (req.body.title === null || typeof req.body.companyId !== 'string') {
+  if (req.body.title === null || typeof req.body.title !== 'string') {
     return MessageType.INVALID_TITLE;
   }
 
