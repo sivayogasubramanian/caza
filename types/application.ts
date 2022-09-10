@@ -1,4 +1,4 @@
-import { ApplicationStageData } from './applicationStage';
+import { ApplicationStageApplicationData } from './applicationStage';
 import { CompanyData } from './company';
 import { RoleData } from './role';
 import { TaskData } from './task';
@@ -6,6 +6,6 @@ import { TaskData } from './task';
 export type ApplicationData = {
   id: number;
   role: RoleData & { company: CompanyData };
-  applicationStages: ApplicationStageData[];
+  applicationStages: ApplicationStageApplicationData[];
   tasks: TaskData[];
 };

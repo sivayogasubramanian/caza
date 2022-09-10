@@ -1,14 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApplicationStageType, PrismaClient } from '@prisma/client';
-import { ApplicationStagePatchData } from '../../../../../types/applicationStage';
-import { ErrorData } from '../../../../../types/error';
+import { ApplicationStageData, ApplicationStagePatchData } from '../../../../../types/applicationStage';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
-import { HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
+import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
+import { Nullable } from '../../../../../types/utils';
+import { isInteger } from '../../../../../utils/numbers/validations';
 
-enum ErrorType {
+enum MessageType {
+  APPLICATION_STAGE_NOT_FOUND,
+  APPLICATION_STAGE_UPDATE_UNAUTHORIZED,
+  APPLICATION_STAGE_UPDATED_SUCCESSFULLY,
+  INVALID_APPLICATION_ID,
+  INVALID_APPLICATION_STAGE_ID,
   INVALID_APPLICATION_STAGE_TYPE,
   INVALID_DATE,
   INVALID_EMOJI_UNICODE_HEX,
@@ -16,11 +23,37 @@ enum ErrorType {
 
 const prisma = new PrismaClient();
 
-const errorMessages = new Map<ErrorType, ErrorData>([
-  [ErrorType.INVALID_APPLICATION_STAGE_TYPE, { message: 'Application stage type is invalid.' }],
-  [ErrorType.INVALID_DATE, { message: 'Date is invalid.' }],
-  [ErrorType.INVALID_EMOJI_UNICODE_HEX, { message: 'Emoji unicode hex is invalid.' }],
-]);
+const messages = Object.freeze({
+  [MessageType.APPLICATION_STAGE_NOT_FOUND]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage cannot be found.',
+  },
+  [MessageType.APPLICATION_STAGE_UPDATE_UNAUTHORIZED]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage cannot be updated by the user.',
+  },
+  [MessageType.APPLICATION_STAGE_UPDATED_SUCCESSFULLY]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Application stage updated successfully.',
+  },
+  [MessageType.INVALID_APPLICATION_ID]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application id is invalid',
+  },
+  [MessageType.INVALID_APPLICATION_STAGE_ID]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage id is invalid',
+  },
+  [MessageType.INVALID_APPLICATION_STAGE_TYPE]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage type is invalid.',
+  },
+  [MessageType.INVALID_DATE]: { type: StatusMessageType.ERROR, message: 'Application stage date is invalid.' },
+  [MessageType.INVALID_EMOJI_UNICODE_HEX]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage emoji unicode hex is invalid.',
+  },
+});
 
 function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
@@ -36,8 +69,16 @@ function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResponse) {
-  validateRequest(req, res);
+async function handlePatch(
+  userId: string,
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<ApplicationStageData>>,
+) {
+  const errorMessageType = validatePatchRequest(req);
+  if (errorMessageType != null) {
+    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
+    return;
+  }
 
   const applicationStageId = Number(req.query.stageId);
   const applicationId = Number(req.query.applicationId);
@@ -48,7 +89,7 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
   };
 
   // Note: updateMany is used to allow filter on non-unique columns.
-  // This allows a check to ensure users are only editing their own application stages.
+  // This allows a check to ensure users are only updating their own application stages.
   const { count } = await prisma.applicationStage.updateMany({
     where: {
       id: applicationStageId,
@@ -65,26 +106,28 @@ async function handlePatch(userId: string, req: NextApiRequest, res: NextApiResp
     },
   });
 
-  if (count < 1) {
-    res.status(HttpStatus.BAD_REQUEST).end();
+  if (count === 0) {
+    res
+      .status(HttpStatus.UNAUTHORIZED)
+      .json(createJsonResponse({}, messages[MessageType.APPLICATION_STAGE_UPDATE_UNAUTHORIZED]));
     return;
   }
 
-  const updatedApplicationStage = await prisma.applicationStage.findUnique({
+  const updatedApplicationStage: Nullable<ApplicationStageData> = await prisma.applicationStage.findUnique({
     where: {
       id: applicationStageId,
     },
-    select: {
-      id: true,
-      applicationId: true,
-      type: true,
-      date: true,
-      emojiUnicodeHex: true,
-      remark: true,
-    },
+    select: { id: true, applicationId: true, type: true, date: true, emojiUnicodeHex: true, remark: true },
   });
 
-  res.status(HttpStatus.OK).json(updatedApplicationStage);
+  if (!updatedApplicationStage) {
+    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_STAGE_NOT_FOUND]));
+    return;
+  }
+
+  res
+    .status(HttpStatus.OK)
+    .json(createJsonResponse(updatedApplicationStage, messages[MessageType.APPLICATION_STAGE_UPDATED_SUCCESSFULLY]));
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse) {
@@ -109,15 +152,21 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   res.status(HttpStatus.OK).json({ message: `Application Stage ${applicationStageId} was deleted successfully.` });
 }
 
-function validateRequest(req: NextApiRequest, res: NextApiResponse) {
+function validatePatchRequest(req: NextApiRequest) {
+  if (!isInteger(req.query.applicationStageId as string)) {
+    return MessageType.INVALID_APPLICATION_STAGE_ID;
+  }
+
+  if (!isInteger(req.query.applicationId as string)) {
+    return MessageType.INVALID_APPLICATION_ID;
+  }
+
   if (req.body.type !== undefined && !Object.values(ApplicationStageType).includes(req.body.type)) {
-    res.status(HttpStatus.BAD_REQUEST).json(errorMessages.get(ErrorType.INVALID_APPLICATION_STAGE_TYPE));
-    return;
+    return MessageType.INVALID_APPLICATION_STAGE_TYPE;
   }
 
   if (req.body.date !== undefined && !isValidDate(req.body.date)) {
-    res.status(HttpStatus.BAD_REQUEST).json(errorMessages.get(ErrorType.INVALID_DATE));
-    return;
+    return MessageType.INVALID_DATE;
   }
 
   if (
@@ -125,8 +174,7 @@ function validateRequest(req: NextApiRequest, res: NextApiResponse) {
     req.body.emojiUnicodeHex !== null &&
     !isValidHex(req.body.emojiUnicodeHex)
   ) {
-    res.status(HttpStatus.BAD_REQUEST).json(errorMessages.get(ErrorType.INVALID_EMOJI_UNICODE_HEX));
-    return;
+    return MessageType.INVALID_EMOJI_UNICODE_HEX;
   }
 }
 
