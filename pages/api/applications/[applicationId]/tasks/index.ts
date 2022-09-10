@@ -111,7 +111,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function validateRequest(req: NextApiRequest): Nullable<MessageType> {
-  if (!req.body.title) {
+  if (req.body.title === undefined) {
     return MessageType.MISSING_TITLE;
   }
 
@@ -119,7 +119,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.EMPTY_TITLE;
   }
 
-  if (!req.body.dueDate) {
+  if (req.body.dueDate === undefined) {
     return MessageType.MISSING_DUE_DATE;
   }
 
@@ -127,10 +127,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.INVALID_DUE_DATE;
   }
 
-  if (
-    (req.body.notification || req.body.notificationDateTime !== undefined) &&
-    !isValidDate(req.body.notificationDateTime)
-  ) {
+  if (req.body.notificationDateTime !== undefined && !isValidDate(req.body.notificationDateTime)) {
     return MessageType.INVALID_NOTIFICATION_DATETIME;
   }
 

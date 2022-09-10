@@ -65,7 +65,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
 
 // TODO: Optional Search query. Will be done in another PR to unblock others.
 
-async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
+async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
       isVerified: true,
@@ -112,7 +112,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 }
 
 function validateRequest(req: NextApiRequest): Nullable<MessageType> {
-  if (!req.body.companyId) {
+  if (req.body.companyId === undefined) {
     return MessageType.MISSING_COMPANY_ID;
   }
 
@@ -120,7 +120,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.INVALID_COMPANY_ID;
   }
 
-  if (!req.body.title) {
+  if (req.body.title === undefined) {
     return MessageType.MISSING_TITLE;
   }
 
@@ -128,7 +128,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.EMPTY_TITLE;
   }
 
-  if (!req.body.type) {
+  if (req.body.type === undefined) {
     return MessageType.MISSING_ROLE_TYPE;
   }
 
@@ -136,7 +136,7 @@ function validateRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.ROLE_TYPE_INVALID;
   }
 
-  if (!req.body.year) {
+  if (req.body.year === undefined) {
     return MessageType.MISSING_ROLE_YEAR;
   }
 
