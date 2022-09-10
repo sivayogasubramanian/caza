@@ -152,11 +152,6 @@ async function linkAccount(
     return MessageType.NEW_USER_EXISTS;
   }
 
-  // New user exists but has no data (linking should continue as if new user does not exist).
-  if (newUser) {
-    await prisma.user.delete({ where: { uid: newUid } });
-  }
-
   // Update UID to new (foreign key references to UID will cascade on update)
   await prisma.user.update({
     where: { uid: oldUid },
