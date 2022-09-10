@@ -88,7 +88,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return;
   }
 
-  const errorMessageType = validateRequest(req);
+  const errorMessageType = validatePostRequest(req);
   if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
@@ -111,7 +111,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
   res.status(HttpStatus.CREATED).json(createJsonResponse(newTask, messages[MessageType.TASK_CREATED_SUCCESSFULLY]));
 }
 
-function validateRequest(req: NextApiRequest): Nullable<MessageType> {
+function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   if (req.body.title === undefined) {
     return MessageType.MISSING_TITLE;
   }
