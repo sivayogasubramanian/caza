@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { spawn, spawnSync } from 'child_process';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { cwd } from 'process';
 import { ApiResponse } from '../../../types/apiResponse';
 import { HttpMethod, HttpStatus } from '../../../utils/http/httpHelpers';
 
@@ -15,8 +17,21 @@ export function getPrismaClientForTests() {
   return prisma;
 }
 
+export function prismaMigrateReset() {
+  process.stdout.write('Resetting database.');
+
+  const command = 'yarn';
+  const args = ['prisma', 'migrate', 'reset', '--force'];
+  const options = {
+    shell: true,
+    cwd: cwd(),
+  };
+
+  spawnSync(command, args, options);
+}
+
 export function createMocks<D>(
-  _handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
+  handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
   // eslint-disable-next-line
   { uid, method, query, body }: { uid: string; method: HttpMethod; query?: Record<string, string>; body?: any },
 ) {
