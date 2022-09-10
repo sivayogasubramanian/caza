@@ -185,14 +185,14 @@ function validatePatchRequest(req: NextApiRequest) {
     return MessageType.INVALID_APPLICATION_STAGE_TYPE;
   }
 
-  if (req.body.date !== undefined && !isValidDate(req.body.date)) {
+  if (req.body.date !== undefined && (typeof req.body.date !== 'string' || !isValidDate(req.body.date))) {
     return MessageType.INVALID_DATE;
   }
 
   if (
     req.body.emojiUnicodeHex !== undefined &&
     req.body.emojiUnicodeHex !== null &&
-    !isValidHex(req.body.emojiUnicodeHex)
+    (typeof req.body.emojiUnicodeHex !== 'string' || !isValidHex(req.body.emojiUnicodeHex))
   ) {
     return MessageType.INVALID_EMOJI_UNICODE_HEX;
   }
