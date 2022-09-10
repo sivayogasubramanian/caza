@@ -7,6 +7,7 @@ import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { MIN_ROLE_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
+import { capitalizeEveryWord } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
@@ -96,7 +97,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 
   const rolePostData: RolePostData = {
     companyId: req.body.companyId,
-    title: req.body.title,
+    title: capitalizeEveryWord(req.body.title),
     type: req.body.type,
     year: req.body.year,
   };
