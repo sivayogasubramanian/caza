@@ -87,7 +87,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData>>) {
-  const errorMessageType = validateRequest(req);
+  const errorMessageType = validatePostRequest(req);
   if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
@@ -114,7 +114,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
 }
 
-function validateRequest(req: NextApiRequest): Nullable<MessageType> {
+function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   if (req.body.companyId === undefined) {
     return MessageType.MISSING_COMPANY_ID;
   }
