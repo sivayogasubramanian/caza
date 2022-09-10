@@ -12,14 +12,13 @@ const prisma = new PrismaClient();
 /** Limited set of data representing user and the list of user application IDs. Only for use in this endpoint. */
 interface UserData {
   uid: string;
-  applications: { id: number }[];
 }
 
 enum MessageType {
   // POST link accounts.
   NEW_USER_UNVERIFIED,
   OLD_USER_NOT_FOUND,
-  NEW_USER_HAS_DATA,
+  NEW_USER_EXISTS,
   NEW_USER_LINKED,
   INVALID_OLD_TOKEN,
   OLD_USER_VERIFIED,
@@ -45,9 +44,9 @@ const messages = Object.freeze({
     message: 'Could not validate and decode "oldToken".',
   },
   [MessageType.OLD_USER_VERIFIED]: { type: StatusMessageType.ERROR, message: 'Old UID is already linked.' },
-  [MessageType.NEW_USER_HAS_DATA]: {
+  [MessageType.NEW_USER_EXISTS]: {
     type: StatusMessageType.ERROR,
-    message: 'New UID already has user data and cannot be linked.',
+    message: 'New UID already exists and cannot be linked.',
   },
   [MessageType.OLD_USER_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Old UID not found.' },
   [MessageType.NEW_USER_LINKED]: {
@@ -110,8 +109,8 @@ async function handlePostWithOldToken(
   const result = await linkAccount(oldUid, currentUid);
 
   switch (result) {
-    case MessageType.NEW_USER_HAS_DATA:
-      return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.NEW_USER_HAS_DATA]));
+    case MessageType.NEW_USER_EXISTS:
+      return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.NEW_USER_EXISTS]));
 
     case MessageType.OLD_USER_NOT_FOUND:
       return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.OLD_USER_NOT_FOUND]));
@@ -147,8 +146,8 @@ async function linkAccount(oldUid: string, newUid: string): Promise<MessageType>
   }
 
   // Handle situation where new user exists already with data.
-  if (newUser && hasUserData(newUser)) {
-    return MessageType.NEW_USER_HAS_DATA;
+  if (newUser) {
+    return MessageType.NEW_USER_EXISTS;
   }
 
   // New user exists but has no data (linking should continue as if new user does not exist).
@@ -169,14 +168,8 @@ async function linkAccount(oldUid: string, newUid: string): Promise<MessageType>
 async function getUserIfExists(uid: string): Promise<Nullable<UserData>> {
   const user = await prisma.user.findUnique({
     where: { uid: uid },
-    select: { uid: true, applications: { select: { id: true } } },
   });
   return user;
-}
-
-// Returns true iff there is at least one application for this User.
-function hasUserData(user: UserData): boolean {
-  return user.applications.length > 0;
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
