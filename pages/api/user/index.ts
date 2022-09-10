@@ -68,7 +68,7 @@ async function handler(currentUid: string, req: NextApiRequest, res: NextApiResp
 
 function handlePost(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<UserData>>) {
   const { oldToken } = req.body as AccountPostData;
-  const oldUserToken = oldToken && typeof oldToken == 'string' ? oldToken.trim() : oldToken;
+  const oldUserToken = oldToken && typeof oldToken === 'string' ? oldToken.trim() : oldToken;
   return oldUserToken /* if null, undefined, empty or contains only whitespace */
     ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
     : handlePostWithoutOldToken(currentUid, res);
@@ -130,9 +130,7 @@ async function handleDelete(uid: string, res: NextApiResponse<ApiResponse<EmptyP
     return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.DELETE_TARGET_NOT_FOUND]));
   }
 
-  await prisma.application.deleteMany({ where: { userId: uid } });
   await prisma.user.delete({ where: { uid } });
-
   return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.USER_DELETED]));
 }
 
