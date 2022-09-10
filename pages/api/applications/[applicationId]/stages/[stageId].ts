@@ -16,6 +16,7 @@ enum MessageType {
   APPLICATION_STAGE_NOT_FOUND,
   APPLICATION_STAGE_UPDATE_UNAUTHORIZED,
   APPLICATION_STAGE_UPDATED_SUCCESSFULLY,
+  EMPTY_UPDATE,
   INVALID_APPLICATION_ID,
   INVALID_APPLICATION_STAGE_ID,
   INVALID_APPLICATION_STAGE_TYPE,
@@ -37,6 +38,10 @@ const messages = Object.freeze({
   [MessageType.APPLICATION_STAGE_NOT_FOUND]: {
     type: StatusMessageType.ERROR,
     message: 'Application stage cannot be found.',
+  },
+  [MessageType.EMPTY_UPDATE]: {
+    type: StatusMessageType.ERROR,
+    message: 'At least one field must be provided for an update.',
   },
   [MessageType.APPLICATION_STAGE_UPDATE_UNAUTHORIZED]: {
     type: StatusMessageType.ERROR,
@@ -181,6 +186,10 @@ function validatePatchRequest(req: NextApiRequest) {
 
   if (!isInteger(req.query.applicationId as string)) {
     return MessageType.INVALID_APPLICATION_ID;
+  }
+
+  if (!req.body || Object.keys(req.body).length == 0) {
+    return MessageType.EMPTY_UPDATE;
   }
 
   if (req.body.type !== undefined && !(req.body.type in ApplicationStageType)) {
