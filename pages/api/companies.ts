@@ -118,7 +118,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_NAME;
   }
 
-  if (req.body.name === null) {
+  if (req.body.name === null || typeof req.body.name !== 'string') {
     return MessageType.INVALID_NAME;
   }
 
@@ -130,7 +130,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_COMPANY_URL;
   }
 
-  if (req.body.companyUrl === null || !isValidUrl(req.body.companyUrl)) {
+  if (req.body.companyUrl === null || typeof req.body.companyUrl !== 'string' || !isValidUrl(req.body.companyUrl)) {
     return MessageType.INVALID_COMPANY_URL;
   }
 
