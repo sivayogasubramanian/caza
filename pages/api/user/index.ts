@@ -24,7 +24,7 @@ const prisma = new PrismaClient();
 async function handler(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   switch (req.method) {
     case HttpMethod.POST:
-      const oldUserToken = req.body?.old_token?.trim();
+      const oldUserToken = req.body?.oldToken?.trim();
       return oldUserToken /* if null, undefined, empty or contains only whitespace */
         ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
         : handlePostWithoutOldToken(currentUid, req, res);
@@ -72,7 +72,7 @@ async function handlePostWithOldToken(
   } catch (error) {
     return res
       .status(HttpStatus.UNAUTHORIZED)
-      .json(createJsonResponse({}, { type: ERROR, message: `Could not validate and decode 'old_token'.` }));
+      .json(createJsonResponse({}, { type: ERROR, message: `Could not validate and decode 'oldToken'.` }));
   }
 
   const oldUid = oldUserDetails.uid;
