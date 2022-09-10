@@ -12,23 +12,31 @@ import { isEmpty } from '../../../utils/strings/validations';
 const prisma = new PrismaClient();
 
 enum MessageType {
+  MISSING_COMPANY_ID,
   INVALID_COMPANY_ID,
   COMPANY_DOES_NOT_EXIST,
+  MISSING_TITLE,
   EMPTY_TITLE,
+  MISSING_ROLE_TYPE,
   ROLE_TYPE_INVALID,
+  MISSING_ROLE_YEAR,
   ROLE_YEAR_NAN,
   ROLE_YEAR_INVALID,
   ROLE_CREATED_SUCCESSFULLY,
 }
 
 const messages = Object.freeze({
-  [MessageType.INVALID_COMPANY_ID]: { type: StatusMessageType.ERROR, message: 'Company id must be a number' },
+  [MessageType.MISSING_COMPANY_ID]: { type: StatusMessageType.ERROR, message: 'Company id is missing.' },
+  [MessageType.INVALID_COMPANY_ID]: { type: StatusMessageType.ERROR, message: 'Company id must be a number.' },
   [MessageType.COMPANY_DOES_NOT_EXIST]: {
     type: StatusMessageType.ERROR,
     message: 'The company for this role does not exists.',
   },
+  [MessageType.MISSING_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is missing.' },
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is empty.' },
+  [MessageType.MISSING_ROLE_TYPE]: { type: StatusMessageType.ERROR, message: 'Role type is missing.' },
   [MessageType.ROLE_TYPE_INVALID]: { type: StatusMessageType.ERROR, message: 'Role type is invalid.' },
+  [MessageType.MISSING_ROLE_YEAR]: { type: StatusMessageType.ERROR, message: 'Role year is missing.' },
   [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
   [MessageType.ROLE_YEAR_INVALID]: {
     type: StatusMessageType.ERROR,
@@ -77,7 +85,7 @@ async function handleGet(_: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData>>) {
   const errorMessageType = validateRequest(req);
-  if (errorMessageType) {
+  if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
   }
@@ -104,16 +112,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 }
 
 function validateRequest(req: NextApiRequest): Nullable<MessageType> {
+  if (!req.body.companyId) {
+    return MessageType.MISSING_COMPANY_ID;
+  }
+
   if (typeof req.body.companyId !== 'number') {
     return MessageType.INVALID_COMPANY_ID;
   }
 
-  if (req.body.title && isEmpty(req.body.title)) {
+  if (!req.body.title) {
+    return MessageType.MISSING_TITLE;
+  }
+
+  if (isEmpty(req.body.title)) {
     return MessageType.EMPTY_TITLE;
   }
 
-  if ((req.body.type && isEmpty(req.body.type)) || !(req.body.type in RoleType)) {
+  if (!req.body.type) {
+    return MessageType.MISSING_ROLE_TYPE;
+  }
+
+  if (isEmpty(req.body.type) || !(req.body.type in RoleType)) {
     return MessageType.ROLE_TYPE_INVALID;
+  }
+
+  if (!req.body.year) {
+    return MessageType.MISSING_ROLE_YEAR;
   }
 
   if (typeof req.body.year !== 'number') {

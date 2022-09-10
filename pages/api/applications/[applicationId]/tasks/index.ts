@@ -13,7 +13,9 @@ import { isEmpty } from '../../../../../utils/strings/validations';
 const prisma = new PrismaClient();
 
 enum MessageType {
+  MISSING_TITLE,
   EMPTY_TITLE,
+  MISSING_DUE_DATE,
   INVALID_DUE_DATE,
   INVALID_NOTIFICATION_DATETIME,
   TASK_APPLICATION_ID_INVALID,
@@ -23,7 +25,12 @@ enum MessageType {
 }
 
 const messages = Object.freeze({
+  [MessageType.MISSING_TITLE]: { type: StatusMessageType.ERROR, message: 'Task title is missing.' },
   [MessageType.EMPTY_TITLE]: { type: StatusMessageType.ERROR, message: 'Task title is empty.' },
+  [MessageType.MISSING_DUE_DATE]: {
+    type: StatusMessageType.ERROR,
+    message: 'Task due date is missing.',
+  },
   [MessageType.INVALID_DUE_DATE]: {
     type: StatusMessageType.ERROR,
     message: 'Task due date is invalid.',
@@ -81,7 +88,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
   }
 
   const errorMessageType = validateRequest(req);
-  if (errorMessageType) {
+  if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
     return;
   }
@@ -104,8 +111,16 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function validateRequest(req: NextApiRequest): Nullable<MessageType> {
-  if (req.body.title && isEmpty(req.body.title)) {
+  if (!req.body.title) {
+    return MessageType.MISSING_TITLE;
+  }
+
+  if (isEmpty(req.body.title)) {
     return MessageType.EMPTY_TITLE;
+  }
+
+  if (!req.body.dueDate) {
+    return MessageType.MISSING_DUE_DATE;
   }
 
   if (!isValidDate(req.body.dueDate)) {
