@@ -69,19 +69,15 @@ async function handler(currentUid: string, req: NextApiRequest, res: NextApiResp
       const oldUserToken = oldToken && typeof oldToken == 'string' ? oldToken.trim() : oldToken;
       return oldUserToken /* if null, undefined, empty or contains only whitespace */
         ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
-        : handlePostWithoutOldToken(currentUid, req, res);
+        : handlePostWithoutOldToken(currentUid, res);
     case HttpMethod.DELETE:
-      return handleDelete(currentUid, req, res);
+      return handleDelete(currentUid, res);
     default:
       return rejectHttpMethod(res, req.method);
   }
 }
 
-async function handlePostWithoutOldToken(
-  currentUid: string,
-  _req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<EmptyPayload>>,
-) {
+async function handlePostWithoutOldToken(currentUid: string, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   const isExisting = (await getUserIfExists(currentUid)) !== null;
   if (isExisting) {
     return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.USER_ALREADY_EXISTS]));
@@ -131,7 +127,7 @@ async function handlePostWithOldToken(
   }
 }
 
-async function handleDelete(uid: string, _req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+async function handleDelete(uid: string, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   // UID is a primary key, so the count will either be 0 (UID does not exist in database) or 1 (successful delete).
   const user = await getUserIfExists(uid);
   if (!user) {
