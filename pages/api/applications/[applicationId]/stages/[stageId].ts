@@ -6,6 +6,7 @@ import { isValidHex } from '../../../../../utils/strings/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
+import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 
 enum ErrorType {
   INVALID_APPLICATION_STAGE_TYPE,
@@ -129,4 +130,4 @@ function validateRequest(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withAuthUser(handler);
+export default withPrismaErrorHandling(withAuthUser(handler));
