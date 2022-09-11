@@ -6,7 +6,6 @@ import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { MIN_ROLE_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
-import { isInteger } from '../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { capitalizeEveryWord } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
@@ -70,18 +69,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
   const { companyId, searchQuery } = req.query as RoleQueryParams;
 
-  const queryCompanyId = typeof companyId == 'string' && isInteger(companyId) ? Number(companyId) : undefined;
+  const queryCompanyId = typeof companyId == 'string' && Number.isInteger(companyId) ? Number(companyId) : undefined;
 
   const searchWords = typeof searchQuery == 'string' && !isEmpty(searchQuery) ? searchQuery.trim().split(/\s+/) : [];
 
   const searchInts = searchWords
-    .filter(isInteger)
+    .filter(Number.isInteger)
     .map(Number)
     .filter((year) => year >= MIN_ROLE_YEAR);
   const queryYear = searchInts.length > 0 ? searchInts[0] : undefined;
 
   const queryWords = searchWords
-    .filter((word) => !(isInteger(word) && Number(word) >= MIN_ROLE_YEAR))
+    .filter((word) => !(Number.isInteger(word) && Number(word) >= MIN_ROLE_YEAR))
     .map((word) => ({
       title: {
         contains: word,
