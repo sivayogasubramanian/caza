@@ -1,7 +1,7 @@
-import { PrismaClient, RoleType } from '@prisma/client';
+import { Prisma, PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
-import { RoleData, RoleListData, RolePostData } from '../../../types/role';
+import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
 import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { MIN_ROLE_YEAR } from '../../../utils/constants';
@@ -68,24 +68,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
-  const { companyId, searchQuery } = req.query;
+  const { companyId, searchQuery } = req.query as RoleQueryParams;
 
-  const queryCompanyId = isInteger(companyId as string) ? Number(companyId) : undefined;
+  const queryCompanyId = typeof companyId == 'string' && isInteger(companyId) ? Number(companyId) : undefined;
 
-  const searchWords = typeof searchQuery === 'string' ? (searchQuery as string).split(' ') : [];
-  const queryYear = searchWords
+  const searchWords = typeof searchQuery == 'string' && !isEmpty(searchQuery) ? searchQuery.split(/\s+/) : [];
+
+  const searchInts = searchWords
     .filter(isInteger)
     .map(Number)
-    .filter((year) => year >= MIN_ROLE_YEAR)[0];
+    .filter((year) => year >= MIN_ROLE_YEAR);
+  const queryYear = searchInts.length > 0 ? searchInts[0] : undefined;
+
   const queryWords = searchWords
     .filter((word) => !(isInteger(word) && Number(word) >= MIN_ROLE_YEAR))
     .map((word) => ({
       title: {
         contains: word,
+        mode: Prisma.QueryMode.insensitive,
       },
     }));
 
-  if (!queryCompanyId || !searchWords.length) {
+  if (!queryCompanyId) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
@@ -94,8 +98,8 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
     where: {
       isVerified: true,
       companyId: queryCompanyId,
-      AND: [{ year: { equals: queryYear } }],
-      OR: [...queryWords],
+      AND: queryYear ? [{ year: { equals: queryYear } }] : undefined,
+      OR: queryWords.length > 0 ? queryWords : undefined,
     },
     select: {
       id: true,
