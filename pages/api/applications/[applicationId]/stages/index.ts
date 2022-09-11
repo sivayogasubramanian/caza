@@ -8,7 +8,6 @@ import { isValidDate } from '../../../../../utils/date/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
 
-const { ERROR, SUCCESS } = StatusMessageType;
 const prisma = new PrismaClient();
 
 type ApplicationDataWithStages = Application & { applicationStages: ApplicationStage[] };
@@ -23,23 +22,23 @@ enum MessageType {
 
 const messages = Object.freeze({
   [MessageType.INVALID_TYPE]: {
-    type: ERROR,
+    type: StatusMessageType.ERROR,
     message:
       'Application Stage type is invalid. Type must be one of: ' + Object.values(ApplicationStageType).join(', ') + '.',
   },
   [MessageType.INVALID_DATE]: {
-    type: ERROR,
+    type: StatusMessageType.ERROR,
     message: 'Application Stage date is invalid.',
   },
   [MessageType.INVALID_APPLICATION_ID]: {
-    type: ERROR,
+    type: StatusMessageType.ERROR,
     message: 'Query parameter applicationId (.../applications/:applicationId/...) is invalid.',
   },
   [MessageType.APPLICATION_NOT_FOUND]: {
-    type: ERROR,
+    type: StatusMessageType.ERROR,
     message: 'User does not have any application with the given ID.',
   },
-  [MessageType.CREATED]: { type: SUCCESS, message: `Application stage has been created.` },
+  [MessageType.CREATED]: { type: StatusMessageType.SUCCESS, message: `Application stage has been created.` },
 });
 
 async function handler(
