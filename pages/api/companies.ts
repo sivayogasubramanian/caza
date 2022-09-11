@@ -34,18 +34,16 @@ const messages = Object.freeze({
   },
 });
 
-function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
     case HttpMethod.GET:
-      handleGet(req, res);
-      break;
+      return handleGet(req, res);
     case HttpMethod.POST:
-      handlePost(req, res);
-      break;
+      return handlePost(req, res);
     default:
-      rejectHttpMethod(res, method);
+      return rejectHttpMethod(res, method);
   }
 }
 

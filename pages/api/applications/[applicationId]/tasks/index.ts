@@ -56,15 +56,14 @@ const messages = Object.freeze({
   [MessageType.TASK_CREATED_SUCCESSFULLY]: { type: StatusMessageType.SUCCESS, message: 'Task created successfully.' },
 });
 
-function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
     case HttpMethod.POST:
-      handlePost(userId, req, res);
-      break;
+      return handlePost(userId, req, res);
     default:
-      rejectHttpMethod(res, method);
+      return rejectHttpMethod(res, method);
   }
 }
 
