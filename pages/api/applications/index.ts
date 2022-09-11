@@ -6,6 +6,7 @@ import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { Nullable } from '../../../types/utils';
 import { MIN_DATE } from '../../../utils/constants';
+import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -171,4 +172,4 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   return null;
 }
 
-export default withAuthUser(handler);
+export default withPrismaErrorHandling(withAuthUser(handler));
