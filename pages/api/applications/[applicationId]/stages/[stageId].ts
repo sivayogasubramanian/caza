@@ -8,6 +8,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
 import { Nullable } from '../../../../../types/utils';
+import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 
 enum MessageType {
   APPLICATION_STAGE_DELETE_UNAUTHORIZED,
@@ -168,11 +169,11 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
 }
 
 function validatePatchRequest(req: NextApiRequest) {
-  if (!Number.isInteger(req.query.stageId)) {
+  if (!canBecomeInteger(req.query.stageId)) {
     return MessageType.INVALID_APPLICATION_STAGE_ID;
   }
 
-  if (!Number.isInteger(req.query.applicationId)) {
+  if (!canBecomeInteger(req.query.applicationId)) {
     return MessageType.INVALID_APPLICATION_ID;
   }
 
@@ -218,11 +219,11 @@ function makePatchData(req: NextApiRequest) {
 }
 
 function validateDeleteRequest(req: NextApiRequest) {
-  if (!Number.isInteger(req.query.stageId)) {
+  if (!canBecomeInteger(req.query.stageId)) {
     return MessageType.INVALID_APPLICATION_STAGE_ID;
   }
 
-  if (!Number.isInteger(req.query.applicationId)) {
+  if (!canBecomeInteger(req.query.applicationId)) {
     return MessageType.INVALID_APPLICATION_ID;
   }
 

@@ -9,6 +9,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { capitalizeEveryWord } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
+import { canBecomeInteger } from '../../../utils/numbers/validations';
 
 const prisma = new PrismaClient();
 
@@ -69,18 +70,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
   const { companyId, searchQuery } = req.query as RoleQueryParams;
 
-  const queryCompanyId = typeof companyId == 'string' && Number.isInteger(companyId) ? Number(companyId) : undefined;
+  const queryCompanyId = typeof companyId == 'string' && canBecomeInteger(companyId) ? Number(companyId) : undefined;
 
   const searchWords = typeof searchQuery == 'string' && !isEmpty(searchQuery) ? searchQuery.trim().split(/\s+/) : [];
 
   const searchInts = searchWords
-    .filter(Number.isInteger)
+    .filter(canBecomeInteger)
     .map(Number)
     .filter((year) => year >= MIN_ROLE_YEAR);
   const queryYear = searchInts.length > 0 ? searchInts[0] : undefined;
 
   const queryWords = searchWords
-    .filter((word) => !(Number.isInteger(word) && Number(word) >= MIN_ROLE_YEAR))
+    .filter((word) => !(canBecomeInteger(word) && Number(word) >= MIN_ROLE_YEAR))
     .map((word) => ({
       title: {
         contains: word,

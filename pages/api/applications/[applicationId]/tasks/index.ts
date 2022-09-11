@@ -8,6 +8,7 @@ import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
+import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 
 const prisma = new PrismaClient();
 
@@ -67,7 +68,7 @@ async function handler(userId: string, req: NextApiRequest, res: NextApiResponse
 }
 
 async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
-  if (!Number.isInteger(req.query.applicationId)) {
+  if (!canBecomeInteger(req.query.applicationId)) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.TASK_APPLICATION_ID_INVALID]));
     return;
   }
