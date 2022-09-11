@@ -121,13 +121,12 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 
   const applicationPostData: ApplicationPostData = {
     roleId: req.body.roleId,
-    userId,
   };
 
   const duplicateCount = await prisma.application.count({
     where: {
       roleId: applicationPostData.roleId,
-      userId: applicationPostData.userId,
+      userId: userId,
     },
   });
 

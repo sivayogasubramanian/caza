@@ -19,7 +19,6 @@ export type ApplicationRoleData = {
 
 export type ApplicationPostData = {
   roleId: number;
-  userId: string;
 };
 
 export type ApplicationListData = {
