@@ -13,7 +13,7 @@
     "docker-postgres": "docker run --rm -itd --name test-instance -p 5433:5432  -e POSTGRES_PASSWORD=password postgres && echo 'Allow a few seconds for the database to set up.'",
     "docker-postgres-migrate": "psql postgresql://postgres:password@localhost:5433 -c 'CREATE DATABASE caza' && yarn run prisma migrate reset",
     "docker-postgres-stop": "docker stop test-instance || true ",
-    "test": "jest --watch --config=.jest.config.js"
+    "test": "jest --watch --config=.jest.config.js --runInBand"
   },
   "dependencies": {
     "@prisma/client": "^4.3.1",

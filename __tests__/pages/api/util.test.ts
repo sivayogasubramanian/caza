@@ -17,6 +17,13 @@ export function getPrismaClientForTests() {
   return prisma;
 }
 
+let x = (new Date().getTime() % 100000) * 1000;
+
+export function getUniqueModifier() {
+  x += 1;
+  return x;
+}
+
 export function prismaMigrateReset() {
   process.stdout.write('Resetting database.');
 
@@ -28,6 +35,22 @@ export function prismaMigrateReset() {
   };
 
   spawnSync(command, args, options);
+}
+
+export async function getUser(prisma: PrismaClient, uid: string) {
+  return prisma.user.findUnique({
+    where: { uid },
+    select: { applications: { include: { applicationStages: true, tasks: true } } },
+  });
+}
+
+export async function getUserOrThrow(prisma: PrismaClient, uid: string) {
+  return getUser(prisma, uid).then((user) => {
+    if (!user) {
+      throw new Error('Test utility: Bad UID.');
+    }
+    return user;
+  });
 }
 
 export function createMocks<D>(
