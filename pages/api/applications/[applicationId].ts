@@ -22,7 +22,7 @@ const messages = Object.freeze({
   [MessageType.APPLICATION_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Application cannot be found.' },
   [MessageType.APPLICATION_DOES_NOT_BELONG_TO_USER]: {
     type: StatusMessageType.ERROR,
-    message: 'Application does not belong to you.',
+    message: 'Application cannot be found',
   },
   [MessageType.APPLICATION_DELETED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
