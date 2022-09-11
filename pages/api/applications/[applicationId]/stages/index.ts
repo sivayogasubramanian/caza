@@ -108,7 +108,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.INVALID_TYPE;
   }
 
-  if (typeof date != 'string' || !isValidDate(date)) {
+  if (date === null || date === undefined || !isValidDate(date + '')) {
     return MessageType.INVALID_DATE;
   }
 
