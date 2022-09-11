@@ -12,6 +12,11 @@ export type ApplicationData = {
   tasks: TaskData[];
 };
 
+export type ApplicationRoleData = {
+  id: number;
+  role: RoleData & { company: CompanyData };
+};
+
 export type ApplicationPostData = {
   roleId: number;
   userId: string;
@@ -20,6 +25,6 @@ export type ApplicationPostData = {
 export type ApplicationListData = {
   id: number;
   role: RoleApplicationListData;
-  latestStage: ApplicationStageApplicationListData;
+  latestStage?: ApplicationStageApplicationListData;
   taskNotificationCount: number;
 };
