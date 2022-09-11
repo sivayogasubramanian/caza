@@ -58,8 +58,6 @@ async function handler(
   switch (req.method) {
     case HttpMethod.POST:
       return handlePost(application, req, res);
-    case HttpMethod.GET:
-      return handleGet(application, res);
     default:
       return rejectHttpMethod(res, req.method);
   }
@@ -84,13 +82,6 @@ async function handlePost(
   });
 
   return res.status(HttpStatus.CREATED).json(createJsonResponse(newStage, messages[MessageType.CREATED]));
-}
-
-async function handleGet(
-  application: ApplicationDataWithStages,
-  res: NextApiResponse<ApiResponse<ApplicationDataWithStages>>,
-) {
-  return res.status(HttpStatus.OK).json(createJsonResponse(application, messages[MessageType.CREATED]));
 }
 
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
