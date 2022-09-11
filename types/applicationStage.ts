@@ -22,5 +22,5 @@ export type ApplicationStageApplicationListData = {
   id: number;
   type: ApplicationStageType;
   date: Date;
-  emojiUnicodeHex: string | null;
+  emojiUnicodeHex: Nullable<string>;
 };
