@@ -8,10 +8,13 @@ function CreateRoleForm() {
   const [form] = Form.useForm();
 
   const onSubmit = (values: RolePostData) => {
-    rolesApi.createRole(values).then(() => {
-      form.resetFields();
-      alert('Role created successfully!');
-    });
+    rolesApi
+      .createRole(values)
+      .then(() => {
+        form.resetFields();
+        alert('Role created successfully!');
+      })
+      .catch((error) => alert(error)); // temporarily while we set up error displays
   };
 
   return (
