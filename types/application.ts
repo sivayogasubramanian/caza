@@ -4,6 +4,7 @@ import { RoleData } from './role';
 import { TaskData } from './task';
 import { RoleApplicationListData } from './role';
 import { ApplicationStageApplicationListData } from './applicationStage';
+import { Application, ApplicationStage } from '@prisma/client';
 
 export type ApplicationData = {
   id: number;
@@ -11,6 +12,8 @@ export type ApplicationData = {
   applicationStages: ApplicationStageApplicationData[];
   tasks: TaskData[];
 };
+
+export type ApplicationDataWithStagesOnly = Application & { applicationStages: ApplicationStage[] };
 
 export type ApplicationRoleData = {
   id: number;

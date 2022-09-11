@@ -7,10 +7,9 @@ import { ApplicationStageData, ApplicationStagePostData } from '../../../../../t
 import { isValidDate } from '../../../../../utils/date/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
+import { ApplicationDataWithStagesOnly } from '../../../../../types/application';
 
 const prisma = new PrismaClient();
-
-type ApplicationDataWithStages = Application & { applicationStages: ApplicationStage[] };
 
 enum MessageType {
   INVALID_TYPE,
@@ -43,7 +42,7 @@ const messages = Object.freeze({
 async function handler(
   uid: string,
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<ApplicationStageData | ApplicationDataWithStages>>,
+  res: NextApiResponse<ApiResponse<ApplicationStageData | ApplicationDataWithStagesOnly>>,
 ) {
   const errorMessageIfInvalid = validatePathParameters(req);
   if (errorMessageIfInvalid !== null) {
@@ -64,7 +63,7 @@ async function handler(
 }
 
 async function handlePost(
-  application: ApplicationDataWithStages,
+  application: ApplicationDataWithStagesOnly,
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<ApplicationStageData>>,
 ) {
@@ -103,7 +102,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
 }
 
 /** Finds application if present for the user, else returns null. */
-async function getApplication(uid: string, applicationId: number): Promise<Nullable<ApplicationDataWithStages>> {
+async function getApplication(uid: string, applicationId: number): Promise<Nullable<ApplicationDataWithStagesOnly>> {
   const application = await prisma.application.findFirst({
     where: { id: applicationId, userId: uid },
     select: {
