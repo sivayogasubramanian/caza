@@ -98,7 +98,6 @@ describe('POST accounts with linking', () => {
     await createUser(prisma, oldUid);
     await createUserData(prisma, oldUid);
     const newUid = 'devUserVerifiedYo' + getUniqueModifier();
-    await prisma.user.create({ data: { uid: oldUid } });
     const { req, res, getResult } = createLinkMocks(oldUid, newUid);
 
     await userHandler(req, res);
@@ -171,7 +170,6 @@ describe('POST accounts with linking', () => {
 });
 
 async function createUser(prisma: PrismaClient, uid: string) {
-  console.log(uid);
   return prisma.user.create({ data: { uid } });
 }
 
