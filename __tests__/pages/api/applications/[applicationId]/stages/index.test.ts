@@ -19,7 +19,7 @@ const createStagePostMocks = (uid: string, applicationId: number, body: Applicat
 describe('POST to create stage works.', () => {
   const prisma = getPrismaClientForTests();
 
-  it('Allows for POST creation', async () => {
+  it('can create with POST', async () => {
     const uid = await createUser(prisma, { type: 'APPLIED', date: '2022-10-01' });
     const user = await getUserOrThrow(prisma, uid);
     const applicationId = user.applications[0].id;
