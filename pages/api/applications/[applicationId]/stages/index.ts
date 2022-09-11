@@ -8,6 +8,7 @@ import { isValidDate } from '../../../../../utils/date/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
 import { ApplicationDataWithStagesOnly } from '../../../../../types/application';
+import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 
 const prisma = new PrismaClient();
 
@@ -84,7 +85,7 @@ async function handlePost(
 }
 
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
-  return !Number.isInteger(req.query.applicationId) ? MessageType.INVALID_APPLICATION_ID : null;
+  return !canBecomeInteger(req.query.applicationId) ? MessageType.INVALID_APPLICATION_ID : null;
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
