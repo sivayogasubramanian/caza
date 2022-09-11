@@ -23,20 +23,19 @@ enum MessageType {
 const messages = Object.freeze({
   [MessageType.INVALID_TYPE]: {
     type: StatusMessageType.ERROR,
-    message:
-      'Application Stage type is invalid. Type must be one of: ' + Object.values(ApplicationStageType).join(', ') + '.',
+    message: 'Application stage type is invalid.',
   },
   [MessageType.INVALID_DATE]: {
     type: StatusMessageType.ERROR,
-    message: 'Application Stage date is invalid.',
+    message: 'Application stage date is invalid.',
   },
   [MessageType.INVALID_APPLICATION_ID]: {
     type: StatusMessageType.ERROR,
-    message: 'Query parameter applicationId (.../applications/:applicationId/...) is invalid.',
+    message: 'ApplicationId is invalid.',
   },
   [MessageType.APPLICATION_NOT_FOUND]: {
     type: StatusMessageType.ERROR,
-    message: 'User does not have any application with the given ID.',
+    message: 'Application cannot be found.',
   },
   [MessageType.CREATED]: { type: StatusMessageType.SUCCESS, message: `Application stage has been created.` },
 });
@@ -58,15 +57,15 @@ async function handler(
 
   switch (req.method) {
     case HttpMethod.POST:
-      return postHandler(application, req, res);
+      return handlePost(application, req, res);
     case HttpMethod.GET:
-      return getHandler(application, res);
+      return handleGet(application, res);
     default:
       return rejectHttpMethod(res, req.method);
   }
 }
 
-async function postHandler(
+async function handlePost(
   application: ApplicationDataWithStages,
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<ApplicationStageData>>,
@@ -83,27 +82,25 @@ async function postHandler(
     data: { ...parameters, applicationId: application.id },
     select: { applicationId: true, id: true, type: true, date: true, emojiUnicodeHex: true, remark: true },
   });
+
   return res.status(HttpStatus.CREATED).json(createJsonResponse(newStage, messages[MessageType.CREATED]));
 }
 
-async function getHandler(
+async function handleGet(
   application: ApplicationDataWithStages,
   res: NextApiResponse<ApiResponse<ApplicationDataWithStages>>,
 ) {
   return res.status(HttpStatus.OK).json(createJsonResponse(application, messages[MessageType.CREATED]));
 }
 
-/** Validates path parameters and body. */
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
-  const applicationId = req.query.applicationId as string;
-  return Number.isInteger(applicationId) ? MessageType.INVALID_APPLICATION_ID : null;
+  return !Number.isInteger(req.query.applicationId) ? MessageType.INVALID_APPLICATION_ID : null;
 }
 
-/** Validates path parameters and body. */
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   const { type, date } = req.body;
 
-  if (typeof type != 'string' || !(type in ApplicationStageType)) {
+  if (typeof type !== 'string' || !(type in ApplicationStageType)) {
     return MessageType.INVALID_TYPE;
   }
 
