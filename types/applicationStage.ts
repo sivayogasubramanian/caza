@@ -11,6 +11,11 @@ export type ApplicationStageApplicationData = {
 
 export type ApplicationStageData = ApplicationStageApplicationData & { applicationId: number };
 
+export type ApplicationStagePostData = {
+  type: ApplicationStageType;
+  date: Date;
+};
+
 export type ApplicationStagePatchData = {
   type?: ApplicationStageType;
   date?: Date;
