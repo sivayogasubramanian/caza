@@ -5,6 +5,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { Nullable } from '../../../types/utils';
+import { MIN_DATE } from '../../../utils/constants';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -93,12 +94,19 @@ async function handleGet(
     },
   });
 
-  const applications: ApplicationListData[] = queriedApplications.map((application) => ({
-    id: application.id,
-    role: application.role,
-    latestStage: application.applicationStages[0],
-    taskNotificationCount: application._count.tasks,
-  }));
+  const applications: ApplicationListData[] = queriedApplications
+    .map((application) => ({
+      id: application.id,
+      role: application.role,
+      latestStage: application.applicationStages[0],
+      taskNotificationCount: application._count.tasks,
+    }))
+    .sort(
+      (firstApplication, secondApplication) =>
+        secondApplication.taskNotificationCount - firstApplication.taskNotificationCount ||
+        (secondApplication.latestStage?.date || MIN_DATE).valueOf() -
+          (firstApplication.latestStage?.date || MIN_DATE).valueOf(),
+    );
 
   res.status(HttpStatus.OK).json(createJsonResponse(applications));
 }
