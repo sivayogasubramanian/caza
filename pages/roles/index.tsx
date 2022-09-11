@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import { Spin, Table, Typography } from 'antd';
 import CreateRoleForm from '../../components/forms/CreateRoleForm';
-import { ROLES_URL } from '../../api/rolesApi';
+import { ROLES_API_ENDPOINT } from '../../api/rolesApi';
 
 const { Title } = Typography;
 
 function Applications() {
-  const { data } = useSWR(ROLES_URL);
+  const { data } = useSWR(ROLES_API_ENDPOINT);
 
   return (
     <div className="p-8 flex flex-col">
