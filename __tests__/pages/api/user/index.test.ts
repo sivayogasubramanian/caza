@@ -1,6 +1,10 @@
-import { createMocks, getPrismaClientForTests, prismaMigrateReset } from '../util.test';
+import { createMocks, getPrismaClientForTests, getUniqueModifier, prismaMigrateReset } from '../util.test';
 import userHandler from '../../../../pages/api/user/index';
 import { HttpMethod, HttpStatus } from '../../../../utils/http/httpHelpers';
+import { PrismaClient } from '@prisma/client';
+
+beforeAll(prismaMigrateReset);
+afterAll(prismaMigrateReset);
 
 const KNOWN_ROLE_ID = 1;
 const createUserMocks = (uid: string, method: HttpMethod, oldToken?: string) =>
@@ -10,10 +14,9 @@ describe('DELETE accounts', () => {
   const createUserDeleteMocks = (uid: string) => createUserMocks(uid, HttpMethod.DELETE);
   const prisma = getPrismaClientForTests();
 
-  beforeAll(prismaMigrateReset);
-
   it('delete accounts with no data', async () => {
-    const uid = 'devUserWithoutData';
+    const uid = 'devUserWithoutData' + getUniqueModifier();
+    await createUser(prisma, uid);
     const { req, res, getResult } = createUserDeleteMocks(uid);
     expect(await prisma.user.count({ where: { uid } })).toStrictEqual(1);
 
@@ -26,7 +29,9 @@ describe('DELETE accounts', () => {
   });
 
   it('delete accounts with data', async () => {
-    const uid = 'devUserWithData';
+    const uid = 'devUserWithData' + getUniqueModifier();
+    await createUser(prisma, uid);
+    await createUserData(prisma, uid);
     const { req, res, getResult } = createUserDeleteMocks(uid);
     expect(await prisma.user.count({ where: { uid } })).toStrictEqual(1);
 
@@ -39,7 +44,7 @@ describe('DELETE accounts', () => {
   });
 
   it('cannot delete missing accounts', async () => {
-    const uid = 'devUserDoesNotExistInDatabase';
+    const uid = 'devUserDoesNotExistInDatabase' + getUniqueModifier();
     const { req, res, getResult } = createUserDeleteMocks(uid);
     expect(await prisma.user.count({ where: { uid } })).toStrictEqual(0);
 
@@ -54,10 +59,8 @@ describe('POST accounts without linking', () => {
   const createUserPostMocks = (uid: string) => createUserMocks(uid, HttpMethod.POST);
   const prisma = getPrismaClientForTests();
 
-  beforeAll(prismaMigrateReset);
-
   it('create new user', async () => {
-    const uid = 'devUserDoesNotExistP1';
+    const uid = 'devUserDoesNotExist' + getUniqueModifier();
     const { req, res, getResult } = createUserPostMocks(uid);
     expect(await prisma.user.count({ where: { uid } })).toStrictEqual(0);
 
@@ -71,8 +74,9 @@ describe('POST accounts without linking', () => {
   });
 
   it('fails to recreate existing user.', async () => {
-    const uid = 'devUserDoesNotExistP2';
-    await prisma.user.create({ data: { uid } });
+    const uid = 'devUserDoesExist' + getUniqueModifier();
+    await createUser(prisma, uid);
+    await createUserData(prisma, uid);
     expect(await prisma.user.count({ where: { uid } })).toStrictEqual(1);
     const { req, res, getResult } = createUserPostMocks(uid);
 
@@ -89,11 +93,11 @@ describe('POST accounts with linking', () => {
   const createLinkMocks = (oldUid: string, newUid: string) => createUserMocks(newUid, HttpMethod.POST, oldUid);
   const prisma = getPrismaClientForTests();
 
-  beforeAll(prismaMigrateReset);
-
   it('will link anon to verified.', async () => {
-    const oldUid = 'devUserFoo';
-    const newUid = 'devUserVerifiedBar';
+    const oldUid = 'devUserFoo' + getUniqueModifier();
+    await createUser(prisma, oldUid);
+    await createUserData(prisma, oldUid);
+    const newUid = 'devUserVerifiedYo' + getUniqueModifier();
     await prisma.user.create({ data: { uid: oldUid } });
     const { req, res, getResult } = createLinkMocks(oldUid, newUid);
 
@@ -105,9 +109,9 @@ describe('POST accounts with linking', () => {
   });
 
   it('will link anon to verified (does not exist) and transfer data.', async () => {
-    const oldUid = 'devUserWithDataBar';
-    const newUid = 'devUserVerifiedWithoutDataBar';
-    await prisma.user.create({ data: { uid: oldUid } });
+    const oldUid = 'devUserWithDataBar' + getUniqueModifier();
+    const newUid = 'devUserVerifiedWithoutDataBar' + getUniqueModifier();
+    await createUser(prisma, oldUid);
     const application = await prisma.application.create({ data: { userId: oldUid, roleId: KNOWN_ROLE_ID } });
     expect(await prisma.user.count({ where: { uid: newUid } })).toStrictEqual(0);
     const { req, res, getResult } = createLinkMocks(oldUid, newUid);
@@ -123,10 +127,10 @@ describe('POST accounts with linking', () => {
   });
 
   it('will not link anon to existing verified.', async () => {
-    const oldUid = 'devUserWithDataFoo';
-    const newUid = 'devUserVerifiedWithoutDataFoo';
-    await prisma.user.create({ data: { uid: oldUid } });
-    await prisma.user.create({ data: { uid: newUid } });
+    const oldUid = 'devUserWithDataFoo' + getUniqueModifier();
+    const newUid = 'devUserVerifiedWithoutDataFoo' + getUniqueModifier();
+    await createUser(prisma, oldUid);
+    await createUser(prisma, newUid);
     const { req, res, getResult } = createLinkMocks(oldUid, newUid);
 
     await userHandler(req, res);
@@ -138,6 +142,7 @@ describe('POST accounts with linking', () => {
 
   function willFailToLinkExceptAnonToVerified(oldUid: string, newUid: string, expectedStatus: HttpStatus) {
     it(`will fail to link ${oldUid} to ${newUid} as it is not anon to verified.`, async () => {
+      await createUser(prisma, oldUid);
       const { req, res, getResult } = createLinkMocks(oldUid, newUid);
 
       await userHandler(req, res);
@@ -148,7 +153,28 @@ describe('POST accounts with linking', () => {
     });
   }
 
-  willFailToLinkExceptAnonToVerified('devUserAnonFoo', 'devUserAnonBar', HttpStatus.UNAUTHORIZED);
-  willFailToLinkExceptAnonToVerified('devUserVerifiedFoo', 'devUserAnonBar', HttpStatus.UNAUTHORIZED);
-  willFailToLinkExceptAnonToVerified('devUserVerifiedFoo', 'devUserVerifiedFoo', HttpStatus.BAD_REQUEST);
+  willFailToLinkExceptAnonToVerified(
+    'devUserAnonFoo' + getUniqueModifier(),
+    'devUserAnonBar' + getUniqueModifier(),
+    HttpStatus.UNAUTHORIZED,
+  );
+  willFailToLinkExceptAnonToVerified(
+    'devUserVerifiedFoo' + getUniqueModifier(),
+    'devUserAnonBar' + getUniqueModifier(),
+    HttpStatus.UNAUTHORIZED,
+  );
+  willFailToLinkExceptAnonToVerified(
+    'devUserVerifiedFoo' + getUniqueModifier(),
+    'devUserVerifiedFoo' + getUniqueModifier(),
+    HttpStatus.BAD_REQUEST,
+  );
 });
+
+async function createUser(prisma: PrismaClient, uid: string) {
+  console.log(uid);
+  return prisma.user.create({ data: { uid } });
+}
+
+async function createUserData(prisma: PrismaClient, uid: string) {
+  return prisma.application.create({ data: { userId: uid, roleId: 1 } });
+}
