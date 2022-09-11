@@ -101,6 +101,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
       AND: queryYear ? [{ year: { equals: queryYear } }] : undefined,
       OR: queryWords.length > 0 ? queryWords : undefined,
     },
+    take: 5,
     select: {
       id: true,
       title: true,
