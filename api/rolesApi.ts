@@ -2,13 +2,11 @@ import { ApiPromise } from '../types/apiResponse';
 import { RoleData, RolePostData } from '../types/role';
 import api from './api';
 
-class RolesApi {
-  private getRolesUrl() {
-    return 'roles';
-  }
+export const ROLES_URL = 'roles';
 
+class RolesApi {
   public createRole(role: RolePostData): ApiPromise<RoleData> {
-    return api.post(this.getRolesUrl(), role).then((res) => res.data);
+    return api.post(ROLES_URL, role).then((res) => res.data);
   }
 }
 
