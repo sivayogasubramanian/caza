@@ -5,7 +5,6 @@ import { ApplicationData } from '../../../types/application';
 import { Nullable } from '../../../types/utils';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
-import { isInteger } from '../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 const prisma = new PrismaClient();
@@ -44,7 +43,7 @@ async function handler(userId: string, req: NextApiRequest, res: NextApiResponse
 }
 
 async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
-  if (!isInteger(req.query.applicationId as string)) {
+  if (!Number.isInteger(req.query.applicationId)) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.APPLICATION_ID_INVALID]));
     return;
   }
@@ -97,7 +96,7 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
-  if (!isInteger(req.query.applicationId as string)) {
+  if (!Number.isInteger(req.query.applicationId)) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.APPLICATION_ID_INVALID]));
     return;
   }

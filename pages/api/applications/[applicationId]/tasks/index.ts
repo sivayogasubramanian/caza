@@ -6,7 +6,6 @@ import { Nullable } from '../../../../../types/utils';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
-import { isInteger } from '../../../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 
@@ -68,7 +67,7 @@ async function handler(userId: string, req: NextApiRequest, res: NextApiResponse
 }
 
 async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
-  if (!isInteger(req.query.applicationId as string)) {
+  if (!Number.isInteger(req.query.applicationId)) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.TASK_APPLICATION_ID_INVALID]));
     return;
   }
