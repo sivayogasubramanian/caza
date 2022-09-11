@@ -33,7 +33,7 @@ const AxiosInterceptor = ({ children }: Props) => {
     setIsIntercepted(true);
 
     return () => api.interceptors.request.eject(interceptor);
-  }, [jwtToken]);
+  }, [jwtToken, setIsIntercepted]);
 
   if (!isIntercepted) return null;
 
