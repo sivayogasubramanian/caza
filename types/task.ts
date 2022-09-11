@@ -1,5 +1,10 @@
 import { Nullable } from './utils';
 
+export type TaskQueryParams = {
+  applicationId: string;
+  taskId: string;
+};
+
 export type TaskPostData = {
   title: string;
   dueDate: Date;
