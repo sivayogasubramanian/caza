@@ -16,3 +16,8 @@ export type RoleData = {
 };
 
 export type RoleListData = RoleData & { company: CompanyData; isVerified: boolean };
+
+export type RoleQueryParams = {
+  companyId: string | string[];
+  searchQuery: string | string[];
+};
