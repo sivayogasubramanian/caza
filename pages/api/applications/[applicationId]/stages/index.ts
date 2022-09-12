@@ -7,8 +7,6 @@ import { ApplicationStageData, ApplicationStagePostData } from '../../../../../t
 import { isValidDate } from '../../../../../utils/date/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
-import { ApplicationDataWithStagesOnly } from '../../../../../types/application';
-import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 
@@ -52,11 +50,7 @@ const messages = Object.freeze({
   },
 });
 
-async function handler(
-  uid: string,
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<ApplicationStageData | ApplicationDataWithStagesOnly>>,
-) {
+async function handler(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationStageData>>) {
   switch (req.method) {
     case HttpMethod.POST:
       return handlePost(uid, req, res);
@@ -71,19 +65,14 @@ async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[paramValidationError]));
   }
 
-  const application = await getApplication(uid, Number(req.query.applicationId));
+  const applicationId = Number(req.query.applicationId);
+  const application = await prisma.application.findFirst({ where: { id: applicationId, userId: uid } });
   if (application === null) {
     return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_NOT_FOUND]));
   }
 
   const { type, date, emojiUnicodeHex, remark } = req.body;
-  // Empty or undefined emojis and remarks will be set to null.
-  const parameters: ApplicationStagePostData = {
-    type,
-    date: new Date(date),
-    emojiUnicodeHex: emojiUnicodeHex || null,
-    remark: remark || null,
-  };
+  const parameters: ApplicationStagePostData = { type, date: new Date(date), emojiUnicodeHex, remark };
 
   const newStage: ApplicationStageData = await prisma.applicationStage.create({
     data: { ...parameters, applicationId: application.id },
@@ -127,21 +116,6 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   }
 
   return null;
-}
-
-/** Finds application if present for the user, else returns null. */
-async function getApplication(uid: string, applicationId: number): Promise<Nullable<ApplicationDataWithStagesOnly>> {
-  const application = await prisma.application.findFirst({
-    where: { id: applicationId, userId: uid },
-    select: {
-      id: true,
-      userId: true,
-      roleId: true,
-      updatedAt: true,
-      applicationStages: true,
-    },
-  });
-  return application;
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
