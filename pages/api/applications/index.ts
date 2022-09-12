@@ -81,18 +81,16 @@ async function handleGet(
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
   // Safe to typecast as validation is done above.
   const roleTypeFilters = makeRoleTypeFilters(queryParams.roleTypeWords as RoleType[]);
-  const selectedApplicationStageTypes = queryParams.stageTypeWords;
-  const hasSelectedApplicationStageTypes = selectedApplicationStageTypes && selectedApplicationStageTypes.length > 0;
   const companyOrFilters = companyNameFilters?.map((filter) => ({ company: filter }));
-  const roleOrFilters = getArrayOrUndefined<Prisma.RoleWhereInput>(
-    combineDefinedArrays<Prisma.RoleWhereInput>([companyOrFilters, roleTitleFilters]),
+  const roleTitleOrYearOrCompanyFilters = getArrayOrUndefined<Prisma.RoleWhereInput>(
+    combineDefinedArrays<Prisma.RoleWhereInput>([roleTitleFilters, roleYearFilters, companyOrFilters]),
   );
 
   const queriedApplications = await prisma.application.findMany({
     where: {
       userId: userId,
       role: {
-        AND: [{ OR: roleTypeFilters }, { OR: roleYearFilters }, { OR: roleOrFilters }],
+        AND: [{ OR: roleTypeFilters }, { OR: roleTitleOrYearOrCompanyFilters }],
       },
     },
     select: {
@@ -138,6 +136,11 @@ async function handleGet(
       },
     },
   });
+
+  // Filter for applications whose latest stage type matches any of the query stage types.
+  // Done in application layer as prisma does not support such queries.
+  const selectedApplicationStageTypes = queryParams.stageTypeWords;
+  const hasSelectedApplicationStageTypes = selectedApplicationStageTypes && selectedApplicationStageTypes.length > 0;
 
   const applications: ApplicationListData[] = queriedApplications
     .map((application) => ({
@@ -207,7 +210,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     .json(createJsonResponse(newApplication, messages[MessageType.APPLICATION_CREATED_SUCCESSFULLY]));
 }
 
-function parseGetQueryParams(req: NextApiRequest) {
+function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
   const searchWords =
     req.query.searchQuery === undefined
       ? []

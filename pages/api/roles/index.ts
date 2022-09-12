@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, RoleType } from '@prisma/client';
+import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
@@ -10,6 +10,7 @@ import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { capitalizeEveryWord } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../utils/numbers/validations';
+import { makeRoleTitleFilters, makeRoleYearFilters } from '../../../utils/filters/filterHelpers';
 
 const prisma = new PrismaClient();
 
@@ -68,38 +69,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
-  const { companyId, searchQuery } = req.query as RoleQueryParams;
-
-  const queryCompanyId = typeof companyId == 'string' && canBecomeInteger(companyId) ? Number(companyId) : undefined;
-
-  const searchWords = typeof searchQuery == 'string' && !isEmpty(searchQuery) ? searchQuery.trim().split(/\s+/) : [];
-
-  const searchInts = searchWords
-    .filter(canBecomeInteger)
-    .map(Number)
-    .filter((year) => year >= MIN_ROLE_YEAR);
-  const queryYear = searchInts.length > 0 ? searchInts[0] : undefined;
-
-  const queryWords = searchWords
-    .filter((word) => !(canBecomeInteger(word) && Number(word) >= MIN_ROLE_YEAR))
-    .map((word) => ({
-      title: {
-        contains: word,
-        mode: Prisma.QueryMode.insensitive,
-      },
-    }));
-
-  if (!queryCompanyId) {
-    res.status(HttpStatus.OK).json(createJsonResponse([]));
-    return;
-  }
+  const queryParams: RoleQueryParams = parseGetQueryParams(req);
+  const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
+  const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
 
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
       isVerified: true,
-      companyId: queryCompanyId,
-      AND: queryYear ? [{ year: { equals: queryYear } }] : undefined,
-      OR: queryWords.length > 0 ? queryWords : undefined,
+      companyId: queryParams.companyId,
+      AND: roleYearFilters,
+      OR: roleTitleFilters,
     },
     take: 5,
     select: {
@@ -141,6 +120,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   });
 
   res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+}
+
+function parseGetQueryParams(req: NextApiRequest): RoleQueryParams {
+  const { companyId, searchQuery } = req.query;
+  const searchWords =
+    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : searchQuery.trim().split(/\s+/);
+  const parsedCompanyId = canBecomeInteger(companyId) ? Number(companyId) : undefined;
+  return { companyId: parsedCompanyId, searchWords };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
