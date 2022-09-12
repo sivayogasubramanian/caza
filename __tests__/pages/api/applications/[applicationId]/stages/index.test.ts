@@ -19,23 +19,29 @@ const createStagePostMocks = (uid: string, applicationId: number, body: Applicat
 describe('POST to create stage works.', () => {
   const prisma = getPrismaClientForTests();
 
-  it('can create with POST', async () => {
-    const uid = await createUser(prisma, { type: 'APPLIED', date: '2022-10-01' });
-    const user = await getUserOrThrow(prisma, uid);
-    const applicationId = user.applications[0].id;
-    const type = 'OFFERED';
-    const { req, res, getResult } = createStagePostMocks(uid, applicationId, {
-      type,
-      date: new Date(),
+  function canCreateWithPost(name: string, body: ApplicationStagePostData) {
+    it(`can create with POST ${name}`, async () => {
+      const uid = await createUser(prisma, { type: 'APPLIED', date: '2022-10-01' });
+      const user = await getUserOrThrow(prisma, uid);
+      const applicationId = user.applications[0].id;
+      const { req, res, getResult } = createStagePostMocks(uid, applicationId, body);
+
+      await stagesHandler(req, res);
+      const { status, json } = getResult();
+
+      const stage = await prisma.applicationStage.findFirstOrThrow({
+        where: { applicationId, type: body.type },
+        select: { date: true, emojiUnicodeHex: true, id: true, remark: true, type: true, applicationId: true },
+      });
+      expect(status).toBe(HttpStatus.CREATED);
+      expect(json.payload).toEqual(stage);
     });
+  }
 
-    await stagesHandler(req, res);
-    const { status, json } = getResult();
-
-    const stage = await prisma.applicationStage.findFirstOrThrow({ where: { applicationId, type } });
-    expect(status).toBe(HttpStatus.CREATED);
-    expect(json.payload).toEqual(stage);
-  });
+  canCreateWithPost('full', { type: 'OFFERED', date: new Date(), emojiUnicodeHex: '1f604', remark: 'Foo' });
+  canCreateWithPost('minimal', { type: 'OFFERED', date: new Date() });
+  canCreateWithPost('null emoji', { type: 'OFFERED', date: new Date(), emojiUnicodeHex: null, remark: 'Foo' });
+  canCreateWithPost('null remark', { type: 'OFFERED', date: new Date(), emojiUnicodeHex: '1f604', remark: null });
 
   it('Does not POST with bad applicationId', async () => {
     const uid = await createUser(prisma, { type: 'APPLIED', date: '2022-10-01' });
