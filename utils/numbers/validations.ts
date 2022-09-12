@@ -1,4 +1,4 @@
 export function canBecomeInteger(value: unknown) {
-  const number = Number(value);
-  return !isNaN(number) && Number.isInteger(number);
+  const valueIsFalsyAndNotZero = value !== 0 && !value;
+  return !valueIsFalsyAndNotZero && Number.isInteger(Number(value));
 }
