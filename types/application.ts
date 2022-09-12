@@ -27,3 +27,9 @@ export type ApplicationListData = {
   latestStage?: ApplicationStageApplicationListData;
   taskNotificationCount: number;
 };
+
+export type ApplicationQueryParams = {
+  searchWords: string[];
+  roleTypeWords: string[];
+  stageTypeWords: string[];
+};
