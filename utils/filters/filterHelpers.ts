@@ -3,6 +3,7 @@ import { canBecomeValidYear, isValidYear } from '../date/validations';
 import { canBecomeInteger } from '../numbers/validations';
 
 export function makeCompanyNameFilters(searchWords: string[]) {
+  // Do not want to return names that contain the year to prevent zero results.
   return searchWords.length === 0
     ? undefined
     : searchWords
