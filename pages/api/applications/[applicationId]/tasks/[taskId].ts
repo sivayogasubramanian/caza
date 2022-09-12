@@ -57,7 +57,7 @@ async function handler(uid: string, req: NextApiRequest, res: NextApiResponse<Ap
 }
 
 async function handlePatch(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
-  const validationError = validatePathParameters(req) ?? validatePatchRequestBody(req);
+  const validationError = validatePatchRequest(req);
   if (validationError !== null) {
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[validationError]));
   }
@@ -110,7 +110,12 @@ function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
   return null;
 }
 
-function validatePatchRequestBody(req: NextApiRequest): Nullable<MessageType> {
+function validatePatchRequest(req: NextApiRequest): Nullable<MessageType> {
+  const pathParameterError = validatePathParameters(req);
+  if (pathParameterError !== null) {
+    return pathParameterError;
+  }
+
   const { title, dueDate, notificationDateTime, isDone } = req.body;
 
   const isValidTitle = title === undefined || (typeof title === 'string' && !isEmpty(title));
