@@ -10,6 +10,7 @@ import { Nullable } from '../../../../../types/utils';
 import { ApplicationDataWithStagesOnly } from '../../../../../types/application';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 import { isValidHex } from '../../../../../utils/strings/validations';
+import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 
 const prisma = new PrismaClient();
 
@@ -112,8 +113,8 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.INVALID_DATE;
   }
 
-  const isValidRemark = !remark === null || remark === undefined || typeof remark === 'string';
-  if (isValidRemark) {
+  const isValidRemark = remark === null || remark === undefined || typeof remark === 'string';
+  if (!isValidRemark) {
     return MessageType.INVALID_REMARK;
   }
 
