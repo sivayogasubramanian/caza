@@ -18,7 +18,7 @@ import {
   makeRoleTypeFilters,
   makeRoleYearFilters,
 } from '../../../utils/filters/filterHelpers';
-import { combineDefinedArrays, getArrayOrUndefined } from '../../../utils/arrays';
+import { combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../utils/arrays';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -66,7 +66,7 @@ async function handleGet(
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
   const roleTypeFilters = makeRoleTypeFilters(queryParams.roleTypeWords);
   const companyOrFilters = companyNameFilters?.map((filter) => ({ company: filter }));
-  const roleTitleOrCompanyFilters = getArrayOrUndefined<Prisma.RoleWhereInput>(
+  const roleTitleOrCompanyFilters = getNonEmptyArrayOrUndefined<Prisma.RoleWhereInput>(
     combineDefinedArrays<Prisma.RoleWhereInput>([roleTitleFilters, companyOrFilters]),
   );
 
