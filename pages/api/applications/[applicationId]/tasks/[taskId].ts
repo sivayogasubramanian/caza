@@ -7,6 +7,7 @@ import { Nullable } from '../../../../../types/utils';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
+import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 
@@ -99,11 +100,11 @@ async function handleDelete(uid: string, req: NextApiRequest, res: NextApiRespon
 
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
   const { taskId, applicationId } = req.query;
-  if (!taskId && !Number.isInteger(Number(taskId))) {
+  if (canBecomeInteger(taskId)) {
     return MessageType.INVALID_TASK_ID;
   }
 
-  if (!Number.isInteger(Number(applicationId))) {
+  if (canBecomeInteger(applicationId)) {
     return MessageType.INVALID_APPLICATION_ID;
   }
 
@@ -147,7 +148,7 @@ function validatePatchRequest(req: NextApiRequest): Nullable<MessageType> {
 }
 
 async function getTask(uid: string, req: NextApiRequest) {
-  const { applicationId, taskId } = req.query as unknown as TaskQueryParams;
+  const { applicationId, taskId } = req.query as TaskQueryParams;
   const task = await prisma.task.findFirst({
     where: { id: Number(taskId) },
     include: { application: { select: { id: true, userId: true } } },
