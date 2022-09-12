@@ -9,6 +9,7 @@ import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
 import { ApplicationDataWithStagesOnly } from '../../../../../types/application';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
+import { isValidHex } from '../../../../../utils/strings/validations';
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,8 @@ enum MessageType {
   INVALID_APPLICATION_ID,
   APPLICATION_NOT_FOUND,
   CREATED,
+  INVALID_EMOJI_UNICODE_HEX,
+  INVALID_REMARK,
 }
 
 const messages = Object.freeze({
@@ -37,7 +40,15 @@ const messages = Object.freeze({
     type: StatusMessageType.ERROR,
     message: 'Application cannot be found.',
   },
-  [MessageType.CREATED]: { type: StatusMessageType.SUCCESS, message: `Application stage has been created.` },
+  [MessageType.CREATED]: { type: StatusMessageType.SUCCESS, message: 'Application stage has been created.' },
+  [MessageType.INVALID_REMARK]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage remark is invalid.',
+  },
+  [MessageType.INVALID_EMOJI_UNICODE_HEX]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage emoji unicode hex is invalid.',
+  },
 });
 
 async function handler(
@@ -45,9 +56,18 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<ApplicationStageData | ApplicationDataWithStagesOnly>>,
 ) {
-  const errorMessageIfInvalid = validatePathParameters(req);
-  if (errorMessageIfInvalid !== null) {
-    return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageIfInvalid]));
+  switch (req.method) {
+    case HttpMethod.POST:
+      return handlePost(uid, req, res);
+    default:
+      return rejectHttpMethod(res, req.method);
+  }
+}
+
+async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationStageData>>) {
+  const paramValidationError = validatePathParameters(req) ?? validatePostRequestBody(req);
+  if (paramValidationError !== null) {
+    return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[paramValidationError]));
   }
 
   const application = await getApplication(uid, Number(req.query.applicationId));
@@ -55,26 +75,14 @@ async function handler(
     return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_NOT_FOUND]));
   }
 
-  switch (req.method) {
-    case HttpMethod.POST:
-      return handlePost(application, req, res);
-    default:
-      return rejectHttpMethod(res, req.method);
-  }
-}
-
-async function handlePost(
-  application: ApplicationDataWithStagesOnly,
-  req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<ApplicationStageData>>,
-) {
-  const paramValidationError = validatePostRequest(req);
-  if (paramValidationError !== null) {
-    return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[paramValidationError]));
-  }
-
-  const { type, date } = req.body;
-  const parameters: ApplicationStagePostData = { type, date: new Date(date) };
+  const { type, date, emojiUnicodeHex, remark } = req.body;
+  // Empty or undefined emojis and remarks will be set to null.
+  const parameters: ApplicationStagePostData = {
+    type,
+    date: new Date(date),
+    emojiUnicodeHex: emojiUnicodeHex || null,
+    remark: remark || null,
+  };
 
   const newStage: ApplicationStageData = await prisma.applicationStage.create({
     data: { ...parameters, applicationId: application.id },
@@ -88,8 +96,8 @@ function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
   return !canBecomeInteger(req.query.applicationId) ? MessageType.INVALID_APPLICATION_ID : null;
 }
 
-function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
-  const { type, date } = req.body;
+function validatePostRequestBody(req: NextApiRequest): Nullable<MessageType> {
+  const { type, date, emojiUnicodeHex, remark } = req.body;
 
   if (typeof type !== 'string' || !(type in ApplicationStageType)) {
     return MessageType.INVALID_TYPE;
@@ -97,6 +105,19 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
 
   if (date === null || date === undefined || !isValidDate(date + '')) {
     return MessageType.INVALID_DATE;
+  }
+
+  const isValidRemark = !remark === null || remark === undefined || typeof remark === 'string';
+  if (isValidRemark) {
+    return MessageType.INVALID_REMARK;
+  }
+
+  const isValidEmojiUnicodeHex =
+    emojiUnicodeHex === null ||
+    emojiUnicodeHex === undefined ||
+    (typeof emojiUnicodeHex === 'string' && isValidHex(emojiUnicodeHex));
+  if (!isValidEmojiUnicodeHex) {
+    return MessageType.INVALID_EMOJI_UNICODE_HEX;
   }
 
   return null;
