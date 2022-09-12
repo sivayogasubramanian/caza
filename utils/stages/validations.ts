@@ -18,9 +18,9 @@ const FINAL_STAGES: string[] = [
 /**
  * Takes in a list of stages and if any of the following conditions are out of order, returns a message.
  * - final stage (withdrawn / accepted / rejected) occurs before another stage
- * - more than one final stage
+ * - more than one final stages
  * - first stage (applied) occurs after another stage
- * - more than one first stage
+ * - more than one or zero first stages
  *
  * In the interest of user flexibility, having zero first / final stages is tolerated, as is having final / first
  * stages on the same date as other stages.
