@@ -25,8 +25,6 @@ enum MessageType {
   DUPLICATE_APPLICATION,
   MISSING_ROLE_ID,
   INVALID_ROLE_ID,
-  INVALID_QUERY_APPLICATION_STAGE_TYPE,
-  INVALID_QUERY_ROLE_TYPE,
 }
 
 const prisma = new PrismaClient();
@@ -42,14 +40,6 @@ const messages = Object.freeze({
   },
   [MessageType.MISSING_ROLE_ID]: { type: StatusMessageType.ERROR, message: 'Application role id is missing.' },
   [MessageType.INVALID_ROLE_ID]: { type: StatusMessageType.ERROR, message: 'Application role id is invalid.' },
-  [MessageType.INVALID_QUERY_ROLE_TYPE]: {
-    type: StatusMessageType.ERROR,
-    message: 'Application query role type is invalid.',
-  },
-  [MessageType.INVALID_QUERY_APPLICATION_STAGE_TYPE]: {
-    type: StatusMessageType.ERROR,
-    message: 'Application query stage type is invalid.',
-  },
 });
 
 async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
@@ -70,17 +60,11 @@ async function handleGet(
   res: NextApiResponse<ApiResponse<ApplicationListData[]>>,
 ) {
   const queryParams: ApplicationQueryParams = parseGetQueryParams(req);
-  const errorMessageType = validateGetQueryParams(queryParams);
-  if (errorMessageType !== null) {
-    res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
-    return;
-  }
 
   const companyNameFilters = makeCompanyNameFilters(queryParams.searchWords);
   const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
-  // Safe to typecast as validation is done above.
-  const roleTypeFilters = makeRoleTypeFilters(queryParams.roleTypeWords as RoleType[]);
+  const roleTypeFilters = makeRoleTypeFilters(queryParams.roleTypeWords);
   const companyOrFilters = companyNameFilters?.map((filter) => ({ company: filter }));
   const roleTitleOrCompanyFilters = getArrayOrUndefined<Prisma.RoleWhereInput>(
     combineDefinedArrays<Prisma.RoleWhereInput>([roleTitleFilters, companyOrFilters]),
@@ -218,33 +202,29 @@ function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
       ? req.query.searchQuery
       : req.query.searchQuery.trim().split(/\s+/);
 
-  const roleTypeWords =
+  const roleTypeUncheckedWords =
     req.query.roleTypes === undefined
       ? []
       : Array.isArray(req.query.roleTypes)
       ? req.query.roleTypes
       : req.query.roleTypes.trim().split(/\s*,\s*/);
 
-  const stageTypeWords =
+  // Safe to typecast due to the filter check.
+  const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
+
+  const stageTypeUncheckedWords =
     req.query.stageTypes === undefined
       ? []
       : Array.isArray(req.query.stageTypes)
       ? req.query.stageTypes
       : req.query.stageTypes.trim().split(/\s*,\s*/);
 
+  // Safe to typecast due to the filter check.
+  const stageTypeWords: ApplicationStageType[] = stageTypeUncheckedWords.filter(
+    (word) => word in ApplicationStageType,
+  ) as ApplicationStageType[];
+
   return { searchWords, roleTypeWords, stageTypeWords };
-}
-
-function validateGetQueryParams(queryParams: ApplicationQueryParams): Nullable<MessageType> {
-  if (!queryParams.roleTypeWords.every((type) => type in RoleType)) {
-    return MessageType.INVALID_QUERY_ROLE_TYPE;
-  }
-
-  if (!queryParams.stageTypeWords.every((type) => type in ApplicationStageType)) {
-    return MessageType.INVALID_QUERY_APPLICATION_STAGE_TYPE;
-  }
-
-  return null;
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
