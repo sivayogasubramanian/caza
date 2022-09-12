@@ -57,7 +57,7 @@ async function handler(uid: string, req: NextApiRequest, res: NextApiResponse<Ap
 }
 
 async function patchHandler(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
-  const validationError = validatePathParameters(req) || validatePatchRequestBody(req);
+  const validationError = validatePathParameters(req) ?? validatePatchRequestBody(req);
   if (validationError !== null) {
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[validationError]));
   }
