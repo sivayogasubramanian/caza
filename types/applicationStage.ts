@@ -64,7 +64,7 @@ export function validateStageChronology(
   }
 
   if (finalStages.length !== 0) {
-    const finalStage = stages[0];
+    const finalStage = finalStages[0];
     for (const stage of stages) {
       if (stage.date > finalStage.date) {
         return ChronologicalValidationError.FINAL_STAGE_OUT_OF_ORDER;
