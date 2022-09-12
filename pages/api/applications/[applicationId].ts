@@ -97,7 +97,7 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
-  if (!Number.isInteger(req.query.applicationId)) {
+  if (!canBecomeInteger(req.query.applicationId)) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.APPLICATION_ID_INVALID]));
     return;
   }
