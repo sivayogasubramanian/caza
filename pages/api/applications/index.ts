@@ -82,15 +82,15 @@ async function handleGet(
   // Safe to typecast as validation is done above.
   const roleTypeFilters = makeRoleTypeFilters(queryParams.roleTypeWords as RoleType[]);
   const companyOrFilters = companyNameFilters?.map((filter) => ({ company: filter }));
-  const roleTitleOrYearOrCompanyFilters = getArrayOrUndefined<Prisma.RoleWhereInput>(
-    combineDefinedArrays<Prisma.RoleWhereInput>([roleTitleFilters, roleYearFilters, companyOrFilters]),
+  const roleTitleOrCompanyFilters = getArrayOrUndefined<Prisma.RoleWhereInput>(
+    combineDefinedArrays<Prisma.RoleWhereInput>([roleTitleFilters, companyOrFilters]),
   );
 
   const queriedApplications = await prisma.application.findMany({
     where: {
       userId: userId,
       role: {
-        AND: [{ OR: roleTypeFilters }, { OR: roleTitleOrYearOrCompanyFilters }],
+        AND: [{ OR: roleTypeFilters }, { OR: roleTitleOrCompanyFilters }, { OR: roleYearFilters }],
       },
     },
     select: {
@@ -137,7 +137,7 @@ async function handleGet(
     },
   });
 
-  // Filter for applications whose latest stage type matches any of the query stage types.
+  // Used in filters for applications whose latest stage type matches any of the query stage types.
   // Done in application layer as prisma does not support such queries.
   const selectedApplicationStageTypes = queryParams.stageTypeWords;
   const hasSelectedApplicationStageTypes = selectedApplicationStageTypes && selectedApplicationStageTypes.length > 0;

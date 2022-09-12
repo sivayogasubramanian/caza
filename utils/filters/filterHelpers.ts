@@ -5,12 +5,14 @@ import { canBecomeInteger } from '../numbers/validations';
 export function makeCompanyNameFilters(searchWords: string[]) {
   return searchWords.length === 0
     ? undefined
-    : searchWords.map((word) => ({
-        name: {
-          contains: word,
-          mode: Prisma.QueryMode.insensitive,
-        },
-      }));
+    : searchWords
+        .filter((word) => !canBecomeValidYear(word))
+        .map((word) => ({
+          name: {
+            contains: word,
+            mode: Prisma.QueryMode.insensitive,
+          },
+        }));
 }
 
 export function makeRoleTitleFilters(searchWords: string[]) {
