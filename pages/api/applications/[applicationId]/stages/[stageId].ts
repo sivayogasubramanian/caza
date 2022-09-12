@@ -22,6 +22,7 @@ enum MessageType {
   INVALID_APPLICATION_STAGE_TYPE,
   INVALID_DATE,
   INVALID_EMOJI_UNICODE_HEX,
+  INVALID_REMARK,
 }
 
 const prisma = new PrismaClient();
@@ -63,6 +64,10 @@ const messages = Object.freeze({
   [MessageType.INVALID_EMOJI_UNICODE_HEX]: {
     type: StatusMessageType.ERROR,
     message: 'Application stage emoji unicode hex is invalid.',
+  },
+  [MessageType.INVALID_REMARK]: {
+    type: StatusMessageType.ERROR,
+    message: 'Application stage remark is invalid.',
   },
 });
 
@@ -193,6 +198,10 @@ function validatePatchRequest(req: NextApiRequest) {
     return MessageType.INVALID_EMOJI_UNICODE_HEX;
   }
 
+  if (req.body.remark !== undefined && req.body.remark !== null && typeof req.body.remark !== 'string') {
+    return MessageType.INVALID_REMARK;
+  }
+
   return null;
 }
 
@@ -208,11 +217,11 @@ function makePatchData(req: NextApiRequest) {
   }
 
   if (req.body.emojiUnicodeHex !== undefined) {
-    applicationStagePatchData.emojiUnicodeHex = req.body.emojiUnicodeHex;
+    applicationStagePatchData.emojiUnicodeHex = req.body.emojiUnicodeHex || null;
   }
 
   if (req.body.remark !== undefined) {
-    applicationStagePatchData.remark = req.body.remark;
+    applicationStagePatchData.remark = req.body.remark || null;
   }
 
   return applicationStagePatchData;
