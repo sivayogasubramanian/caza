@@ -65,7 +65,7 @@ async function handler(
 }
 
 async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationStageData>>) {
-  const paramValidationError = validatePathParameters(req) ?? validatePostRequestBody(req);
+  const paramValidationError = validatePostRequest(req);
   if (paramValidationError !== null) {
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[paramValidationError]));
   }
@@ -96,7 +96,12 @@ function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
   return !canBecomeInteger(req.query.applicationId) ? MessageType.INVALID_APPLICATION_ID : null;
 }
 
-function validatePostRequestBody(req: NextApiRequest): Nullable<MessageType> {
+function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
+  const pathParameterError = validatePathParameters(req);
+  if (pathParameterError !== null) {
+    return pathParameterError;
+  }
+
   const { type, date, emojiUnicodeHex, remark } = req.body;
 
   if (typeof type !== 'string' || !(type in ApplicationStageType)) {
