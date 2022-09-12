@@ -48,15 +48,15 @@ const messages = Object.freeze({
 async function handler(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
   switch (req.method) {
     case HttpMethod.PATCH:
-      return patchHandler(uid, req, res);
+      return handlePatch(uid, req, res);
     case HttpMethod.DELETE:
-      return deleteHandler(uid, req, res);
+      return handleDelete(uid, req, res);
     default:
       rejectHttpMethod(res, req.method);
   }
 }
 
-async function patchHandler(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
+async function handlePatch(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<TaskData>>) {
   const validationError = validatePathParameters(req) ?? validatePatchRequestBody(req);
   if (validationError !== null) {
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[validationError]));
@@ -81,7 +81,7 @@ async function patchHandler(uid: string, req: NextApiRequest, res: NextApiRespon
     .json(createJsonResponse(updatedTask, messages[MessageType.TASK_UPDATED_SUCCESSFULLY]));
 }
 
-async function deleteHandler(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
+async function handleDelete(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
   const validationError = validatePathParameters(req);
   if (validationError !== null) {
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[validationError]));
