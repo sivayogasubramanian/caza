@@ -2,6 +2,7 @@ import { Auth, GithubAuthProvider, signInWithRedirect, signOut, User } from 'fir
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, useEffect, useState } from 'react';
+import RoleSankey from '../components/sankey/RoleSankey';
 import AuthContext from '../context/AuthContext';
 import styles from '../styles/Home.module.css';
 
@@ -22,6 +23,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        <RoleSankey />
         <h1 className="text-3xl italic text-rose-500 bg-amber-300 rounded-md p-2">
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
