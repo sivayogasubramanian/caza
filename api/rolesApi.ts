@@ -1,13 +1,15 @@
 import { ApiPromise } from '../types/apiResponse';
-import { RoleData, RoleListData, RolePostData } from '../types/role';
+import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../types/role';
+import { toQueryString } from '../utils/url';
 import api from './api';
 
 export const ROLES_API_ENDPOINT = 'roles';
 
 class RolesApi {
-  // TODO: Query params
-  public getRoles(): ApiPromise<RoleListData[]> {
-    return api.get(ROLES_API_ENDPOINT).then((res) => res.data);
+  public getRoles(rolesQueryParams: RoleQueryParams): ApiPromise<RoleListData[]> {
+    const queryString = toQueryString(rolesQueryParams);
+
+    return api.get(`${ROLES_API_ENDPOINT}?${queryString}`).then((res) => res.data);
   }
 
   public createRole(role: RolePostData): ApiPromise<RoleData> {
