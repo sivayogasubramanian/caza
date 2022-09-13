@@ -4,12 +4,12 @@ import api from './api';
 
 export const USER_API_ENDPOINT = 'user';
 
-class UserApi {
+class UsersApi {
   public linkAccount(userPostData: UserPostData): ApiPromise<UserData> {
     return api.post(USER_API_ENDPOINT, userPostData).then((res) => res.data);
   }
 }
 
-const userApi = new UserApi();
+const usersApi = new UsersApi();
 
-export default userApi;
+export default usersApi;
