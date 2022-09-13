@@ -5,6 +5,7 @@ import api from './api';
 export const APPLICATIONS_API_ENDPOINT = 'applications';
 
 class ApplicationsApi {
+  // TODO: Query params
   public getApplications(): ApiPromise<ApplicationListData[]> {
     return api.get(APPLICATIONS_API_ENDPOINT).then((res) => res.data);
   }
