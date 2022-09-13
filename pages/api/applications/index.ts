@@ -19,6 +19,7 @@ import {
   makeRoleYearFilters,
 } from '../../../utils/filters/filterHelpers';
 import { combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../utils/arrays';
+import { splitByCommaRemovingWhitespacesAround, splitByWhitespaces } from '../../../utils/strings/formatters';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -195,29 +196,27 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
+  const { searchQuery, roleTypes, stageTypes } = req.query;
+
   const searchWords =
-    req.query.searchQuery === undefined
-      ? []
-      : Array.isArray(req.query.searchQuery)
-      ? req.query.searchQuery
-      : req.query.searchQuery.trim().split(/\s+/);
+    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
 
   const roleTypeUncheckedWords =
-    req.query.roleTypes === undefined
+    roleTypes === undefined
       ? []
-      : Array.isArray(req.query.roleTypes)
-      ? req.query.roleTypes
-      : req.query.roleTypes.trim().split(/\s*,\s*/);
+      : Array.isArray(roleTypes)
+      ? roleTypes
+      : splitByCommaRemovingWhitespacesAround(roleTypes);
 
   // Safe to typecast due to the filter check.
   const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
 
   const stageTypeUncheckedWords =
-    req.query.stageTypes === undefined
+    stageTypes === undefined
       ? []
-      : Array.isArray(req.query.stageTypes)
-      ? req.query.stageTypes
-      : req.query.stageTypes.trim().split(/\s*,\s*/);
+      : Array.isArray(stageTypes)
+      ? stageTypes
+      : splitByCommaRemovingWhitespacesAround(stageTypes);
 
   // Safe to typecast due to the filter check.
   const stageTypeWords: ApplicationStageType[] = stageTypeUncheckedWords.filter(

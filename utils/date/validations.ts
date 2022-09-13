@@ -1,4 +1,4 @@
-import { MIN_ROLE_YEAR } from '../constants';
+import { MIN_YEAR } from '../constants';
 import { canBecomeInteger } from '../numbers/validations';
 
 export function isValidDate(value: string) {
@@ -6,7 +6,7 @@ export function isValidDate(value: string) {
 }
 
 export function isValidYear(value: number) {
-  return value >= MIN_ROLE_YEAR;
+  return value >= MIN_YEAR;
 }
 
 export function canBecomeValidYear(value: unknown) {

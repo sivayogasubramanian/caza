@@ -1,6 +1,6 @@
 import { Prisma, RoleType } from '@prisma/client';
-import { canBecomeValidYear, isValidYear } from '../date/validations';
-import { canBecomeInteger } from '../numbers/validations';
+import { canBecomeValidYear } from '../date/validations';
+import { getNonEmptyArrayOrUndefined } from '../arrays';
 
 export function makeCompanyNameFilters(searchWords: string[]) {
   // Do not want to return names that contain the year to prevent zero results.
@@ -19,7 +19,6 @@ export function makeCompanyNameFilters(searchWords: string[]) {
 export function makeRoleTitleFilters(searchWords: string[]) {
   // Do not want to return titles that contain the year.
   // This prevents unrelated titles that only match the year but not the other search words.
-  // Filtering for year is done separately.
   const roleTitleSearchWords = searchWords
     .filter((word) => !canBecomeValidYear(word))
     .map((word) => ({
@@ -28,20 +27,19 @@ export function makeRoleTitleFilters(searchWords: string[]) {
         mode: Prisma.QueryMode.insensitive,
       },
     }));
-  return roleTitleSearchWords.length === 0 ? undefined : roleTitleSearchWords;
+  return getNonEmptyArrayOrUndefined(roleTitleSearchWords);
 }
 
 export function makeRoleYearFilters(searchWords: string[]) {
   const roleYearSearchWords = searchWords
-    .filter(canBecomeInteger)
+    .filter(canBecomeValidYear)
     .map(Number)
-    .filter(isValidYear)
     .map((yearKeyword) => ({
       year: {
         equals: yearKeyword,
       },
     }));
-  return roleYearSearchWords.length === 0 ? undefined : roleYearSearchWords;
+  return getNonEmptyArrayOrUndefined(roleYearSearchWords);
 }
 
 export function makeRoleTypeFilters(roleTypes: RoleType[]) {
