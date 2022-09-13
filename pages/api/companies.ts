@@ -1,13 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { CompanyData, CompanyListData, CompanyPostData } from '../../types/company';
-import { isEmpty, isValidUrl } from '../../utils/strings/validations';
-import { capitalizeEveryWord, removeProtocolAndWwwIfPresent, trim } from '../../utils/strings/formatters';
-import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
-import { withAuth } from '../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
+import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } from '../../types/company';
 import { Nullable } from '../../types/utils';
+import { withAuth } from '../../utils/auth/jwtHelpers';
+import { makeCompanyNameFilters } from '../../utils/filters/filterHelpers';
+import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../utils/prisma/prismaHelpers';
+import { capitalizeEveryWord, removeProtocolAndWwwIfPresent, splitByWhitespaces } from '../../utils/strings/formatters';
+import { isEmpty, isValidUrl } from '../../utils/strings/validations';
 
 enum MessageType {
   COMPANY_ALREADY_EXISTS,
@@ -48,21 +49,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
-  const { name } = req.query;
-  const trimmedName = name && trim(name);
+  const queryParams: CompanyQueryParams = parseGetQueryParams(req);
 
-  if (!trimmedName) {
+  if (!queryParams.companyNames) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
 
+  const companyNamesFilters = makeCompanyNameFilters(queryParams.companyNames);
+
   const companies: CompanyListData[] = await prisma.company.findMany({
     where: {
       isVerified: true,
-      name: {
-        contains: trimmedName,
-        mode: 'insensitive',
-      },
+      OR: companyNamesFilters,
     },
     orderBy: {
       name: 'asc',
@@ -109,6 +108,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   res
     .status(HttpStatus.CREATED)
     .json(createJsonResponse(newCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
+}
+
+function parseGetQueryParams(req: NextApiRequest): CompanyQueryParams {
+  const { companyNames } = req.query;
+  const names =
+    companyNames === undefined ? [] : Array.isArray(companyNames) ? companyNames : splitByWhitespaces(companyNames);
+  return { companyNames: names };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {

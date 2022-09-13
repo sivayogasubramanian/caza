@@ -1,13 +1,15 @@
 import { ApiPromise } from '../types/apiResponse';
-import { CompanyData, CompanyListData, CompanyPostData } from '../types/company';
+import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } from '../types/company';
+import { toQueryString } from '../utils/url';
 import api from './api';
 
 export const COMPANIES_API_ENDPOINT = 'companies';
 
 class CompaniesApi {
-  // TODO: Query params
-  public getCompanies(): ApiPromise<CompanyListData[]> {
-    return api.get(COMPANIES_API_ENDPOINT).then((res) => res.data);
+  public getCompanies(comapanyQueryParams: CompanyQueryParams): ApiPromise<CompanyListData[]> {
+    const queryString = toQueryString(comapanyQueryParams);
+
+    return api.get(`${COMPANIES_API_ENDPOINT}?${queryString}`).then((res) => res.data);
   }
 
   public createCompany(company: CompanyPostData): ApiPromise<CompanyData> {

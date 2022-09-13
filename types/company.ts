@@ -10,3 +10,7 @@ export type CompanyPostData = {
 };
 
 export type CompanyData = CompanyListData;
+
+export type CompanyQueryParams = {
+  companyNames: string[];
+};
