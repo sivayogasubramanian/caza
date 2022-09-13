@@ -16,7 +16,7 @@ const SAMPLE: PathData[] = [
 function createSampleData(...stages: ApplicationStageType[]): PathData {
   return {
     stages: ['APPLIED', ...stages, 'ACCEPTED'] as ApplicationStageType[],
-    daysToNext: [5, ...stages.map((_) => 1)],
+    daysToNext: [5, ...stages.map(() => 1)],
   };
 }
 
@@ -102,8 +102,8 @@ function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
     const { next, previous, numberOfDays } = edge;
     const src = nodeIdentifierToString(previous);
     const dest = nodeIdentifierToString(next);
-    let srcEdges = map[src] ?? {};
-    let srcDestAmount = srcEdges[dest] ?? { sum: 0, count: 0 };
+    const srcEdges = map[src] ?? {};
+    const srcDestAmount = srcEdges[dest] ?? { sum: 0, count: 0 };
     srcEdges[dest] = { sum: srcDestAmount.sum + numberOfDays, count: srcDestAmount.count + 1 };
     map[src] = srcEdges;
   }
@@ -118,7 +118,7 @@ function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
   return result.map((res) => [res.src, res.dest, res.avgNumDays]);
 }
 
-export interface RoleSankeyProps {}
+export type RoleSankeyProps = Record<string, never>; // for now.
 
 const RoleSankey: FC<RoleSankeyProps> = () => {
   const data = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
