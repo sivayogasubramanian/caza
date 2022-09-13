@@ -7,6 +7,10 @@ const SAMPLE: PathData[] = [
   createSampleData('ONLINE_ASSESSMENT'),
   createSampleData('ONLINE_ASSESSMENT', 'NON_TECHNICAL'),
   createSampleData('ONLINE_ASSESSMENT', 'NON_TECHNICAL', 'TECHNICAL'),
+  { stages: ['APPLIED'], daysToNext: [] },
+  { stages: ['APPLIED', 'REJECTED'], daysToNext: [5] },
+  { stages: ['APPLIED', 'ONLINE_ASSESSMENT', 'REJECTED'], daysToNext: [5, 7] },
+  { stages: ['APPLIED', 'ONLINE_ASSESSMENT', 'NON_TECHNICAL', 'REJECTED'], daysToNext: [5, 3, 8] },
 ];
 
 function createSampleData(...stages: ApplicationStageType[]): PathData {
@@ -84,13 +88,12 @@ function convertPathToEdges({ stages, daysToNext }: PathData): Edge[] {
   return edges;
 }
 
-function nodeIdentifierToString(node: NodeIdentifier) {
+function nodeIdentifierToString(node: NodeIdentifier): string {
   if (typeof node === 'string') {
     return node;
   }
   const { stage, previousStages } = node;
-  const prevStageIds = previousStages.map((str) => str.slice(0, 2));
-  return `${stage}:${prevStageIds.join(',')}`;
+  return `${stage}:${previousStages.join(',')}`;
 }
 
 function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
@@ -118,12 +121,13 @@ function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
 export interface RoleSankeyProps {}
 
 const RoleSankey: FC<RoleSankeyProps> = () => {
-  const data = [['FROM', 'TO', 'WEIGHT']].concat(SAMPLE.map(convertPathToEdges).flatMap(convertEdgesToSankeyData));
-  console.log(SAMPLE.map(convertPathToEdges).flatMap(convertEdgesToSankeyData));
-  console.log(data);
+  const data = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
+    SAMPLE.map(convertPathToEdges).flatMap(convertEdgesToSankeyData),
+  );
+
   return (
     <div>
-      <Chart chartType="Sankey" width="100%" height="200px" data={data} options={{}}></Chart>
+      <Chart chartType="Sankey" width="80%" height="200px" data={data} options={{}}></Chart>
     </div>
   );
 };
