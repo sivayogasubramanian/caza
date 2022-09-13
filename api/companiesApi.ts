@@ -5,6 +5,7 @@ import api from './api';
 export const COMPANIES_API_ENDPOINT = 'companies';
 
 class CompaniesApi {
+  // TODO: Query params
   public getCompanies(): ApiPromise<CompanyListData[]> {
     return api.get(COMPANIES_API_ENDPOINT).then((res) => res.data);
   }

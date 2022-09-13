@@ -5,6 +5,7 @@ import api from './api';
 export const ROLES_API_ENDPOINT = 'roles';
 
 class RolesApi {
+  // TODO: Query params
   public getRoles(): ApiPromise<RoleListData[]> {
     return api.get(ROLES_API_ENDPOINT).then((res) => res.data);
   }
