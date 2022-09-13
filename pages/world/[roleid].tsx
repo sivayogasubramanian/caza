@@ -6,7 +6,7 @@ import AuthContext from '../../context/AuthContext';
 const RoleWorldPage: NextPage = () => {
   const { currentUser } = useContext(AuthContext);
   if (!currentUser || currentUser.isAnonymous) {
-    return <div>Insert 'Log In or Go Back' component here.</div>;
+    return <div>Insert Log In or Go Back component here.</div>;
   }
 
   return (
