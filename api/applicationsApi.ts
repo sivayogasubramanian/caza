@@ -1,13 +1,20 @@
 import { ApiPromise, EmptyPayload } from '../types/apiResponse';
-import { ApplicationData, ApplicationListData, ApplicationPostData } from '../types/application';
+import {
+  ApplicationData,
+  ApplicationListData,
+  ApplicationPostData,
+  ApplicationQueryParams,
+} from '../types/application';
+import { toQueryString } from '../utils/url';
 import api from './api';
 
 export const APPLICATIONS_API_ENDPOINT = 'applications';
 
 class ApplicationsApi {
-  // TODO: Query params
-  public getApplications(): ApiPromise<ApplicationListData[]> {
-    return api.get(APPLICATIONS_API_ENDPOINT).then((res) => res.data);
+  public getApplications(applicationQueryParams: ApplicationQueryParams): ApiPromise<ApplicationListData[]> {
+    const queryString = toQueryString(applicationQueryParams);
+
+    return api.get(`${APPLICATIONS_API_ENDPOINT}?${queryString}`).then((res) => res.data);
   }
 
   public getApplication(applicationId: number): ApiPromise<ApplicationData> {

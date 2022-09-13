@@ -196,7 +196,9 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
-  const { searchQuery, roleTypes, stageTypes } = req.query;
+  const searchQuery = req.query.searchWords;
+  const roleTypes = req.query.roleTypeWords;
+  const stageTypes = req.query.stageTypeWords;
 
   const searchWords =
     searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
