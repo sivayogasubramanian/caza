@@ -4,6 +4,7 @@ import { RoleData } from './role';
 import { TaskData } from './task';
 import { RoleApplicationListData } from './role';
 import { ApplicationStageApplicationListData } from './applicationStage';
+import { ApplicationStageType, RoleType } from '@prisma/client';
 
 export type ApplicationData = {
   id: number;
@@ -26,4 +27,10 @@ export type ApplicationListData = {
   role: RoleApplicationListData;
   latestStage?: ApplicationStageApplicationListData;
   taskNotificationCount: number;
+};
+
+export type ApplicationQueryParams = {
+  searchWords: string[];
+  roleTypeWords: RoleType[];
+  stageTypeWords: ApplicationStageType[];
 };

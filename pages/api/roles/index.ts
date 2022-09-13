@@ -1,15 +1,16 @@
-import { Prisma, PrismaClient, RoleType } from '@prisma/client';
+import { PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
 import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
-import { MIN_ROLE_YEAR } from '../../../utils/constants';
+import { MIN_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
-import { capitalizeEveryWord } from '../../../utils/strings/formatters';
+import { capitalizeEveryWord, splitByWhitespaces } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../utils/numbers/validations';
+import { makeRoleTitleFilters, makeRoleYearFilters } from '../../../utils/filters/filterHelpers';
 
 const prisma = new PrismaClient();
 
@@ -46,7 +47,7 @@ const messages = Object.freeze({
   [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
   [MessageType.ROLE_YEAR_TOO_SMALL]: {
     type: StatusMessageType.ERROR,
-    message: `Role year must be after ${MIN_ROLE_YEAR}.`,
+    message: `Role year must be after ${MIN_YEAR}.`,
   },
   [MessageType.ROLE_CREATED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
@@ -68,38 +69,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
-  const { companyId, searchQuery } = req.query as RoleQueryParams;
-
-  const queryCompanyId = typeof companyId == 'string' && canBecomeInteger(companyId) ? Number(companyId) : undefined;
-
-  const searchWords = typeof searchQuery == 'string' && !isEmpty(searchQuery) ? searchQuery.trim().split(/\s+/) : [];
-
-  const searchInts = searchWords
-    .filter(canBecomeInteger)
-    .map(Number)
-    .filter((year) => year >= MIN_ROLE_YEAR);
-  const queryYear = searchInts.length > 0 ? searchInts[0] : undefined;
-
-  const queryWords = searchWords
-    .filter((word) => !(canBecomeInteger(word) && Number(word) >= MIN_ROLE_YEAR))
-    .map((word) => ({
-      title: {
-        contains: word,
-        mode: Prisma.QueryMode.insensitive,
-      },
-    }));
-
-  if (!queryCompanyId) {
-    res.status(HttpStatus.OK).json(createJsonResponse([]));
-    return;
-  }
+  const queryParams: RoleQueryParams = parseGetQueryParams(req);
+  const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
+  const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
 
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
       isVerified: true,
-      companyId: queryCompanyId,
-      AND: queryYear ? [{ year: { equals: queryYear } }] : undefined,
-      OR: queryWords.length > 0 ? queryWords : undefined,
+      companyId: queryParams.companyId,
+      AND: [{ OR: roleYearFilters }, { OR: roleTitleFilters }],
     },
     take: 5,
     select: {
@@ -141,6 +119,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   });
 
   res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+}
+
+function parseGetQueryParams(req: NextApiRequest): RoleQueryParams {
+  const { companyId, searchQuery } = req.query;
+  const searchWords =
+    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
+  const parsedCompanyId = canBecomeInteger(companyId) ? Number(companyId) : undefined;
+  return { companyId: parsedCompanyId, searchWords };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
@@ -189,7 +175,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.ROLE_YEAR_NAN;
   }
 
-  if (req.body.year < MIN_ROLE_YEAR) {
+  if (req.body.year < MIN_YEAR) {
     return MessageType.ROLE_YEAR_TOO_SMALL;
   }
 

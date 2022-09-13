@@ -20,6 +20,6 @@ export type RoleApplicationListData = RoleData & { company: CompanyData };
 export type RoleListData = RoleData & { company: CompanyData; isVerified: boolean };
 
 export type RoleQueryParams = {
-  companyId: string | string[];
-  searchQuery: string | string[];
+  companyId?: number;
+  searchWords: string[];
 };

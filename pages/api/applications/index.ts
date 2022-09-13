@@ -1,12 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApplicationListData, ApplicationPostData, ApplicationRoleData } from '../../../types/application';
-import { PrismaClient } from '@prisma/client';
+import {
+  ApplicationListData,
+  ApplicationPostData,
+  ApplicationQueryParams,
+  ApplicationRoleData,
+} from '../../../types/application';
+import { ApplicationStageType, Prisma, PrismaClient, RoleType } from '@prisma/client';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { Nullable } from '../../../types/utils';
 import { MIN_DATE } from '../../../utils/constants';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
+import {
+  makeCompanyNameFilters,
+  makeRoleTitleFilters,
+  makeRoleTypeFilters,
+  makeRoleYearFilters,
+} from '../../../utils/filters/filterHelpers';
+import { combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../utils/arrays';
+import { splitByCommaRemovingWhitespacesAround, splitByWhitespaces } from '../../../utils/strings/formatters';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -47,9 +60,23 @@ async function handleGet(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<ApplicationListData[]>>,
 ) {
+  const queryParams: ApplicationQueryParams = parseGetQueryParams(req);
+
+  const companyNameFilters = makeCompanyNameFilters(queryParams.searchWords);
+  const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
+  const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
+  const roleTypeFilters = makeRoleTypeFilters(queryParams.roleTypeWords);
+  const companyOrFilters = companyNameFilters?.map((filter) => ({ company: filter }));
+  const roleTitleOrCompanyFilters = getNonEmptyArrayOrUndefined<Prisma.RoleWhereInput>(
+    combineDefinedArrays<Prisma.RoleWhereInput>([roleTitleFilters, companyOrFilters]),
+  );
+
   const queriedApplications = await prisma.application.findMany({
     where: {
       userId: userId,
+      role: {
+        AND: [{ OR: roleTypeFilters }, { OR: roleTitleOrCompanyFilters }, { OR: roleYearFilters }],
+      },
     },
     select: {
       id: true,
@@ -95,6 +122,11 @@ async function handleGet(
     },
   });
 
+  // Used in filters for applications whose latest stage type matches any of the query stage types.
+  // Done in application layer as prisma does not support such queries.
+  const selectedApplicationStageTypes = queryParams.stageTypeWords;
+  const hasSelectedApplicationStageTypes = selectedApplicationStageTypes && selectedApplicationStageTypes.length > 0;
+
   const applications: ApplicationListData[] = queriedApplications
     .map((application) => ({
       id: application.id,
@@ -102,6 +134,10 @@ async function handleGet(
       latestStage: application.applicationStages[0],
       taskNotificationCount: application._count.tasks,
     }))
+    .filter(
+      (application) =>
+        !hasSelectedApplicationStageTypes || application.latestStage?.type in selectedApplicationStageTypes,
+    )
     .sort(
       (firstApplication, secondApplication) =>
         secondApplication.taskNotificationCount - firstApplication.taskNotificationCount ||
@@ -157,6 +193,37 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
   res
     .status(HttpStatus.CREATED)
     .json(createJsonResponse(newApplication, messages[MessageType.APPLICATION_CREATED_SUCCESSFULLY]));
+}
+
+function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
+  const { searchQuery, roleTypes, stageTypes } = req.query;
+
+  const searchWords =
+    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
+
+  const roleTypeUncheckedWords =
+    roleTypes === undefined
+      ? []
+      : Array.isArray(roleTypes)
+      ? roleTypes
+      : splitByCommaRemovingWhitespacesAround(roleTypes);
+
+  // Safe to typecast due to the filter check.
+  const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
+
+  const stageTypeUncheckedWords =
+    stageTypes === undefined
+      ? []
+      : Array.isArray(stageTypes)
+      ? stageTypes
+      : splitByCommaRemovingWhitespacesAround(stageTypes);
+
+  // Safe to typecast due to the filter check.
+  const stageTypeWords: ApplicationStageType[] = stageTypeUncheckedWords.filter(
+    (word) => word in ApplicationStageType,
+  ) as ApplicationStageType[];
+
+  return { searchWords, roleTypeWords, stageTypeWords };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
