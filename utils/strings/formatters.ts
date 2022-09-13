@@ -32,3 +32,11 @@ export function capitalizeEveryWord(phrase: string) {
 export function trim(value: string | string[]) {
   return value.toString().trim();
 }
+
+export function splitByCommaRemovingWhitespacesAround(phrase: string) {
+  return phrase.trim().split(/\s*,\s*/);
+}
+
+export function splitByWhitespaces(phrase: string) {
+  return phrase.trim().split(/\s+/);
+}

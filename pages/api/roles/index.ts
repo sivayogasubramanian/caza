@@ -4,10 +4,10 @@ import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
 import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
-import { MIN_ROLE_YEAR } from '../../../utils/constants';
+import { MIN_YEAR } from '../../../utils/constants';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
-import { capitalizeEveryWord } from '../../../utils/strings/formatters';
+import { capitalizeEveryWord, splitByWhitespaces } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../utils/numbers/validations';
 import { makeRoleTitleFilters, makeRoleYearFilters } from '../../../utils/filters/filterHelpers';
@@ -47,7 +47,7 @@ const messages = Object.freeze({
   [MessageType.ROLE_YEAR_NAN]: { type: StatusMessageType.ERROR, message: 'Role year is not a number.' },
   [MessageType.ROLE_YEAR_TOO_SMALL]: {
     type: StatusMessageType.ERROR,
-    message: `Role year must be after ${MIN_ROLE_YEAR}.`,
+    message: `Role year must be after ${MIN_YEAR}.`,
   },
   [MessageType.ROLE_CREATED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
@@ -77,8 +77,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
     where: {
       isVerified: true,
       companyId: queryParams.companyId,
-      AND: roleYearFilters,
-      OR: roleTitleFilters,
+      AND: [{ OR: roleYearFilters }, { OR: roleTitleFilters }],
     },
     take: 5,
     select: {
@@ -125,7 +124,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 function parseGetQueryParams(req: NextApiRequest): RoleQueryParams {
   const { companyId, searchQuery } = req.query;
   const searchWords =
-    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : searchQuery.trim().split(/\s+/);
+    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
   const parsedCompanyId = canBecomeInteger(companyId) ? Number(companyId) : undefined;
   return { companyId: parsedCompanyId, searchWords };
 }
@@ -176,7 +175,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.ROLE_YEAR_NAN;
   }
 
-  if (req.body.year < MIN_ROLE_YEAR) {
+  if (req.body.year < MIN_YEAR) {
     return MessageType.ROLE_YEAR_TOO_SMALL;
   }
 
