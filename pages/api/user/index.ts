@@ -1,18 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
-import { AccountPostData } from '../../../types/user';
+import { UserPostData, UserData } from '../../../types/user';
 import { Nullable } from '../../../types/utils';
 import { getBearerToken, getUserFromJwt, UserDetailsFromRequest, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 
 const prisma = new PrismaClient();
-
-/** Limited set of data representing user and the list of user application IDs. Only for use in this endpoint. */
-interface UserData {
-  uid: string;
-}
 
 enum MessageType {
   // POST link accounts.
@@ -67,7 +62,7 @@ async function handler(currentUid: string, req: NextApiRequest, res: NextApiResp
 }
 
 function handlePost(currentUid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<UserData>>) {
-  const { oldToken } = req.body as AccountPostData;
+  const { oldToken } = req.body as UserPostData;
   const oldUserToken = oldToken && typeof oldToken === 'string' ? oldToken.trim() : oldToken;
   return oldUserToken /* if null, undefined, empty or contains only whitespace */
     ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
