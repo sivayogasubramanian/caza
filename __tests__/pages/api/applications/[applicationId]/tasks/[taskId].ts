@@ -146,7 +146,6 @@ describe('Handles bad path or bad method', () => {
 
     await taskHandler(req, res);
     const { status, json } = getResult();
-    console.log(json.messages);
 
     expect(status).toEqual(HttpStatus.BAD_REQUEST);
   });
