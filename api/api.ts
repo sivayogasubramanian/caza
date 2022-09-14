@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
 import { ApiPromise, ApiResponse, EmptyPayload, StatusMessageType } from '../types/apiResponse';
+
 class BaseApi {
   client = axios.create({
     baseURL: '/api/',
