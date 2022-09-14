@@ -32,10 +32,10 @@ const AxiosInterceptor = ({ children }: Props) => {
       return config;
     };
 
-    const interceptor = api.interceptors.request.use(requestInterceptor);
+    const interceptor = api.client.interceptors.request.use(requestInterceptor);
     setIsIntercepted(true);
 
-    return () => api.interceptors.request.eject(interceptor);
+    return () => api.client.interceptors.request.eject(interceptor);
   }, [jwtToken, setIsIntercepted]);
 
   if (!isIntercepted) return null;

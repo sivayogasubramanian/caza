@@ -6,7 +6,7 @@ export const USER_API_ENDPOINT = 'user';
 
 class UsersApi {
   public linkAccount(userPostData: UserPostData): ApiPromise<UserData> {
-    return api.post(USER_API_ENDPOINT, userPostData).then((res) => res.data);
+    return api.post(USER_API_ENDPOINT, userPostData);
   }
 }
 
