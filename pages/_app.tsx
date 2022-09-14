@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <AxiosInterceptor>
         <SWRConfig
           value={{
-            fetcher: (url) => api.get(url).then((res) => res.data),
+            fetcher: (url) => api.get(url),
           }}
         >
           <Component {...pageProps} />
