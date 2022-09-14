@@ -73,9 +73,6 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
   const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
 
-  console.log(req.query);
-  console.log(queryParams);
-
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
       isVerified: true,
