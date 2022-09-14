@@ -8,9 +8,7 @@ export function toQueryString(object: Record<string, any>, prefix = ''): string 
     return '';
   }
 
-  const query = Object.keys(object).map((key) => {
-    const value = object[key];
-
+  const query = Object.entries(object).map(([key, value]) => {
     if (object.constructor === Array) {
       key = prefix;
     } else if (object.constructor === Object) {

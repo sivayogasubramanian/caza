@@ -52,7 +52,7 @@ function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D
 
       return apiResponse;
     })
-    .catch((error: AxiosError) => {
+    .catch((error) => {
       if (process.env.NODE_ENV === 'development') {
         console.error(`[API] ${error.code} ${endpoint} : ${error.message}`);
       }
@@ -61,10 +61,8 @@ function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D
     });
 }
 
-function makeApiErrorResponse(error: AxiosError): ApiResponse<EmptyPayload> {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  if (!error.response || !error.response.data || !error.response.data.messages) {
+function makeApiErrorResponse(error: any): ApiResponse<EmptyPayload> {
+  if (!error?.response?.data?.messages) {
     return {
       payload: {},
       messages: [
@@ -76,8 +74,6 @@ function makeApiErrorResponse(error: AxiosError): ApiResponse<EmptyPayload> {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   return error.response.data;
 }
 

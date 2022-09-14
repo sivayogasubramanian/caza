@@ -7,15 +7,19 @@ export const TASKS_API_ENDPOINT = 'tasks';
 
 class TasksApi {
   public createTask(applicationId: number, task: TaskPostData): ApiPromise<TaskData> {
-    return api.post(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${TASKS_API_ENDPOINT}`, task);
+    return api.post(this.makeTasksApiEndpoint(applicationId), task);
   }
 
   public editTask(applicationId: number, taskId: number, taskPatchData: TaskPatchData): ApiPromise<TaskData> {
-    return api.post(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${TASKS_API_ENDPOINT}/${taskId}`, taskPatchData);
+    return api.post(`${this.makeTasksApiEndpoint(applicationId)}/${taskId}`, taskPatchData);
   }
 
   public deleteTask(applicationId: number, taskId: number): ApiPromise<EmptyPayload> {
-    return api.delete(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${TASKS_API_ENDPOINT}/${taskId}`);
+    return api.delete(`${this.makeTasksApiEndpoint(applicationId)}/${taskId}`);
+  }
+
+  private makeTasksApiEndpoint(applicationId: number) {
+    return `${APPLICATIONS_API_ENDPOINT}/${applicationId}/${TASKS_API_ENDPOINT}`;
   }
 }
 
