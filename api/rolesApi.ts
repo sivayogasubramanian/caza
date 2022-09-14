@@ -6,11 +6,11 @@ export const ROLES_API_ENDPOINT = 'roles';
 
 class RolesApi {
   public getRoles(rolesQueryParams: RoleQueryParams): ApiPromise<RoleListData[]> {
-    return api.get(ROLES_API_ENDPOINT, { params: rolesQueryParams }).then((res) => res.data);
+    return api.get(ROLES_API_ENDPOINT, { params: rolesQueryParams });
   }
 
   public createRole(role: RolePostData): ApiPromise<RoleData> {
-    return api.post(ROLES_API_ENDPOINT, role).then((res) => res.data);
+    return api.post(ROLES_API_ENDPOINT, role);
   }
 }
 

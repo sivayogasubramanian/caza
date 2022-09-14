@@ -10,9 +10,7 @@ class ApplicationStagesApi {
     applicationId: number,
     stage: ApplicationStagePostData,
   ): ApiPromise<ApplicationStageData> {
-    return api
-      .post(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${APPLICATION_STAGES_API_ENDPOINT}`, stage)
-      .then((res) => res.data);
+    return api.post(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${APPLICATION_STAGES_API_ENDPOINT}`, stage);
   }
 
   public editApplicationStage(
@@ -20,18 +18,14 @@ class ApplicationStagesApi {
     stageId: number,
     stagePatchData: ApplicationStagePatchData,
   ): ApiPromise<ApplicationStageData> {
-    return api
-      .patch(
-        `${APPLICATIONS_API_ENDPOINT}/${applicationId}/${APPLICATION_STAGES_API_ENDPOINT}/${stageId}`,
-        stagePatchData,
-      )
-      .then((res) => res.data);
+    return api.patch(
+      `${APPLICATIONS_API_ENDPOINT}/${applicationId}/${APPLICATION_STAGES_API_ENDPOINT}/${stageId}`,
+      stagePatchData,
+    );
   }
 
   public deleteApplicationStage(applicationId: number, stageId: number): ApiPromise<EmptyPayload> {
-    return api
-      .delete(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${APPLICATION_STAGES_API_ENDPOINT}/${stageId}`)
-      .then((res) => res.data);
+    return api.delete(`${APPLICATIONS_API_ENDPOINT}/${applicationId}/${APPLICATION_STAGES_API_ENDPOINT}/${stageId}`);
   }
 }
 
