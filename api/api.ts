@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios, { AxiosPromise, AxiosResponse } from 'axios';
-import { ApiPromise, ApiResponse, EmptyPayload, StatusMessageType } from '../types/apiResponse';
+import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
+import { ApiPromise, ApiResponse, StatusMessageType } from '../types/apiResponse';
 
 class BaseApi {
   client = axios.create({
@@ -43,7 +43,7 @@ class BaseApi {
 
 function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D>>): ApiPromise<D> {
   return promise
-    .then((response: AxiosResponse) => {
+    .then((response: AxiosResponse<ApiResponse<D>>) => {
       const apiResponse = response.data;
 
       if (process.env.NODE_ENV === 'development') {
@@ -52,7 +52,7 @@ function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D
 
       return apiResponse;
     })
-    .catch((error) => {
+    .catch((error: AxiosError<ApiResponse<D>>) => {
       if (process.env.NODE_ENV === 'development') {
         console.error(`[API] ${error.code} ${endpoint} : ${error.message}`);
       }
@@ -61,8 +61,8 @@ function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D
     });
 }
 
-function makeApiErrorResponse(error: any): ApiResponse<EmptyPayload> {
-  if (!error?.response?.data?.messages) {
+function makeApiErrorResponse<D>(error: AxiosError<ApiResponse<D>>): ApiResponse<D> {
+  if (!error?.response?.data.messages) {
     return {
       payload: {},
       messages: [
