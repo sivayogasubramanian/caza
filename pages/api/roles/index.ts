@@ -73,6 +73,9 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
   const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
 
+  console.log(req.query);
+  console.log(queryParams);
+
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
       isVerified: true,
@@ -122,7 +125,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 }
 
 function parseGetQueryParams(req: NextApiRequest): RoleQueryParams {
-  const { companyId, searchQuery } = req.query;
+  const companyId = req.query.companyId;
+  const searchQuery = req.query.searchWords;
   const searchWords =
     searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
   const parsedCompanyId = canBecomeInteger(companyId) ? Number(companyId) : undefined;

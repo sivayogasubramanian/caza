@@ -5,16 +5,13 @@ import {
   ApplicationPostData,
   ApplicationQueryParams,
 } from '../types/application';
-import { toQueryString } from '../utils/url';
 import api from './api';
 
 export const APPLICATIONS_API_ENDPOINT = 'applications';
 
 class ApplicationsApi {
   public getApplications(applicationQueryParams: ApplicationQueryParams): ApiPromise<ApplicationListData[]> {
-    const queryString = toQueryString(applicationQueryParams);
-
-    return api.get(`${APPLICATIONS_API_ENDPOINT}?${queryString}`).then((res) => res.data);
+    return api.get(APPLICATIONS_API_ENDPOINT, { params: applicationQueryParams }).then((res) => res.data);
   }
 
   public getApplication(applicationId: number): ApiPromise<ApplicationData> {
