@@ -2,6 +2,7 @@ import { Auth, GithubAuthProvider, signInWithRedirect, signOut, User } from 'fir
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, useEffect, useState } from 'react';
+import rolesApi from '../api/rolesApi';
 import AuthContext from '../context/AuthContext';
 import styles from '../styles/Home.module.css';
 

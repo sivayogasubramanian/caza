@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/AuthContext';
+import { toQueryString } from '../utils/url';
 import api from './api';
 
 type Props = {
@@ -26,6 +27,8 @@ const AxiosInterceptor = ({ children }: Props) => {
       }
 
       config.headers.Authorization = `Bearer ${jwtToken}`;
+      config.paramsSerializer = toQueryString;
+
       return config;
     };
 
