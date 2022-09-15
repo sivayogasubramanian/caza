@@ -6,6 +6,12 @@ import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskT
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 import TaskIcon from '../../components/icons/timeline/TaskIcon';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
+import useSWR from 'swr';
+import { useRouter } from 'next/router';
+import { canBecomeInteger } from '../../utils/numbers/validations';
+import applicationsApi from '../../api/applicationsApi';
+import { ApplicationApiData } from '../../types/application';
+import { Nullable } from '../../types/utils';
 
 const testApplicationStages: ApplicationStageApplicationData[] = [
   {
@@ -68,16 +74,45 @@ function getTimelineIcon(item: TimelineData) {
 }
 
 function Application() {
-  const timelineApplicationStages: TimelineData[] = testApplicationStages.map((stage) => ({
-    date: stage.date,
-    type: TimelineType.STAGE,
-    data: stage,
-  }));
-  const timelineApplicationTasks: TimelineData[] = testTasks.map((task) => ({
-    date: task.dueDate,
-    type: TimelineType.TASK,
-    data: task,
-  }));
+  const router = useRouter();
+  const applicationId = canBecomeInteger(router.query.applicationId) ? Number(router.query.applicationId) : undefined;
+  const hasValidApplicationId = applicationId !== undefined;
+  const response = hasValidApplicationId ? useSWR([applicationId], applicationsApi.getApplication) : undefined;
+  const payload = response?.data?.payload;
+  const hasSuccessfullyFetchedApplication = payload?.id !== undefined;
+  const application: Nullable<ApplicationApiData> = hasSuccessfullyFetchedApplication
+    ? (payload as ApplicationApiData)
+    : null;
+  const applicationStages: ApplicationStageApplicationData[] =
+    application?.applicationStages.map((stage) => ({
+      id: stage.id,
+      type: stage.type,
+      date: new Date(stage.date),
+      emojiUnicodeHex: stage.emojiUnicodeHex,
+      remark: stage.remark,
+    })) ?? [];
+  const applicationTasks: TaskData[] =
+    application?.tasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      dueDate: new Date(task.dueDate),
+      notificationDateTime: task.notificationDateTime ? new Date(task.notificationDateTime) : null,
+      isDone: task.isDone,
+    })) ?? [];
+
+  const timelineApplicationStages: TimelineData[] =
+    testApplicationStages.map((stage) => ({
+      date: stage.date,
+      type: TimelineType.STAGE,
+      data: stage,
+    })) ?? [];
+  const timelineApplicationTasks: TimelineData[] =
+    testTasks.map((task) => ({
+      date: task.dueDate,
+      type: TimelineType.TASK,
+      data: task,
+    })) ?? [];
+
   const timelineItems = [...timelineApplicationStages, ...timelineApplicationTasks].sort(
     (firstItem, secondItem) =>
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
@@ -85,17 +120,25 @@ function Application() {
 
   return (
     <>
-      <Timeline className="mt-4 mb-4 ml-4 mr-2" reverse={true}>
-        {timelineItems.map((item, index) => (
-          <Timeline.Item key={index} dot={getTimelineIcon(item)}>
-            {item.type === TimelineType.STAGE ? (
-              <ApplicationStageTimelineCard applicationStage={item.data as ApplicationStageApplicationData} />
-            ) : (
-              <ApplicationTaskTimelineCard task={item.data as TaskData} />
-            )}
-          </Timeline.Item>
-        ))}
-      </Timeline>
+      {hasValidApplicationId && hasSuccessfullyFetchedApplication ? (
+        timelineItems.length === 0 ? (
+          <div>Add your first stage or task!</div>
+        ) : (
+          <Timeline className="mt-4 mb-4 ml-4 mr-2" reverse={true}>
+            {timelineItems.map((item, index) => (
+              <Timeline.Item key={index} dot={getTimelineIcon(item)}>
+                {item.type === TimelineType.STAGE ? (
+                  <ApplicationStageTimelineCard applicationStage={item.data as ApplicationStageApplicationData} />
+                ) : (
+                  <ApplicationTaskTimelineCard task={item.data as TaskData} />
+                )}
+              </Timeline.Item>
+            ))}
+          </Timeline>
+        )
+      ) : (
+        <div>Not found</div>
+      )}
     </>
   );
 }

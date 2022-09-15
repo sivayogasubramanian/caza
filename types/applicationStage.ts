@@ -9,6 +9,14 @@ export type ApplicationStageApplicationData = {
   remark: Nullable<string>;
 };
 
+export type ApplicationStageApplicationApiData = {
+  id: number;
+  type: ApplicationStageType;
+  date: string;
+  emojiUnicodeHex: Nullable<string>;
+  remark: Nullable<string>;
+};
+
 export type ApplicationStageData = ApplicationStageApplicationData & { applicationId: number };
 
 export type ApplicationStagePostData = {
