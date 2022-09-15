@@ -1,7 +1,9 @@
 import { ApplicationStageApplicationData } from '../../types/applicationStage';
-import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 import { TaskData } from '../../types/task';
+import { TimelineData, TimelineType } from '../../types/timeline';
+import { Timeline } from 'antd';
 import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
+import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 
 const testApplicationStages: ApplicationStageApplicationData[] = [
   {
@@ -46,15 +48,34 @@ const testTasks: TaskData[] = [
 ];
 
 function Application() {
+  const timelineApplicationStages: TimelineData[] = testApplicationStages.map((stage) => ({
+    date: stage.date,
+    type: TimelineType.STAGE,
+    data: stage,
+  }));
+  const timelineApplicationTasks: TimelineData[] = testTasks.map((task) => ({
+    date: task.dueDate,
+    type: TimelineType.TASK,
+    data: task,
+  }));
+  const timelineItems = [...timelineApplicationStages, ...timelineApplicationTasks].sort(
+    (firstItem, secondItem) =>
+      firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
+  );
+
   return (
     <>
-      {testApplicationStages.map((applicationStage, index) => (
-        <ApplicationStageTimelineCard key={index} applicationStage={applicationStage} />
-      ))}
-
-      {testTasks.map((task, index) => (
-        <ApplicationTaskTimelineCard key={index} task={task} />
-      ))}
+      <Timeline className="mt-2 mb-2 ml-2 mr-4" reverse={true}>
+        {timelineItems.map((item, index) => (
+          <Timeline.Item key={index}>
+            {item.type === TimelineType.STAGE ? (
+              <ApplicationStageTimelineCard applicationStage={item.data as ApplicationStageApplicationData} />
+            ) : (
+              <ApplicationTaskTimelineCard task={item.data as TaskData} />
+            )}
+          </Timeline.Item>
+        ))}
+      </Timeline>
     </>
   );
 }
