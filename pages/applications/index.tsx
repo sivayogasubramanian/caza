@@ -1,5 +1,5 @@
-import { ApplicationStage, ApplicationStageType, RoleType } from '@prisma/client';
-import { Col, Form, Row, Table } from 'antd';
+import { ApplicationStageType, RoleType } from '@prisma/client';
+import { Col, Form, Row, Spin, Table } from 'antd';
 import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
 import { ChangeEventHandler, useState } from 'react';
@@ -42,6 +42,7 @@ function Applications() {
     <div className="p-8">
       <Title>My Applications</Title>
 
+      {/* Search and Filters */}
       <Form>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={18}>
@@ -60,15 +61,18 @@ function Applications() {
         </Row>
       </Form>
 
-      <Table
-        dataSource={applications}
-        columns={[
-          { title: 'ID', dataIndex: 'id' },
-          { title: 'Role', render: (application) => JSON.stringify(application.role) },
-          { title: 'Latest Stage', render: (application) => JSON.stringify(application.latestStage) },
-          { title: 'Task Notification Count', dataIndex: 'taskNotificationCount' },
-        ]}
-      />
+      <Spin spinning={!data}>
+        {/* TODO: Replace Table with Application List Items */}
+        <Table
+          dataSource={applications}
+          columns={[
+            { title: 'ID', dataIndex: 'id' },
+            { title: 'Role', render: (application) => JSON.stringify(application.role) },
+            { title: 'Latest Stage', render: (application) => JSON.stringify(application.latestStage) },
+            { title: 'Task Notification Count', dataIndex: 'taskNotificationCount' },
+          ]}
+        />
+      </Spin>
     </div>
   );
 }
