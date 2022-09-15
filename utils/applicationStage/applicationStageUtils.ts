@@ -13,9 +13,9 @@ import WithdrawnIcon from '../../components/icons/timeline/WithdrawnIcon';
 export const stageTypeToDisplayStringMap = Immutable.Map<ApplicationStageType, string>({
   APPLIED: 'Applied',
   ONLINE_ASSESSMENT: 'Online Assessment',
-  TECHNICAL: 'Technical',
-  NON_TECHNICAL: 'Non Technical',
-  MIXED: 'Mixed',
+  TECHNICAL: 'Technical Round',
+  NON_TECHNICAL: 'Non Technical Round',
+  MIXED: 'Mixed Round',
   OFFERED: 'Offered',
   ACCEPTED: 'Accepted',
   REJECTED: 'Rejected',
