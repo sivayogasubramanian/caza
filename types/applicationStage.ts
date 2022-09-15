@@ -1,6 +1,18 @@
 import { ApplicationStageType } from '@prisma/client';
 import { Nullable } from './utils';
 
+export const ApplicationStageTypeToLabelMap = Object.freeze({
+  [ApplicationStageType.APPLIED]: 'Applied',
+  [ApplicationStageType.ONLINE_ASSESSMENT]: 'Online Assessment',
+  [ApplicationStageType.TECHNICAL]: 'Technical Round',
+  [ApplicationStageType.NON_TECHNICAL]: 'Non-Technical Round',
+  [ApplicationStageType.MIXED]: 'Mixed Round',
+  [ApplicationStageType.OFFERED]: 'Offered',
+  [ApplicationStageType.ACCEPTED]: 'Accepted',
+  [ApplicationStageType.REJECTED]: 'Rejected',
+  [ApplicationStageType.WITHDRAWN]: 'Withdrawn',
+});
+
 export type ApplicationStageApplicationData = {
   id: number;
   type: ApplicationStageType;
