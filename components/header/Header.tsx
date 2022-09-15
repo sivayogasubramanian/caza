@@ -1,9 +1,8 @@
 import { GithubOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { GithubAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { GithubAuthProvider, signInWithRedirect, signOut } from 'firebase/auth';
 import { useContext } from 'react';
-import logo from '../../assets/placeholder.png';
-import profilePlaceholder from '../../assets/profilePlaceholder.png';
+import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
 import { StatusMessageType } from '../../types/apiResponse';
 import { openNotification } from '../notification/Notifier';
@@ -26,9 +25,7 @@ function Header() {
       allow_signup: 'false',
     });
 
-    signInWithPopup(auth, provider).then((userCredentials) =>
-      openNotification({ type: StatusMessageType.SUCCESS, message: `Welcome, ${userCredentials.user.displayName}!` }),
-    );
+    signInWithRedirect(auth, provider);
   };
 
   const handleLogout = () => {
@@ -43,7 +40,7 @@ function Header() {
     signOut(auth).then(() =>
       openNotification({
         type: StatusMessageType.SUCCESS,
-        message: `See you again soon, ${currentUser?.displayName}!`,
+        message: currentUser?.displayName ? `See you again soon, ${currentUser?.displayName}!` : 'See you again soon!',
       }),
     );
   };
@@ -56,7 +53,7 @@ function Header() {
         <Button
           type="primary"
           icon={<GithubOutlined />}
-          className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black"
+          className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black border-none hover:border-none"
           onClick={handleLogin}
         >
           Log in with Github
@@ -68,13 +65,15 @@ function Header() {
           <Button
             type="primary"
             icon={<LogoutOutlined />}
-            className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black"
+            className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black border-none hover:border-none"
             onClick={handleLogout}
           >
             Log out
           </Button>
 
-          <img src={githubProviderData?.photoURL || profilePlaceholder.src} width="35px" className="rounded-full" />
+          {githubProviderData?.photoURL && (
+            <img src={githubProviderData?.photoURL} width="35px" className="rounded-full" />
+          )}
         </div>
       )}
     </div>
