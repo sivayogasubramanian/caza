@@ -5,6 +5,7 @@ import { TaskData } from './task';
 import { RoleApplicationListData } from './role';
 import { ApplicationStageApplicationListData } from './applicationStage';
 import { ApplicationStageType, RoleType } from '@prisma/client';
+import { Nullable } from './utils';
 
 export type ApplicationData = {
   id: number;
@@ -25,7 +26,7 @@ export type ApplicationPostData = {
 export type ApplicationListData = {
   id: number;
   role: RoleApplicationListData;
-  latestStage?: ApplicationStageApplicationListData;
+  latestStage: Nullable<ApplicationStageApplicationListData>;
   taskNotificationCount: number;
 };
 
