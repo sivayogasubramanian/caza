@@ -1,8 +1,7 @@
 import { Form, InputNumber, Input, Select, Button } from 'antd';
 import rolesApi from '../../api/rolesApi';
 import { RolePostData } from '../../types/role';
-
-const { Option } = Select;
+import RoleTypesSelect from './RoleTypesSelect';
 
 function CreateRoleForm() {
   const [form] = Form.useForm();
@@ -30,13 +29,7 @@ function CreateRoleForm() {
         <Input />
       </Form.Item>
       <Form.Item label="Type" name="type" rules={[{ required: true }]}>
-        <Select>
-          <Option value="SUMMER_INTERNSHIP">Summer Internship</Option>
-          <Option value="FALL_INTERNSHIP">Fall Internship</Option>
-          <Option value="WINTER_INTERNSHIP">Winter Internship</Option>
-          <Option value="SPRING_INTERNSHIP">Spring Internship</Option>
-          <Option value="FULL_TIME">Full-time Job</Option>
-        </Select>
+        <RoleTypesSelect />
       </Form.Item>
       <Form.Item label="Year" name="year" rules={[{ required: true, message: 'Please input the year!' }]}>
         <InputNumber />
