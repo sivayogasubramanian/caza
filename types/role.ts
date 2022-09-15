@@ -1,4 +1,4 @@
-import { RoleType } from '@prisma/client';
+import { ApplicationStage, ApplicationStageType, RoleType } from '@prisma/client';
 import { CompanyData } from './company';
 
 export type RolePostData = {
@@ -22,4 +22,14 @@ export type RoleListData = RoleData & { company: CompanyData; isVerified: boolea
 export type RoleQueryParams = {
   companyId?: number;
   searchWords: string[];
+};
+
+export type WorldRoleListData = RoleData & {
+  company: CompanyData;
+  applicationStages: { type: ApplicationStageType; count: number }[];
+};
+
+export type WorldRoleQueryParams = {
+  searchWords: string[];
+  roleTypeWords: RoleType[];
 };
