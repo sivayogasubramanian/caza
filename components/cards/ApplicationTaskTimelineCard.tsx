@@ -1,6 +1,6 @@
 import { TaskData } from '../../types/task';
 import { makeDisplayDate, makeDisplayNotificationDatetime } from '../../utils/date/formatters';
-import NotificationBell from '../icons/notifiationBell';
+import NotificationBell from '../icons/notifiationBellIcon';
 import { Checkbox } from 'antd';
 
 interface Props {

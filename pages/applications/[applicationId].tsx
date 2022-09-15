@@ -4,6 +4,8 @@ import { TimelineData, TimelineType } from '../../types/timeline';
 import { Timeline } from 'antd';
 import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
+import TaskIcon from '../../components/icons/timeline/TaskIcon';
+import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
 
 const testApplicationStages: ApplicationStageApplicationData[] = [
   {
@@ -28,6 +30,13 @@ const testApplicationStages: ApplicationStageApplicationData[] = [
     emojiUnicodeHex: null,
     remark: 'Sian',
   },
+  {
+    id: 4,
+    type: 'MIXED',
+    date: new Date(Date.now() + 10 * 86400000),
+    emojiUnicodeHex: null,
+    remark: 'Wow',
+  },
 ];
 
 const testTasks: TaskData[] = [
@@ -47,6 +56,17 @@ const testTasks: TaskData[] = [
   },
 ];
 
+function getTimelineIcon(item: TimelineData) {
+  if (item.type === TimelineType.TASK) {
+    const taskData = item.data as TaskData;
+    return TaskIcon({ isDone: taskData.isDone });
+  }
+
+  const stageData = item.data as ApplicationStageApplicationData;
+  const stageIcon = stageTypeToIconMap.get(stageData.type);
+  return stageIcon ? stageIcon() : <></>;
+}
+
 function Application() {
   const timelineApplicationStages: TimelineData[] = testApplicationStages.map((stage) => ({
     date: stage.date,
@@ -65,9 +85,9 @@ function Application() {
 
   return (
     <>
-      <Timeline className="mt-2 mb-2 ml-2 mr-4" reverse={true}>
+      <Timeline className="mt-4 mb-4 ml-4 mr-2" reverse={true}>
         {timelineItems.map((item, index) => (
-          <Timeline.Item key={index}>
+          <Timeline.Item key={index} dot={getTimelineIcon(item)}>
             {item.type === TimelineType.STAGE ? (
               <ApplicationStageTimelineCard applicationStage={item.data as ApplicationStageApplicationData} />
             ) : (
