@@ -40,7 +40,7 @@ function Header() {
     signOut(auth).then(() =>
       openNotification({
         type: StatusMessageType.SUCCESS,
-        message: currentUser?.displayName ? `See you again soon, ${currentUser?.displayName}!` : 'See you again soon!',
+        message: currentUser?.displayName ? `See you again soon, ${currentUser.displayName}!` : 'See you again soon!',
       }),
     );
   };
