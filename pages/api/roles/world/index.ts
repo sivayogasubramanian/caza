@@ -91,15 +91,15 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
 }
 
 function parseGetQueryParams(req: NextApiRequest): WorldRoleQueryParams {
-  const { searchQuery, roleTypes } = req.query;
+  const { searchWords, roleTypes } = req.query;
 
-  const searchWords = convertQueryParamToStringArray(searchQuery, splitByWhitespaces);
+  const searchWordsArr = convertQueryParamToStringArray(searchWords, splitByWhitespaces);
   const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypes, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
   const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
 
-  return { searchWords, roleTypeWords };
+  return { searchWords: searchWordsArr, roleTypeWords };
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
