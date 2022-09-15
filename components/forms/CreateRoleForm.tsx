@@ -1,4 +1,4 @@
-import { Form, InputNumber, Input, Select, Button } from 'antd';
+import { Form, InputNumber, Input, Button } from 'antd';
 import rolesApi from '../../api/rolesApi';
 import { RolePostData } from '../../types/role';
 import RoleTypesSelect from './RoleTypesSelect';
