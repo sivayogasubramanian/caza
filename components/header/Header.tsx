@@ -57,7 +57,7 @@ function Header() {
           type="primary"
           icon={<GithubOutlined />}
           className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black"
-          onClick={!currentUser?.isAnonymous ? handleLogout : handleLogin}
+          onClick={handleLogin}
         >
           Log in with Github
         </Button>
@@ -73,6 +73,7 @@ function Header() {
           >
             Log out
           </Button>
+
           <img src={githubProviderData?.photoURL || profilePlaceholder.src} width="35px" className="rounded-full" />
         </div>
       )}
