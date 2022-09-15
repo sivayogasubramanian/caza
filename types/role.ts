@@ -1,4 +1,4 @@
-import { ApplicationStage, ApplicationStageType, RoleType } from '@prisma/client';
+import { ApplicationStageType, RoleType } from '@prisma/client';
 import { CompanyData } from './company';
 
 export type RolePostData = {
