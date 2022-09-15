@@ -1,7 +1,6 @@
-import { ApplicationStageType, PrismaClient, Prisma, RoleType } from '@prisma/client';
+import { PrismaClient, Prisma, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse } from '../../../../types/apiResponse';
-import { ApplicationListData, ApplicationQueryParams } from '../../../../types/application';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../../../types/role';
 import { getNonEmptyArrayOrUndefined, combineDefinedArrays, buildFrequencyMap } from '../../../../utils/arrays';
 import { withAuthUser } from '../../../../utils/auth/jwtHelpers';
@@ -11,7 +10,13 @@ import {
   makeRoleYearFilters,
   makeRoleTypeFilters,
 } from '../../../../utils/filters/filterHelpers';
-import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../utils/http/httpHelpers';
+import {
+  convertQueryParamToStringArray,
+  createJsonResponse,
+  HttpMethod,
+  HttpStatus,
+  rejectHttpMethod,
+} from '../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../utils/prisma/prismaHelpers';
 import { splitByWhitespaces, splitByCommaRemovingWhitespacesAround } from '../../../../utils/strings/formatters';
 
@@ -88,15 +93,8 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
 function parseGetQueryParams(req: NextApiRequest): WorldRoleQueryParams {
   const { searchQuery, roleTypes } = req.query;
 
-  const searchWords =
-    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
-
-  const roleTypeUncheckedWords =
-    roleTypes === undefined
-      ? []
-      : Array.isArray(roleTypes)
-      ? roleTypes
-      : splitByCommaRemovingWhitespacesAround(roleTypes);
+  const searchWords = convertQueryParamToStringArray(searchQuery, splitByWhitespaces);
+  const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypes, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
   const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];

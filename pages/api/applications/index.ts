@@ -6,7 +6,13 @@ import {
   ApplicationRoleData,
 } from '../../../types/application';
 import { ApplicationStage, ApplicationStageType, Company, Prisma, PrismaClient, Role, RoleType } from '@prisma/client';
-import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import {
+  convertQueryParamToStringArray,
+  createJsonResponse,
+  HttpMethod,
+  HttpStatus,
+  rejectHttpMethod,
+} from '../../../utils/http/httpHelpers';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { Nullable } from '../../../types/utils';
@@ -177,25 +183,13 @@ function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
   const roleTypes = req.query.roleTypeWords;
   const stageTypes = req.query.stageTypeWords;
 
-  const searchWords =
-    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
-
-  const roleTypeUncheckedWords =
-    roleTypes === undefined
-      ? []
-      : Array.isArray(roleTypes)
-      ? roleTypes
-      : splitByCommaRemovingWhitespacesAround(roleTypes);
+  const searchWords = convertQueryParamToStringArray(searchQuery, splitByWhitespaces);
+  const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypes, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
   const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
 
-  const stageTypeUncheckedWords =
-    stageTypes === undefined
-      ? []
-      : Array.isArray(stageTypes)
-      ? stageTypes
-      : splitByCommaRemovingWhitespacesAround(stageTypes);
+  const stageTypeUncheckedWords = convertQueryParamToStringArray(stageTypes, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
   const stageTypeWords: ApplicationStageType[] = stageTypeUncheckedWords.filter(

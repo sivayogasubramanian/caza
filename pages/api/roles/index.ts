@@ -5,7 +5,13 @@ import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../
 import { Nullable } from '../../../types/utils';
 import { withAuth } from '../../../utils/auth/jwtHelpers';
 import { MIN_YEAR } from '../../../utils/constants';
-import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
+import {
+  convertQueryParamToStringArray,
+  createJsonResponse,
+  HttpMethod,
+  HttpStatus,
+  rejectHttpMethod,
+} from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { capitalizeEveryWord, splitByWhitespaces } from '../../../utils/strings/formatters';
 import { isEmpty } from '../../../utils/strings/validations';
@@ -122,12 +128,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 }
 
 function parseGetQueryParams(req: NextApiRequest): RoleQueryParams {
-  const companyId = req.query.companyId;
-  const searchQuery = req.query.searchWords;
-  const searchWords =
-    searchQuery === undefined ? [] : Array.isArray(searchQuery) ? searchQuery : splitByWhitespaces(searchQuery);
+  const { companyId, searchWords } = req.query;
+  const searchWordsArr = convertQueryParamToStringArray(searchWords, splitByWhitespaces);
   const parsedCompanyId = canBecomeInteger(companyId) ? Number(companyId) : undefined;
-  return { companyId: parsedCompanyId, searchWords };
+  return { companyId: parsedCompanyId, searchWords: searchWordsArr };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
