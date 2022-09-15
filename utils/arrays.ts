@@ -6,7 +6,7 @@ export function getNonEmptyArrayOrUndefined<T>(items: T[]) {
   return items.length === 0 ? undefined : items;
 }
 
-export function buildFrequencyMap<T>(items: T[]) {
+export function buildFrequencyMap<T>(items: T[]): Map<T, number> {
   return items.reduce((counts, item) => {
     const currCount = counts.get(item) ?? 0;
     counts.set(item, currCount + 1);
