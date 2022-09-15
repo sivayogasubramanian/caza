@@ -43,3 +43,14 @@ export function rejectHttpMethod(res: NextApiResponse, method?: string) {
 export function createJsonResponse<D extends Payload>(payload: D, ...messages: StatusMessage[]): ApiResponse<D> {
   return { payload, messages };
 }
+
+export function convertQueryParamToStringArray(
+  paramValue: string | string[] | undefined,
+  toArray: (value: string) => string[],
+): string[] {
+  if (paramValue === undefined) {
+    return [];
+  }
+
+  return Array.isArray(paramValue) ? paramValue : toArray(paramValue);
+}
