@@ -1,11 +1,10 @@
 import useSWR from 'swr';
-import { Spin, Table, Typography } from 'antd';
+import { Spin, Table } from 'antd';
 import CreateRoleForm from '../../components/forms/CreateRoleForm';
 import { ROLES_API_ENDPOINT } from '../../api/rolesApi';
+import Title from 'antd/lib/typography/Title';
 
-const { Title } = Typography;
-
-function Applications() {
+function Roles() {
   const { data } = useSWR(ROLES_API_ENDPOINT);
 
   return (
@@ -29,4 +28,4 @@ function Applications() {
   );
 }
 
-export default Applications;
+export default Roles;
