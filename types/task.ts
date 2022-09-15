@@ -25,3 +25,11 @@ export type TaskData = {
   notificationDateTime: Nullable<string>;
   isDone: boolean;
 };
+
+export type TaskApiData = {
+  id: number;
+  title: string;
+  dueDate: string;
+  notificationDateTime: Nullable<string>;
+  isDone: boolean;
+};
