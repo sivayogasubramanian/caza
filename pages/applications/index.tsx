@@ -10,6 +10,7 @@ import ApplicationStagesSelect from '../../components/forms/ApplicationStagesSel
 import RoleTypesSelect from '../../components/forms/RoleTypesSelect';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../../types/application';
+import { splitByWhitespaces } from '../../utils/strings/formatters';
 
 function Applications() {
   const [searchParams, setSearchParams] = useState<ApplicationQueryParams>({
@@ -19,8 +20,7 @@ function Applications() {
   });
 
   const onSearchBarChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    const { value } = e.target;
-    setSearchParams({ ...searchParams, searchWords: value.split(' ') });
+    setSearchParams({ ...searchParams, searchWords: splitByWhitespaces(e.target.value) });
   };
 
   const onRoleTypesFilterChange = (roleTypes: RoleType[]) => {
