@@ -29,9 +29,9 @@ export function validateStageChronology(
   ...stages: { type: ApplicationStageType; date: Date }[]
 ): Nullable<ChronologicalValidationError> {
   return (
-    hasOnlyOneAppliedStage(...stages) ||
-    hasCorrectOrderForFirstStage(...stages) ||
-    hasOnlyOneFinalStage(...stages) ||
+    hasOnlyOneAppliedStage(...stages) ??
+    hasCorrectOrderForFirstStage(...stages) ??
+    hasOnlyOneFinalStage(...stages) ??
     hasCorrectOrderForFinalStage(...stages)
   );
 }
