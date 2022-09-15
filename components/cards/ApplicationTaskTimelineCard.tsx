@@ -12,8 +12,8 @@ function ApplicationTaskTimelineCard({ task }: Props) {
     <div className="shadow-md rounded-lg">
       <div className="mt-1 mb-1 ml-1 mr-1">
         <div className="grid grid-cols-3 gap-2">
-          <div className="flex items-center gap-1 col-span-2">
-            <Checkbox checked={task.isDone} />
+          <div className="flex items-start gap-1 col-span-2">
+            <Checkbox className="mt-1" checked={task.isDone} />
             <div className="text-lg font-bold">{task.title}</div>
           </div>
 
