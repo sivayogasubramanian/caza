@@ -2,7 +2,6 @@ import { ApplicationStage, Company, PrismaClient, Role, Task } from '@prisma/cli
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
-import { Nullable } from '../../../types/utils';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';

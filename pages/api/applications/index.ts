@@ -5,7 +5,7 @@ import {
   ApplicationQueryParams,
   ApplicationRoleData,
 } from '../../../types/application';
-import { ApplicationStageType, Prisma, PrismaClient, RoleType } from '@prisma/client';
+import { ApplicationStage, ApplicationStageType, Company, Prisma, PrismaClient, Role, RoleType } from '@prisma/client';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
@@ -20,6 +20,7 @@ import {
 } from '../../../utils/filters/filterHelpers';
 import { combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../utils/arrays';
 import { splitByCommaRemovingWhitespacesAround, splitByWhitespaces } from '../../../utils/strings/formatters';
+import { convertApplicationStageToPayload } from '../../../utils/applicationStage/converter';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -80,42 +81,12 @@ async function handleGet(
     },
     select: {
       id: true,
-      role: {
-        select: {
-          id: true,
-          title: true,
-          type: true,
-          year: true,
-          company: {
-            select: {
-              id: true,
-              name: true,
-              companyUrl: true,
-            },
-          },
-        },
-      },
-      applicationStages: {
-        orderBy: {
-          date: 'desc',
-        },
-        take: 1,
-        select: {
-          id: true,
-          type: true,
-          date: true,
-          emojiUnicodeHex: true,
-        },
-      },
+      role: { include: { company: true } },
+      applicationStages: { orderBy: { date: 'desc' }, take: 1 },
       _count: {
         select: {
           tasks: {
-            where: {
-              notificationDateTime: {
-                lte: new Date(),
-              },
-              isDone: false,
-            },
+            where: { notificationDateTime: { lte: new Date() }, isDone: false },
           },
         },
       },
@@ -143,7 +114,8 @@ async function handleGet(
         secondApplication.taskNotificationCount - firstApplication.taskNotificationCount ||
         (secondApplication.latestStage?.date || MIN_DATE).valueOf() -
           (firstApplication.latestStage?.date || MIN_DATE).valueOf(),
-    );
+    )
+    .map(convertApplicationListDataToPayload);
 
   res.status(HttpStatus.OK).json(createJsonResponse(applications));
 }
@@ -238,6 +210,32 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   }
 
   return null;
+}
+
+function convertApplicationListDataToPayload({
+  id,
+  role,
+  latestStage,
+  taskNotificationCount,
+}: {
+  id: number;
+  role: Role & { company: Company };
+  latestStage: ApplicationStage;
+  taskNotificationCount: number;
+}): ApplicationListData {
+  const { company, title, type, year } = role;
+  return {
+    id,
+    taskNotificationCount,
+    role: {
+      type,
+      title,
+      year,
+      id: role.id,
+      company: { id: company.id, name: company.name, companyUrl: company.companyUrl },
+    },
+    latestStage: convertApplicationStageToPayload(latestStage),
+  };
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
