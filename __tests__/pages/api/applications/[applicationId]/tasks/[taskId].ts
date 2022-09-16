@@ -1,22 +1,22 @@
 import { createMocks, getPrismaClientForTests, getUniqueModifier, prismaMigrateReset } from '../../../util.test';
 import taskHandler from '../../../../../../pages/api/applications/[applicationId]/tasks/[taskId]';
 import { HttpMethod, HttpStatus } from '../../../../../../utils/http/httpHelpers';
-import { TaskPatchData, TaskPostData } from '../../../../../../types/task';
-import { Application, Task } from '@prisma/client';
+import { TaskPatchData } from '../../../../../../types/task';
+import { Application } from '@prisma/client';
+import { convertTaskToPayload } from '../../../../../../utils/task/converter';
 
 const DEFAULT_TASK_DATA = {
   title: 'Default Title',
-  dueDate: new Date('2022-01-01'),
-  notificationDateTime: new Date('2022-01-01'),
+  dueDate: new Date('2022-01-01').toJSON(),
+  notificationDateTime: new Date('2022-01-01').toJSON(),
   isDone: false,
 };
 const ALTERNATE_TASK_DATA = {
   title: 'Other Title',
-  dueDate: new Date('2022-09-09'),
-  notificationDateTime: new Date('2022-09-09'),
+  dueDate: new Date('2022-09-09').toJSON(),
+  notificationDateTime: new Date('2022-09-09').toJSON(),
   isDone: true,
 };
-const SELECT_CLAUSE = { select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true } };
 
 const KNOWN_ROLE_ID = 1;
 const createTaskMocks = (
@@ -45,11 +45,13 @@ describe('PATCH tasks', () => {
 
     const newTask = { ...ALTERNATE_TASK_DATA, id: tasks[0].id };
     expect(status).toEqual(HttpStatus.OK);
+    expect(json.payload).toEqual(newTask);
     expect(
-      await prisma.task.findMany({
-        where: { applicationId },
-        ...SELECT_CLAUSE,
-      }),
+      (
+        await prisma.task.findMany({
+          where: { applicationId },
+        })
+      ).map(convertTaskToPayload),
     ).toEqual([newTask]);
   });
 
@@ -58,10 +60,16 @@ describe('PATCH tasks', () => {
     const { req, res, getResult } = createTaskPatchMocks(uid, applicationId, tasks[0].id, {});
 
     await taskHandler(req, res);
-    const { status, json } = getResult();
+    const { status } = getResult();
 
     expect(status).toEqual(HttpStatus.OK);
-    expect(await prisma.task.findMany({ where: { applicationId }, ...SELECT_CLAUSE })).toEqual(tasks);
+    expect(
+      (
+        await prisma.task.findMany({
+          where: { applicationId },
+        })
+      ).map(convertTaskToPayload),
+    ).toEqual(tasks);
   });
 
   it('Fails to PATCH non-existent tasks', async () => {
@@ -98,7 +106,9 @@ describe('DELETE tasks', () => {
     const { status, json } = getResult();
 
     expect(status).toEqual(HttpStatus.OK);
-    expect(await prisma.task.findMany({ where: { applicationId }, ...SELECT_CLAUSE })).toEqual(tasks.slice(1));
+    expect((await prisma.task.findMany({ where: { applicationId } })).map(convertTaskToPayload)).toEqual(
+      tasks.slice(1),
+    );
   });
 
   it('Fails to DELETE non-existent tasks.', async () => {
@@ -110,7 +120,7 @@ describe('DELETE tasks', () => {
     const { status, json } = getResult();
 
     expect(status).toEqual(HttpStatus.NOT_FOUND);
-    expect(await prisma.task.findMany({ where: { applicationId }, ...SELECT_CLAUSE })).toEqual(tasks);
+    expect((await prisma.task.findMany({ where: { applicationId } })).map(convertTaskToPayload)).toEqual(tasks);
   });
 
   it('Fails to DELETE non-user tasks.', async () => {
@@ -122,7 +132,7 @@ describe('DELETE tasks', () => {
     const { status, json } = getResult();
 
     expect(status).toEqual(HttpStatus.NOT_FOUND);
-    expect(await prisma.task.findMany({ where: { applicationId }, ...SELECT_CLAUSE })).toEqual(tasks);
+    expect((await prisma.task.findMany({ where: { applicationId } })).map(convertTaskToPayload)).toEqual(tasks);
   });
 });
 
@@ -184,7 +194,7 @@ async function createUserWithDefaultData() {
 
   const newApplication = (await prisma.application.findUnique({
     where: { id: application.id },
-    include: { tasks: { ...SELECT_CLAUSE } },
+    include: { tasks: true },
   })) as Application & {
     tasks: {
       id: number;

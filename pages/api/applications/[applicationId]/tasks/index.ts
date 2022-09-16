@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
-import { TaskData, TaskPostData } from '../../../../../types/task';
+import { TaskData } from '../../../../../types/task';
 import { Nullable } from '../../../../../types/utils';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
@@ -95,7 +95,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return;
   }
 
-  const taskPostData: TaskPostData = {
+  const taskPostData = {
     title: req.body.title,
     dueDate: new Date(req.body.dueDate),
     notificationDateTime: req.body.notificationDateTime ? new Date(req.body.notificationDateTime) : null,

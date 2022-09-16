@@ -7,14 +7,14 @@ export type TaskQueryParams = {
 
 export type TaskPostData = {
   title: string;
-  dueDate: Date;
-  notificationDateTime: Nullable<Date>;
+  dueDate: string;
+  notificationDateTime: Nullable<string>;
 };
 
 export type TaskPatchData = {
   title?: string;
-  dueDate?: Date;
-  notificationDateTime?: Nullable<Date>;
+  dueDate?: string;
+  notificationDateTime?: Nullable<string>;
   isDone?: boolean;
 };
 
