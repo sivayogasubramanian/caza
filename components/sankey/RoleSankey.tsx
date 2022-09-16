@@ -1,6 +1,6 @@
 import { ApplicationStageType } from '@prisma/client';
 import { FC } from 'react';
-import Chart from 'react-google-charts';
+import PlotlyChart from 'react-plotlyjs-ts';
 
 const SAMPLE: PathData[] = [
   createSampleData(),
@@ -96,7 +96,7 @@ function nodeIdentifierToString(node: NodeIdentifier): string {
   return `${stage}:${previousStages.join(',')}`;
 }
 
-function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
+function convertEdgesToSankeyData(edges: Edge[]) {
   const map: Record<string, Record<string, { sum: number; count: number }>> = {};
   for (const edge of edges) {
     const { next, previous, numberOfDays } = edge;
@@ -115,19 +115,57 @@ function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
       result = result.concat({ src, dest, avgNumDays: sum / count });
     }
   }
-  return result.map((res) => [res.src, res.dest, res.avgNumDays]);
+  return result;
+}
+
+function createPlotlyData(data: { src: string; dest: string; avgNumDays: number }[]) {
+  const nodeIdSet = new Set<string>();
+  data.forEach((res) => nodeIdSet.add(res.src) && nodeIdSet.add(res.dest));
+  let nodeIds: string[] = [];
+  nodeIds.forEach((s) => (nodeIds = nodeIds.concat(s)));
+
+  const link = {
+    source: data.map((data) => nodeIds.findIndex((value: string) => value.localeCompare(data.src) === 0)),
+    target: data.map((data) => nodeIds.findIndex((value: string) => value.localeCompare(data.dest) === 0)),
+    value: data.map((data) => data.avgNumDays),
+  };
+
+  return {
+    type: 'sankey',
+    orientation: 'h',
+    node: {
+      pad: 15,
+      thickness: 30,
+      line: {
+        color: 'black',
+        width: 0.5,
+      },
+      label: nodeIds,
+      color: nodeIds.map((r) => 'green'),
+    },
+
+    link,
+  };
 }
 
 export type RoleSankeyProps = Record<string, never>; // for now.
 
 const RoleSankey: FC<RoleSankeyProps> = () => {
-  const data = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
-    SAMPLE.map(convertPathToEdges).flatMap(convertEdgesToSankeyData),
-  );
+  // const data = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
+  //   SAMPLE.map(convertPathToEdges).flatMap(convertEdgesToSankeyData).flatMap((res) => [res.src, res.dest, res.avgNumDays]);
+  // );
+  const data = SAMPLE.map(convertPathToEdges).flatMap(convertEdgesToSankeyData);
+  const plotlyData = createPlotlyData(data);
+  const layout = {
+    title: 'Basic Sankey',
+    font: {
+      size: 10,
+    },
+  };
 
   return (
     <div>
-      <Chart chartType="Sankey" width="80%" height="200px" data={data} options={{}}></Chart>
+      <PlotlyChart data={data} layout={layout} />
     </div>
   );
 };
