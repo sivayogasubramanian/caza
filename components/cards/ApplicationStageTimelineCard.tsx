@@ -13,8 +13,8 @@ function ApplicationStageTimelineCard({ applicationStage }: Props) {
   return (
     <div className="shadow-md rounded-lg">
       <div className="mt-1 mb-1 ml-1 mr-1">
-        <div className="grid grid-cols-3 gap-2">
-          <div className="text-lg font-bold flex items-start col-span-2 gap-1">
+        <div className="grid grid-cols-4 gap-2">
+          <div className="text-lg font-bold flex items-start col-span-3 gap-1">
             {stageTypeToDisplayStringMap.get(applicationStage.type)}
             {applicationStage.emojiUnicodeHex && (
               <span role="img" aria-label="emoji">
