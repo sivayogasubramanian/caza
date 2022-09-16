@@ -9,6 +9,7 @@ import stagesHandler from '../../../../../../pages/api/applications/[application
 import { HttpMethod, HttpStatus } from '../../../../../../utils/http/httpHelpers';
 import { ApplicationStagePostData } from '../../../../../../types/applicationStage';
 import { ApplicationStageType, PrismaClient, User } from '@prisma/client';
+import { convertApplicationStageToPayload } from '../../../../../../utils/applicationStage/converter';
 
 beforeAll(prismaMigrateReset);
 afterAll(prismaMigrateReset);
@@ -31,10 +32,9 @@ describe('POST to create stage works.', () => {
 
       const stage = await prisma.applicationStage.findFirstOrThrow({
         where: { applicationId, type: body.type },
-        select: { date: true, emojiUnicodeHex: true, id: true, remark: true, type: true, applicationId: true },
       });
       expect(status).toBe(HttpStatus.CREATED);
-      expect(json.payload).toEqual(stage);
+      expect(json.payload).toEqual(convertApplicationStageToPayload(stage));
     });
   }
 
