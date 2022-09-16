@@ -1,7 +1,7 @@
-import { ApplicationStageApplicationApiData, ApplicationStageApplicationData } from './applicationStage';
+import { ApplicationStageApplicationData } from './applicationStage';
 import { CompanyData } from './company';
 import { RoleData } from './role';
-import { TaskApiData, TaskData } from './task';
+import { TaskData } from './task';
 import { RoleApplicationListData } from './role';
 import { ApplicationStageApplicationListData } from './applicationStage';
 import { ApplicationStageType, RoleType } from '@prisma/client';
@@ -11,13 +11,6 @@ export type ApplicationData = {
   role: RoleData & { company: CompanyData };
   applicationStages: ApplicationStageApplicationData[];
   tasks: TaskData[];
-};
-
-export type ApplicationApiData = {
-  id: number;
-  role: RoleData & { company: CompanyData };
-  applicationStages: ApplicationStageApplicationApiData[];
-  tasks: TaskApiData[];
 };
 
 export type ApplicationRoleData = {
