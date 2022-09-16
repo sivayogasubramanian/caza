@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Task } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { TaskData, TaskPostData } from '../../../../../types/task';
@@ -9,6 +9,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
+import { convertTaskToPayload } from '../../../../../utils/task/converter';
 
 const prisma = new PrismaClient();
 
@@ -105,10 +106,11 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
       applicationId,
       ...taskPostData,
     },
-    select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
   });
 
-  res.status(HttpStatus.CREATED).json(createJsonResponse(newTask, messages[MessageType.TASK_CREATED_SUCCESSFULLY]));
+  res
+    .status(HttpStatus.CREATED)
+    .json(createJsonResponse(convertTaskToPayload(newTask), messages[MessageType.TASK_CREATED_SUCCESSFULLY]));
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
