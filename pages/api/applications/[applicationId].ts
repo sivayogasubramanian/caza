@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { ApplicationStage, Company, PrismaClient, Role, Task } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../types/apiResponse';
 import { ApplicationData } from '../../../types/application';
@@ -7,6 +7,8 @@ import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../utils/prisma/prismaHelpers';
 import { canBecomeInteger } from '../../../utils/numbers/validations';
+import { convertApplicationStageToPayload } from '../../../utils/applicationStage/converter';
+import { convertTaskToPayload } from '../../../utils/task/converter';
 
 const prisma = new PrismaClient();
 
@@ -51,7 +53,7 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
 
   const applicationId = Number(req.query.applicationId);
 
-  const application: Nullable<ApplicationData> = await prisma.application.findFirst({
+  const application = await prisma.application.findFirst({
     where: {
       id: applicationId,
       userId,
@@ -59,31 +61,17 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
     select: {
       id: true,
       role: {
-        select: {
-          id: true,
-          title: true,
-          type: true,
-          year: true,
-          company: { select: { id: true, name: true, companyUrl: true } },
-        },
+        include: { company: true },
       },
       applicationStages: {
         orderBy: {
           date: 'desc',
-        },
-        select: {
-          id: true,
-          type: true,
-          date: true,
-          emojiUnicodeHex: true,
-          remark: true,
         },
       },
       tasks: {
         orderBy: {
           dueDate: 'desc',
         },
-        select: { id: true, title: true, dueDate: true, notificationDateTime: true, isDone: true },
       },
     },
   });
@@ -93,7 +81,7 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
     return;
   }
 
-  res.status(HttpStatus.OK).json(createJsonResponse(application));
+  res.status(HttpStatus.OK).json(createJsonResponse(createPayload(application)));
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
@@ -115,6 +103,25 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   }
 
   res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.APPLICATION_DELETED_SUCCESSFULLY]));
+}
+
+function createPayload({
+  id,
+  role,
+  applicationStages,
+  tasks,
+}: {
+  id: number;
+  role: Role & { company: Company };
+  applicationStages: ApplicationStage[];
+  tasks: Task[];
+}): ApplicationData {
+  return {
+    id,
+    role,
+    applicationStages: applicationStages.map(convertApplicationStageToPayload),
+    tasks: tasks.map(convertTaskToPayload),
+  };
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
