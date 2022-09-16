@@ -96,7 +96,12 @@ async function handlePatch(
   const applicationStageId = Number(req.query.stageId);
   const applicationId = Number(req.query.applicationId);
 
-  const applicationStagePatchData: ApplicationStagePatchData = makePatchData(req);
+  const applicationStagePatchData: ApplicationStagePatchData = {
+    type: req.body.type,
+    date: req.body.date,
+    emojiUnicodeHex: req.body.emojiUnicodeHex,
+    remark: req.body.remark,
+  };
 
   // Note: updateMany is used to allow filter on non-unique columns.
   // This allows a check to ensure users are only updating their own application stages.
@@ -206,28 +211,6 @@ function validatePatchRequest(req: NextApiRequest) {
   }
 
   return null;
-}
-
-function makePatchData(req: NextApiRequest) {
-  const applicationStagePatchData: ApplicationStagePatchData = {};
-
-  if (req.body.type !== undefined) {
-    applicationStagePatchData.type = req.body.type;
-  }
-
-  if (req.body.date !== undefined) {
-    applicationStagePatchData.date = req.body.date;
-  }
-
-  if (req.body.emojiUnicodeHex !== undefined) {
-    applicationStagePatchData.emojiUnicodeHex = req.body.emojiUnicodeHex || null;
-  }
-
-  if (req.body.remark !== undefined) {
-    applicationStagePatchData.remark = req.body.remark || null;
-  }
-
-  return applicationStagePatchData;
 }
 
 function validateDeleteRequest(req: NextApiRequest) {
