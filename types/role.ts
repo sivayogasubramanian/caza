@@ -1,5 +1,6 @@
 import { ApplicationStageType, RoleType } from '@prisma/client';
 import { CompanyData } from './company';
+import { Nullable } from './utils';
 
 export type RolePostData = {
   companyId: number;
@@ -33,4 +34,9 @@ export type WorldRoleQueryParams = {
   searchWords: string[];
   roleTypeWords: RoleType[];
   shouldFilterForCurrentUserApplications: boolean;
+};
+
+export type RoleAutocompleteOption = {
+  roleId: Nullable<number>;
+  value: string;
 };
