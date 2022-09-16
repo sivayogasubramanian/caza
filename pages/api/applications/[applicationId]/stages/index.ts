@@ -9,6 +9,7 @@ import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
+import { convertApplicationStageToPayload } from '../../../../../utils/applicationStage/converter';
 
 const prisma = new PrismaClient();
 
@@ -80,7 +81,7 @@ async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse
 
   return res
     .status(HttpStatus.CREATED)
-    .json(createJsonResponse(createPayload(newStage), messages[MessageType.CREATED]));
+    .json(createJsonResponse(convertApplicationStageToPayload(newStage), messages[MessageType.CREATED]));
 }
 
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
@@ -117,11 +118,6 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   }
 
   return null;
-}
-
-function createPayload(stage: ApplicationStage): ApplicationStageData {
-  const { applicationId, id, type, date, emojiUnicodeHex, remark } = stage;
-  return { applicationId, id, type, date: date.toJSON(), emojiUnicodeHex, remark };
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
