@@ -4,7 +4,7 @@ import { Nullable } from './utils';
 export type ApplicationStageApplicationData = {
   id: number;
   type: ApplicationStageType;
-  date: Date;
+  date: string;
   emojiUnicodeHex: Nullable<string>;
   remark: Nullable<string>;
 };
