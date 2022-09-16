@@ -8,6 +8,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
+import { convertApplicationStageToPayload } from '../../../../../utils/applicationStage/converter';
 
 enum MessageType {
   APPLICATION_STAGE_DELETE_UNAUTHORIZED,
@@ -137,7 +138,7 @@ async function handlePatch(
     .status(HttpStatus.OK)
     .json(
       createJsonResponse(
-        createPayload(updatedApplicationStage),
+        convertApplicationStageToPayload(updatedApplicationStage),
         messages[MessageType.APPLICATION_STAGE_UPDATED_SUCCESSFULLY],
       ),
     );
