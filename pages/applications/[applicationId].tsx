@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { canBecomeInteger } from '../../utils/numbers/validations';
 import applicationsApi from '../../api/applicationsApi';
 import { ApplicationData } from '../../types/application';
+import { useEffect, useState } from 'react';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -27,10 +28,13 @@ function Application() {
   const router = useRouter();
   const applicationId = canBecomeInteger(router.query.applicationId) ? Number(router.query.applicationId) : undefined;
   const hasValidApplicationId = applicationId !== undefined;
-  const response = hasValidApplicationId ? useSWR([applicationId], applicationsApi.getApplication) : undefined;
+
+  const response = hasValidApplicationId
+    ? useSWR([applicationId], applicationsApi.getApplication, { revalidateOnMount: true })
+    : undefined;
   const isLoading = response?.data === undefined;
   const hasSuccessfullyFetchedApplication = response?.data?.payload?.id !== undefined;
-  const application = hasSuccessfullyFetchedApplication ? (response?.data?.payload as ApplicationData) : undefined;
+  const application = response?.data?.payload as ApplicationData;
 
   const timelineApplicationStages: TimelineData[] =
     application?.applicationStages.map((stage) => ({
@@ -50,20 +54,33 @@ function Application() {
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
   );
 
+  const [shouldFetchData, setShouldFetchData] = useState(true);
+
+  useEffect(() => {
+    if (shouldFetchData) {
+      response?.mutate();
+      setShouldFetchData(false);
+    }
+  }, [shouldFetchData]);
+
   return (
     <>
       {isLoading && <div>Loading...</div>}
 
       {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && <div>Add your first stage or task!</div>}
 
-      {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
+      {hasValidApplicationId && hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
         <Timeline className="mt-4 mb-4 ml-4 mr-2" reverse={true}>
           {timelineItems.map((item, index) => (
             <Timeline.Item key={index} dot={getTimelineIcon(item)}>
               {item.type === TimelineType.STAGE ? (
                 <ApplicationStageTimelineCard applicationStage={item.data as ApplicationStageApplicationData} />
               ) : (
-                <ApplicationTaskTimelineCard task={item.data as TaskData} />
+                <ApplicationTaskTimelineCard
+                  applicationId={applicationId}
+                  task={item.data as TaskData}
+                  setShouldFetchData={setShouldFetchData}
+                />
               )}
             </Timeline.Item>
           ))}

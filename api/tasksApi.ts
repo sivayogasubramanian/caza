@@ -11,7 +11,7 @@ class TasksApi {
   }
 
   public editTask(applicationId: number, taskId: number, taskPatchData: TaskPatchData): ApiPromise<TaskData> {
-    return api.post(`${this.makeTasksApiEndpoint(applicationId)}/${taskId}`, taskPatchData);
+    return api.patch(`${this.makeTasksApiEndpoint(applicationId)}/${taskId}`, taskPatchData);
   }
 
   public deleteTask(applicationId: number, taskId: number): ApiPromise<EmptyPayload> {
