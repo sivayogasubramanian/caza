@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApplicationStageType, PrismaClient } from '@prisma/client';
+import { ApplicationStage, ApplicationStageType, PrismaClient } from '@prisma/client';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
@@ -74,12 +74,13 @@ async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse
   const { type, date, emojiUnicodeHex, remark } = req.body;
   const parameters: ApplicationStagePostData = { type, date: new Date(date), emojiUnicodeHex, remark };
 
-  const newStage: ApplicationStageData = await prisma.applicationStage.create({
+  const newStage = await prisma.applicationStage.create({
     data: { ...parameters, applicationId: application.id },
-    select: { applicationId: true, id: true, type: true, date: true, emojiUnicodeHex: true, remark: true },
   });
 
-  return res.status(HttpStatus.CREATED).json(createJsonResponse(newStage, messages[MessageType.CREATED]));
+  return res
+    .status(HttpStatus.CREATED)
+    .json(createJsonResponse(createPayload(newStage), messages[MessageType.CREATED]));
 }
 
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
@@ -116,6 +117,11 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   }
 
   return null;
+}
+
+function createPayload(stage: ApplicationStage): ApplicationStageData {
+  const { applicationId, id, type, date, emojiUnicodeHex, remark } = stage;
+  return { applicationId, id, type, date: date.toJSON(), emojiUnicodeHex, remark };
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));
