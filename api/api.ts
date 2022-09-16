@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
-import { ApiPromise, ApiResponse, StatusMessageType } from '../types/apiResponse';
+import { ApiPromise, ApiResponse, Payload, StatusMessageType } from '../types/apiResponse';
 
 class BaseApi {
   client = axios.create({
@@ -8,40 +8,40 @@ class BaseApi {
     timeout: 10 * 1000, // 10 seconds
   });
 
-  private getData<D>(url: string, params?: any): AxiosPromise<ApiResponse<D>> {
+  private getData<D extends Payload>(url: string, params?: any): AxiosPromise<ApiResponse<D>> {
     return this.client.get(url, params);
   }
 
-  private postData<D>(url: string, data: any = {}): AxiosPromise<ApiResponse<D>> {
+  private postData<D extends Payload>(url: string, data: any = {}): AxiosPromise<ApiResponse<D>> {
     return this.client.post(url, data);
   }
 
-  private patchData<D>(url: string, data: any = {}): AxiosPromise<ApiResponse<D>> {
+  private patchData<D extends Payload>(url: string, data: any = {}): AxiosPromise<ApiResponse<D>> {
     return this.client.patch(url, data);
   }
 
-  private deleteData<D>(url: string): AxiosPromise<ApiResponse<D>> {
+  private deleteData<D extends Payload>(url: string): AxiosPromise<ApiResponse<D>> {
     return this.client.delete(url);
   }
 
-  public get<D>(url: string, params?: any): ApiPromise<D> {
+  public get<D extends Payload>(url: string, params?: any): ApiPromise<D> {
     return processRequest(url, this.getData(url, params));
   }
 
-  public post<D>(url: string, data: any = {}): ApiPromise<D> {
+  public post<D extends Payload>(url: string, data: any = {}): ApiPromise<D> {
     return processRequest(url, this.postData(url, data));
   }
 
-  public patch<D>(url: string, data: any = {}): ApiPromise<D> {
+  public patch<D extends Payload>(url: string, data: any = {}): ApiPromise<D> {
     return processRequest(url, this.patchData(url, data));
   }
 
-  public delete<D>(url: string): ApiPromise<D> {
+  public delete<D extends Payload>(url: string): ApiPromise<D> {
     return processRequest(url, this.deleteData(url));
   }
 }
 
-function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D>>): ApiPromise<D> {
+function processRequest<D extends Payload>(endpoint: string, promise: AxiosPromise<ApiResponse<D>>): ApiPromise<D> {
   return promise
     .then((response: AxiosResponse<ApiResponse<D>>) => {
       const apiResponse = response.data;
@@ -61,7 +61,7 @@ function processRequest<D>(endpoint: string, promise: AxiosPromise<ApiResponse<D
     });
 }
 
-function makeApiErrorResponse<D>(error: AxiosError<ApiResponse<D>>): ApiResponse<D> {
+function makeApiErrorResponse<D extends Payload>(error: AxiosError<ApiResponse<D>>): ApiResponse<D> {
   if (!error?.response?.data.messages) {
     return {
       payload: {},
