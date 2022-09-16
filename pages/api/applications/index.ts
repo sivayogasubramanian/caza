@@ -106,12 +106,13 @@ async function handleGet(
     .map((application) => ({
       id: application.id,
       role: application.role,
-      latestStage: application.applicationStages[0],
+      latestStage: application.applicationStages.length > 0 ? application.applicationStages[0] : undefined,
       taskNotificationCount: application._count.tasks,
     }))
     .filter(
       (application) =>
-        !hasSelectedApplicationStageTypes || application.latestStage?.type in selectedApplicationStageTypes,
+        !hasSelectedApplicationStageTypes ||
+        (application.latestStage && selectedApplicationStageTypes.includes(application.latestStage?.type)),
     )
     .sort(
       (firstApplication, secondApplication) =>
