@@ -1,6 +1,5 @@
 import { ApiPromise, EmptyPayload } from '../types/apiResponse';
 import {
-  ApplicationApiData,
   ApplicationData,
   ApplicationListData,
   ApplicationPostData,
@@ -15,7 +14,7 @@ class ApplicationsApi {
     return api.get(APPLICATIONS_API_ENDPOINT, { params: applicationQueryParams });
   }
 
-  public getApplication(applicationId: number): ApiPromise<ApplicationApiData> {
+  public getApplication(applicationId: number): ApiPromise<ApplicationData> {
     return api.get(`${APPLICATIONS_API_ENDPOINT}/${applicationId}`);
   }
 

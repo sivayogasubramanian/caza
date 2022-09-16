@@ -2,12 +2,20 @@ import { TaskData } from '../../types/task';
 import { makeDisplayDate, makeDisplayNotificationDatetime } from '../../utils/date/formatters';
 import NotificationBell from '../icons/notifiationBellIcon';
 import { Checkbox } from 'antd';
+import { isValidDate } from '../../utils/date/validations';
 
 interface Props {
   task: TaskData;
 }
 
 function ApplicationTaskTimelineCard({ task }: Props) {
+  const dueDate = isValidDate(task.dueDate) ? new Date(task.dueDate) : undefined;
+
+  const notificationDateTime =
+    task.notificationDateTime && isValidDate(task.notificationDateTime)
+      ? new Date(task.notificationDateTime)
+      : undefined;
+
   return (
     <div className="shadow-md rounded-lg">
       <div className="mt-1 mb-1 ml-1 mr-1">
@@ -17,15 +25,13 @@ function ApplicationTaskTimelineCard({ task }: Props) {
             <div className="text-lg font-bold">{task.title}</div>
           </div>
 
-          <div className="flex items-start justify-end">{makeDisplayDate(task.dueDate)}</div>
+          {dueDate && <div className="flex items-start justify-end">{makeDisplayDate(dueDate)}</div>}
         </div>
 
-        {task.notificationDateTime && (
+        {notificationDateTime && dueDate && (
           <div className="flex justify-end items-center gap-1">
             <NotificationBell />
-            <div className="text-gray-700">
-              {makeDisplayNotificationDatetime(task.notificationDateTime, task.dueDate)}
-            </div>
+            <div className="text-gray-700">{makeDisplayNotificationDatetime(notificationDateTime, dueDate)}</div>
           </div>
         )}
       </div>
