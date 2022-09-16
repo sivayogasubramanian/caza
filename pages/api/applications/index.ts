@@ -44,7 +44,11 @@ const messages = Object.freeze({
   [MessageType.INVALID_ROLE_ID]: { type: StatusMessageType.ERROR, message: 'Application role id is invalid.' },
 });
 
-async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  userId: string,
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<ApplicationListData[] | ApplicationRoleData>>,
+) {
   const method = req.method;
   switch (method) {
     case HttpMethod.GET:
