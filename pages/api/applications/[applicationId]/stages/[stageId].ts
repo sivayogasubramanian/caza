@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApplicationStageType, PrismaClient } from '@prisma/client';
+import { ApplicationStage, ApplicationStageType, PrismaClient } from '@prisma/client';
 import { ApplicationStageData, ApplicationStagePatchData } from '../../../../../types/applicationStage';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
@@ -7,7 +7,6 @@ import { isValidDate } from '../../../../../utils/date/validations';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
-import { Nullable } from '../../../../../types/utils';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 
 enum MessageType {
@@ -123,11 +122,10 @@ async function handlePatch(
     return;
   }
 
-  const updatedApplicationStage: Nullable<ApplicationStageData> = await prisma.applicationStage.findUnique({
+  const updatedApplicationStage = await prisma.applicationStage.findUnique({
     where: {
       id: applicationStageId,
     },
-    select: { id: true, applicationId: true, type: true, date: true, emojiUnicodeHex: true, remark: true },
   });
 
   if (!updatedApplicationStage) {
@@ -137,7 +135,12 @@ async function handlePatch(
 
   res
     .status(HttpStatus.OK)
-    .json(createJsonResponse(updatedApplicationStage, messages[MessageType.APPLICATION_STAGE_UPDATED_SUCCESSFULLY]));
+    .json(
+      createJsonResponse(
+        createPayload(updatedApplicationStage),
+        messages[MessageType.APPLICATION_STAGE_UPDATED_SUCCESSFULLY],
+      ),
+    );
 }
 
 async function handleDelete(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
