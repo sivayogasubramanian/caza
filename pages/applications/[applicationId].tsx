@@ -12,6 +12,7 @@ import { canBecomeInteger } from '../../utils/numbers/validations';
 import applicationsApi from '../../api/applicationsApi';
 import { ApplicationData } from '../../types/application';
 import { useEffect, useState } from 'react';
+import { isValidDate } from '../../utils/date/validations';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -38,13 +39,13 @@ function Application() {
 
   const timelineApplicationStages: TimelineData[] =
     application?.applicationStages.map((stage) => ({
-      date: new Date(stage.date),
+      date: isValidDate(stage.date) ? new Date(stage.date) : new Date(),
       type: TimelineType.STAGE,
       data: stage,
     })) ?? [];
   const timelineApplicationTasks: TimelineData[] =
     application?.tasks.map((task) => ({
-      date: new Date(task.dueDate),
+      date: isValidDate(task.dueDate) ? new Date(task.dueDate) : new Date(),
       type: TimelineType.TASK,
       data: task,
     })) ?? [];
