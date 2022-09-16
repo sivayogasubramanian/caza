@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApplicationStage, ApplicationStageType, PrismaClient } from '@prisma/client';
+import { ApplicationStageType, PrismaClient } from '@prisma/client';
 import { ApplicationStageData, ApplicationStagePatchData } from '../../../../../types/applicationStage';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';

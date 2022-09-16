@@ -6,7 +6,7 @@ import {
   PrismaClientValidationError,
 } from '@prisma/client/runtime';
 import { NextApiHandler } from 'next';
-import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
+import { ApiResponse, Payload, StatusMessageType } from '../../types/apiResponse';
 import { createJsonResponse, HttpStatus } from '../http/httpHelpers';
 
 // Unsolvable from user perspective.
@@ -50,7 +50,9 @@ type PrismaErrors =
   | PrismaClientInitializationError
   | PrismaClientValidationError;
 
-export function withPrismaErrorHandling<D>(handler: NextApiHandler<ApiResponse<D>>): NextApiHandler<ApiResponse<D>> {
+export function withPrismaErrorHandling<D extends Payload>(
+  handler: NextApiHandler<ApiResponse<D>>,
+): NextApiHandler<ApiResponse<D>> {
   return async (req, res) => {
     try {
       await Promise.resolve(handler(req, res));
