@@ -12,55 +12,6 @@ import { canBecomeInteger } from '../../utils/numbers/validations';
 import applicationsApi from '../../api/applicationsApi';
 import { ApplicationData } from '../../types/application';
 
-const testApplicationStages: ApplicationStageApplicationData[] = [
-  {
-    id: 1,
-    type: 'APPLIED',
-    date: new Date().toJSON(),
-    emojiUnicodeHex: '1F610',
-    remark: null,
-  },
-  {
-    id: 2,
-    type: 'ONLINE_ASSESSMENT',
-    date: new Date(Date.now() + 3 * 86400000).toJSON(),
-    emojiUnicodeHex: '1F614',
-    remark:
-      'Very difficult. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent at aliquam sem. Mauris efficitur consequat metus, eget rutrum urna condimentum at. Proin consectetur id lacus et aliquam. Integer scelerisque vulputate augue. Vivamus in sem rhoncus, cursus eros in, pellentesque sapien.',
-  },
-  {
-    id: 3,
-    type: 'TECHNICAL',
-    date: new Date(Date.now() + 5 * 86400000).toJSON(),
-    emojiUnicodeHex: null,
-    remark: 'Sian',
-  },
-  {
-    id: 4,
-    type: 'MIXED',
-    date: new Date(Date.now() + 10 * 86400000).toJSON(),
-    emojiUnicodeHex: null,
-    remark: 'Wow',
-  },
-];
-
-const testTasks: TaskData[] = [
-  {
-    id: 1,
-    title: 'Do OA',
-    dueDate: new Date(Date.now() + 3 * 86400000).toJSON(),
-    notificationDateTime: new Date(Date.now() + 86400000).toJSON(),
-    isDone: true,
-  },
-  {
-    id: 2,
-    title: 'Prepare for interview',
-    dueDate: new Date(Date.now() + 4 * 86400000).toJSON(),
-    notificationDateTime: new Date(Date.now() + 4 * 86400000).toJSON(),
-    isDone: false,
-  },
-];
-
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
     const taskData = item.data as TaskData;
