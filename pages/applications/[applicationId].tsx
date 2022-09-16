@@ -29,17 +29,17 @@ function Application() {
   const hasValidApplicationId = applicationId !== undefined;
   const response = hasValidApplicationId ? useSWR([applicationId], applicationsApi.getApplication) : undefined;
   const isLoading = response?.data === undefined;
-  const application = response?.data?.payload as ApplicationData;
-  const hasSuccessfullyFetchedApplication = application?.id !== undefined;
+  const hasSuccessfullyFetchedApplication = response?.data?.payload?.id !== undefined;
+  const application = hasSuccessfullyFetchedApplication ? (response?.data?.payload as ApplicationData) : undefined;
 
   const timelineApplicationStages: TimelineData[] =
-    application.applicationStages.map((stage) => ({
+    application?.applicationStages.map((stage) => ({
       date: new Date(stage.date),
       type: TimelineType.STAGE,
       data: stage,
     })) ?? [];
   const timelineApplicationTasks: TimelineData[] =
-    application.tasks.map((task) => ({
+    application?.tasks.map((task) => ({
       date: new Date(task.dueDate),
       type: TimelineType.TASK,
       data: task,
