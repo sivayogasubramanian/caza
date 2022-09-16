@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
+import { ApiResponse, Payload, StatusMessageType } from '../../types/apiResponse';
 import { createJsonResponse, HttpStatus } from '../http/httpHelpers';
 
 export interface UserDetailsFromRequest {
@@ -33,7 +33,7 @@ const USER_NOT_AUTHORIZED = 'User has not verified their identity.';
  * @param handler Takes in an API handler function that needs an authenticated user.
  * @returns NextApiHandler function.
  */
-export function withAuthUser<D>(
+export function withAuthUser<D extends Payload>(
   handler: (uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
 ): NextApiHandler<ApiResponse<D>> {
   return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => {
@@ -59,7 +59,7 @@ export function withAuthUser<D>(
  * @param handler Takes in an API handler function that needs a verified user.
  * @returns NextApiHandler function.
  */
-export function withVerifiedUser<D>(
+export function withVerifiedUser<D extends Payload>(
   handler: (uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
 ): NextApiHandler<ApiResponse<D>> {
   return async (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => {
@@ -94,7 +94,7 @@ export function withVerifiedUser<D>(
  * @param handler Takes in an API handler function that needs an authenticated user.
  * @returns NextApiHandler function.
  */
-export function withAuth<D>(
+export function withAuth<D extends Payload>(
   handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
 ): NextApiHandler<ApiResponse<D>> {
   return withAuthUser((_, req, res) => handler(req, res));

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApplicationStage, ApplicationStageType, PrismaClient } from '@prisma/client';
+import { ApplicationStageType, PrismaClient } from '@prisma/client';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';

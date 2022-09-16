@@ -1,4 +1,4 @@
-import { PrismaClient, Task } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { TaskData, TaskPostData } from '../../../../../types/task';
