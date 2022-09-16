@@ -28,6 +28,6 @@ export type ApplicationStagePatchData = {
 export type ApplicationStageApplicationListData = {
   id: number;
   type: ApplicationStageType;
-  date: Date;
+  date: string;
   emojiUnicodeHex: Nullable<string>;
 };
