@@ -15,6 +15,7 @@ import { TimelineData, TimelineType } from '../../types/timeline';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
+import EditTaskModal from '../../components/modals/EditTaskModal';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -78,6 +79,8 @@ function Application() {
           This application seems very empty. Add you first stage or task now!
         </div>
       )}
+
+      <EditTaskModal />
 
       {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
         <Timeline className="m-4" reverse={true}>
