@@ -31,7 +31,7 @@ const messages = Object.freeze({
   },
 });
 
-async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handler(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<ApplicationData>>) {
   const method = req.method;
 
   switch (method) {
