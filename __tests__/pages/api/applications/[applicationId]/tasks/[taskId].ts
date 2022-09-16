@@ -64,11 +64,9 @@ describe('PATCH tasks', () => {
 
     expect(status).toEqual(HttpStatus.OK);
     expect(
-      (
-        await prisma.task.findMany({
-          where: { applicationId },
-        })
-      ).map(convertTaskToPayload),
+      await prisma.task.findMany({
+        where: { applicationId },
+      }),
     ).toEqual(tasks);
   });
 
@@ -120,7 +118,7 @@ describe('DELETE tasks', () => {
     const { status, json } = getResult();
 
     expect(status).toEqual(HttpStatus.NOT_FOUND);
-    expect((await prisma.task.findMany({ where: { applicationId } })).map(convertTaskToPayload)).toEqual(tasks);
+    expect(await prisma.task.findMany({ where: { applicationId } })).toEqual(tasks);
   });
 
   it('Fails to DELETE non-user tasks.', async () => {
@@ -132,7 +130,7 @@ describe('DELETE tasks', () => {
     const { status, json } = getResult();
 
     expect(status).toEqual(HttpStatus.NOT_FOUND);
-    expect((await prisma.task.findMany({ where: { applicationId } })).map(convertTaskToPayload)).toEqual(tasks);
+    expect(await prisma.task.findMany({ where: { applicationId } })).toEqual(tasks);
   });
 });
 

@@ -13,14 +13,14 @@ export type ApplicationStageData = ApplicationStageApplicationData & { applicati
 
 export type ApplicationStagePostData = {
   type: ApplicationStageType;
-  date: Date;
+  date: string;
   emojiUnicodeHex?: Nullable<string>; // will be set to null if empty or undefined.
   remark?: Nullable<string>; // will be set to null if empty or undefined.
 };
 
 export type ApplicationStagePatchData = {
   type?: ApplicationStageType;
-  date?: Date;
+  date?: string;
   emojiUnicodeHex?: Nullable<string>;
   remark?: Nullable<string>;
 };

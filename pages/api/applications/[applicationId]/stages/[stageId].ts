@@ -110,7 +110,7 @@ async function handlePatch(
     },
     data: {
       type: applicationStagePatchData.type,
-      date: applicationStagePatchData.date,
+      date: applicationStagePatchData.date ? new Date(applicationStagePatchData.date) : undefined,
       emojiUnicodeHex: applicationStagePatchData.emojiUnicodeHex,
       remark: applicationStagePatchData.remark,
     },
@@ -216,7 +216,7 @@ function makePatchData(req: NextApiRequest) {
   }
 
   if (req.body.date !== undefined) {
-    applicationStagePatchData.date = new Date(req.body.date);
+    applicationStagePatchData.date = req.body.date;
   }
 
   if (req.body.emojiUnicodeHex !== undefined) {
