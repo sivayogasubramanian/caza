@@ -21,7 +21,7 @@ export type TaskPatchData = {
 export type TaskData = {
   id: number;
   title: string;
-  dueDate: Date;
-  notificationDateTime: Nullable<Date>;
+  dueDate: string;
+  notificationDateTime: Nullable<string>;
   isDone: boolean;
 };
