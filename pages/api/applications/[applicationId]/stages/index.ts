@@ -72,8 +72,8 @@ async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse
     return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_NOT_FOUND]));
   }
 
-  const { type, date, emojiUnicodeHex, remark } = req.body;
-  const parameters: ApplicationStagePostData = { type, date: new Date(date), emojiUnicodeHex, remark };
+  const { type, date, emojiUnicodeHex, remark } = req.body as ApplicationStagePostData;
+  const parameters = { type, date: new Date(date), emojiUnicodeHex, remark };
 
   const newStage = await prisma.applicationStage.create({
     data: { ...parameters, applicationId: application.id },

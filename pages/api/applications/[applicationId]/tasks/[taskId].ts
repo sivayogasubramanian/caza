@@ -101,11 +101,11 @@ async function handleDelete(uid: string, req: NextApiRequest, res: NextApiRespon
 
 function validatePathParameters(req: NextApiRequest): Nullable<MessageType> {
   const { taskId, applicationId } = req.query;
-  if (canBecomeInteger(taskId)) {
+  if (!canBecomeInteger(taskId)) {
     return MessageType.INVALID_TASK_ID;
   }
 
-  if (canBecomeInteger(applicationId)) {
+  if (!canBecomeInteger(applicationId)) {
     return MessageType.INVALID_APPLICATION_ID;
   }
 

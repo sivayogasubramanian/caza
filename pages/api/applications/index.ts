@@ -224,7 +224,7 @@ function convertApplicationListDataToPayload({
 }: {
   id: number;
   role: Role & { company: Company };
-  latestStage: ApplicationStage;
+  latestStage: ApplicationStage | undefined;
   taskNotificationCount: number;
 }): ApplicationListData {
   const { company, title, type, year } = role;
@@ -238,7 +238,7 @@ function convertApplicationListDataToPayload({
       id: role.id,
       company: { id: company.id, name: company.name, companyUrl: company.companyUrl },
     },
-    latestStage: convertApplicationStageToPayload(latestStage),
+    latestStage: latestStage ? convertApplicationStageToPayload(latestStage) : undefined,
   };
 }
 

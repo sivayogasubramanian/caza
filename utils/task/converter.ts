@@ -6,7 +6,7 @@ export function convertTaskToPayload(task: Task): TaskData {
   return {
     id,
     title,
-    dueDate: dueDate.toJSON() ?? null,
+    dueDate: dueDate.toJSON(),
     notificationDateTime: notificationDateTime?.toJSON() ?? null,
     isDone,
   };

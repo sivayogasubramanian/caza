@@ -38,10 +38,15 @@ describe('POST to create stage works.', () => {
     });
   }
 
-  canCreateWithPost('full', { type: 'OFFERED', date: new Date(), emojiUnicodeHex: '1f604', remark: 'Foo' });
-  canCreateWithPost('minimal', { type: 'OFFERED', date: new Date() });
-  canCreateWithPost('null emoji', { type: 'OFFERED', date: new Date(), emojiUnicodeHex: null, remark: 'Foo' });
-  canCreateWithPost('null remark', { type: 'OFFERED', date: new Date(), emojiUnicodeHex: '1f604', remark: null });
+  canCreateWithPost('full', { type: 'OFFERED', date: new Date().toJSON(), emojiUnicodeHex: '1f604', remark: 'Foo' });
+  canCreateWithPost('minimal', { type: 'OFFERED', date: new Date().toJSON() });
+  canCreateWithPost('null emoji', { type: 'OFFERED', date: new Date().toJSON(), emojiUnicodeHex: null, remark: 'Foo' });
+  canCreateWithPost('null remark', {
+    type: 'OFFERED',
+    date: new Date().toJSON(),
+    emojiUnicodeHex: '1f604',
+    remark: null,
+  });
 
   it('Does not POST with bad applicationId', async () => {
     const uid = await createUser(prisma, { type: 'APPLIED', date: '2022-10-01' });
@@ -50,7 +55,7 @@ describe('POST to create stage works.', () => {
     const type = 'OFFERED';
     const { req, res, getResult } = createStagePostMocks(uid, applicationId, {
       type,
-      date: new Date(),
+      date: new Date().toJSON(),
     });
 
     await stagesHandler(req, res);
@@ -66,7 +71,7 @@ describe('POST to create stage works.', () => {
     const type = 'OFFERED';
     const { req, res, getResult } = createStagePostMocks(uid, applicationId, {
       type,
-      date: new Date(),
+      date: new Date().toJSON(),
     });
 
     await stagesHandler(req, res);
@@ -82,7 +87,7 @@ describe('POST to create stage works.', () => {
     const type = 'OFFERE' as 'OFFERED';
     const { req, res, getResult } = createStagePostMocks(uid, applicationId, {
       type,
-      date: new Date(),
+      date: new Date().toJSON(),
     });
 
     await stagesHandler(req, res);
@@ -99,7 +104,7 @@ describe('POST to create stage works.', () => {
       const type = 'OFFERED';
       const { req, res, getResult } = createStagePostMocks(uid, applicationId, {
         type,
-        date: notDate as Date,
+        date: notDate,
       });
 
       await stagesHandler(req, res);
