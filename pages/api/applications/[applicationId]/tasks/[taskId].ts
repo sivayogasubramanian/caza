@@ -10,6 +10,7 @@ import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '..
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
 import { isEmpty } from '../../../../../utils/strings/validations';
+import { convertTaskToPayload } from '../../../../../utils/task/converter';
 
 const prisma = new PrismaClient();
 
@@ -79,7 +80,7 @@ async function handlePatch(uid: string, req: NextApiRequest, res: NextApiRespons
   const updatedTask: Task = await prisma.task.update({ where: { id: taskId }, data });
   return res
     .status(HttpStatus.OK)
-    .json(createJsonResponse(updatedTask, messages[MessageType.TASK_UPDATED_SUCCESSFULLY]));
+    .json(createJsonResponse(convertTaskToPayload(updatedTask), messages[MessageType.TASK_UPDATED_SUCCESSFULLY]));
 }
 
 async function handleDelete(uid: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<EmptyPayload>>) {
