@@ -25,7 +25,7 @@ export function getCountOfDaysTillTodayFrom(date: Date): number {
 
 export function calculateDaysOffset(currentDate: Date, referenceDate: Date) {
   const differenceInTime = referenceDate.getTime() - currentDate.getTime();
-  return differenceInTime / (1000 * 3600 * 24);
+  return Math.ceil(differenceInTime / (1000 * 3600 * 24));
 }
 
 // Formats the time portion in datetime into hh:mm AM/PM format
