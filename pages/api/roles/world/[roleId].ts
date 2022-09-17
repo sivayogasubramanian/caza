@@ -36,7 +36,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleWorldStatsData>>) {
   const validationError = await validateGetRequest(req);
-  if (validationError !== null) {
+  if (validationError === MessageType.ROLE_NOT_VERIFIED) {
+    return res.status(HttpStatus.TEAPOT).json(createJsonResponse({}, Messages[validationError]));
+  } else if (validationError !== null) {
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, Messages[validationError]));
   }
 
@@ -154,7 +156,7 @@ function analyzeStages(data: { applicationId: number; type: ApplicationStageType
     });
   });
 
-  return { nodes: Array.from(nodes), edges: edges, numberOfApplications: 0 };
+  return { nodes: Array.from(nodes), edges, numberOfApplications: 0 };
 }
 
 function getNodeId(type: ApplicationStageType, lastNodeId: string): string {
