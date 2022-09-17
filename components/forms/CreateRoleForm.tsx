@@ -27,9 +27,13 @@ function CreateRoleForm({ company, isOpen, closeForm, onCreate }: Props) {
   const onSubmit = (companyId: number) => {
     form.validateFields().then(({ title, type, year }) => {
       rolesApi.createRole({ companyId, title, type, year }).then((resp) => {
+        if (resp.payload.id === undefined) {
+          return;
+        }
+
         form.resetFields();
         closeForm();
-        onCreate(resp.payload);
+        onCreate(resp.payload as RoleData);
       });
     });
   };

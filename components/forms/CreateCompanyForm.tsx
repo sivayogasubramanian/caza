@@ -10,15 +10,21 @@ type Props = {
 
 function CreateCompanyForm({ isOpen, closeForm, onCreate }: Props) {
   const [form] = Form.useForm();
+
   const onSubmit = () => {
     form.validateFields().then((values) => {
       companiesApi.createCompany(values).then((resp) => {
+        if (resp.payload.id === undefined) {
+          return;
+        }
+
         form.resetFields();
         closeForm();
-        onCreate(resp.payload);
+        onCreate(resp.payload as CompanyData);
       });
     });
   };
+
   return (
     <Modal title={'Add new company'} open={isOpen} onOk={onSubmit} onCancel={closeForm}>
       <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
