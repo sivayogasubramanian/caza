@@ -31,7 +31,12 @@ function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData, 
       <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex items-center gap-2 col-span-3">
-            <Checkbox className="rounded-full" checked={task.isDone} onChange={onToggleCheckbox} />
+            <Checkbox
+              className="rounded-full"
+              checked={task.isDone}
+              onChange={onToggleCheckbox}
+              onClick={(e) => e.stopPropagation()}
+            />
             <div className="font-bold">{task.title}</div>
           </div>
 
