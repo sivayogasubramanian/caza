@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
 import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } from '../../types/company';
 import { Nullable } from '../../types/utils';
-import { withAuth } from '../../utils/auth/jwtHelpers';
+import { withAuth, withAuthUser } from '../../utils/auth/jwtHelpers';
 import { makeCompanyNameFilters } from '../../utils/filters/filterHelpers';
 import {
   convertQueryParamToStringArray,
@@ -41,20 +41,20 @@ const messages = Object.freeze({
   },
 });
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
     case HttpMethod.GET:
-      return handleGet(req, res);
+      return handleGet(userId, req, res);
     case HttpMethod.POST:
-      return handlePost(req, res);
+      return handlePost(userId, req, res);
     default:
       return rejectHttpMethod(res, method);
   }
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
   const queryParams: CompanyQueryParams = parseGetQueryParams(req);
 
   if (!queryParams.companyNames) {
@@ -66,8 +66,12 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<C
 
   const companies: CompanyListData[] = await prisma.company.findMany({
     where: {
-      isVerified: true,
-      OR: companyNamesFilters,
+      AND: [
+        {
+          OR: [{ isVerified: true }, { contributorId: userId }],
+        },
+        { OR: companyNamesFilters },
+      ],
     },
     orderBy: {
       name: 'asc',
@@ -78,7 +82,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<C
   res.status(HttpStatus.OK).json(createJsonResponse(companies));
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyData>>) {
+async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyData>>) {
   const errorMessageType = validatePostRequest(req);
   if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
@@ -105,6 +109,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 
   const newCompany = await prisma.company.create({
     data: {
+      contributorId: userId,
       name: companyPostData.name,
       companyUrl: companyPostData.companyUrl,
     },
@@ -144,4 +149,4 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   return null;
 }
 
-export default withPrismaErrorHandling(withAuth(handler));
+export default withPrismaErrorHandling(withAuthUser(handler));
