@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import companiesApi, { COMPANIES_API_ENDPOINT } from '../../api/companiesApi';
 import rolesApi, { ROLES_API_ENDPOINT } from '../../api/rolesApi';
 import CompanyOption from '../../components/CompanyOption';
+import CreateCompanyForm from '../../components/forms/CreateCompanyForm';
 import { ApiResponse } from '../../types/apiResponse';
 import { CompanyAutocompleteOption, CompanyListData, CompanyQueryParams } from '../../types/company';
 import { RoleAutocompleteOption, RoleListData, RoleQueryParams, RoleTypeToLabelMap } from '../../types/role';
@@ -12,13 +13,15 @@ import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 
 function ApplicationCreate() {
+  const [isCreateCompanyFormOpen, setIsCreateCompanyFormOpen] = useState<boolean>(false);
+
   const [companySearchParams, setCompanySearchParams] = useState<CompanyQueryParams>({ companyNames: [] });
   const [selectedCompanyId, setSelectedCompanyId] = useState<Nullable<number>>(null);
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [] });
   const [selectedRoleId, setSelectedRoleId] = useState<Nullable<number>>(null);
 
-  const { data: companiesData } = useSWR<ApiResponse<CompanyListData[]>>(
+  const { data: companiesData, mutate } = useSWR<ApiResponse<CompanyListData[]>>(
     [COMPANIES_API_ENDPOINT, companySearchParams],
     (url: string, companySearchParams: CompanyQueryParams) => companiesApi.getCompanies(companySearchParams),
   );
@@ -46,12 +49,16 @@ function ApplicationCreate() {
 
     if (companyId === null) {
       // TODO: Bring up dialog
-      alert('Add new company');
+      setIsCreateCompanyFormOpen(true);
     }
   };
 
   const onSearchCompany = (inputValue: string) => {
     setCompanySearchParams({ companyNames: splitByWhitespaces(inputValue) });
+  };
+
+  const onCreateCompany = (company: CompanyListData) => {
+    setSelectedCompanyId(company.id);
   };
 
   const { data: rolesData } = useSWR<ApiResponse<RoleListData[]>>(
@@ -80,33 +87,41 @@ function ApplicationCreate() {
   };
 
   return (
-    <Form labelCol={{ span: 6 }} wrapperCol={{ span: 12 }} className="p-8">
-      <Form.Item label={'Company'}>
-        <Select
-          showSearch
-          options={companyOptionsWithAdd}
-          onSelect={onSelectCompany}
-          onSearch={onSearchCompany}
-          filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
-          value={companyOptions.find((option) => option.companyId === selectedCompanyId)?.value}
-          loading={!companiesData}
-        />
-      </Form.Item>
-      <Form.Item label={'Role'}>
-        <Select
-          showSearch
-          options={roleOptionsWithAdd}
-          onSelect={onSelectRole}
-          onSearch={onSearchRole}
-          filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
-          value={roleOptions.find((option) => option.roleId === selectedRoleId)?.value}
-          loading={!rolesData}
-        />
-      </Form.Item>
-      <Form.Item label={'Date Applied'}>
-        <DatePicker />
-      </Form.Item>
-    </Form>
+    <>
+      <CreateCompanyForm
+        isOpen={isCreateCompanyFormOpen}
+        closeForm={() => setIsCreateCompanyFormOpen(false)}
+        onCreate={onCreateCompany}
+      />
+
+      <Form labelCol={{ span: 6 }} wrapperCol={{ span: 12 }} className="p-8">
+        <Form.Item label={'Company'}>
+          <Select
+            showSearch
+            options={companyOptionsWithAdd}
+            onSelect={onSelectCompany}
+            onSearch={onSearchCompany}
+            filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
+            value={companyOptions.find((option) => option.companyId === selectedCompanyId)?.value}
+            loading={!companiesData}
+          />
+        </Form.Item>
+        <Form.Item label={'Role'}>
+          <Select
+            showSearch
+            options={roleOptionsWithAdd}
+            onSelect={onSelectRole}
+            onSearch={onSearchRole}
+            filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
+            value={roleOptions.find((option) => option.roleId === selectedRoleId)?.value}
+            loading={!rolesData}
+          />
+        </Form.Item>
+        <Form.Item label={'Date Applied'}>
+          <DatePicker />
+        </Form.Item>
+      </Form>
+    </>
   );
 }
 
