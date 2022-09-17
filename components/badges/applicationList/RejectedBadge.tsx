@@ -4,7 +4,12 @@ import React from 'react';
 import { stageTypeToDisplayStringMap } from '../../../utils/applicationStage/applicationStageUtils';
 
 function RejectedBadge() {
-  return <Badge count={stageTypeToDisplayStringMap.get(ApplicationStageType.REJECTED)} />;
+  return (
+    <Badge
+      style={{ backgroundColor: '#FF9C9C', color: '#000000' }}
+      count={stageTypeToDisplayStringMap.get(ApplicationStageType.REJECTED)}
+    />
+  );
 }
 
 export default RejectedBadge;

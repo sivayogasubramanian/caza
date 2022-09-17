@@ -24,25 +24,25 @@ const roles: RoleApplicationListData[] = [
 const testApplicationStages: ApplicationStageApplicationListData[] = [
   {
     id: 1,
-    type: 'ACCEPTED',
+    type: 'OFFERED',
     date: new Date().toJSON(),
     emojiUnicodeHex: '1F610',
   },
   {
     id: 2,
-    type: 'APPLIED',
+    type: 'ONLINE_ASSESSMENT',
     date: new Date(Date.now() + 3 * 86400000).toJSON(),
     emojiUnicodeHex: '1F614',
   },
   {
     id: 3,
-    type: 'MIXED',
+    type: 'REJECTED',
     date: new Date(Date.now() + 5 * 86400000).toJSON(),
     emojiUnicodeHex: null,
   },
   {
     id: 4,
-    type: 'NON_TECHNICAL',
+    type: 'WITHDRAWN',
     date: new Date(Date.now() + 10 * 86400000).toJSON(),
     emojiUnicodeHex: null,
   },
