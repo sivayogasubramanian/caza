@@ -18,7 +18,7 @@ export type CompanyQueryParams = {
 };
 
 export type CompanyAutocompleteOption = {
-  companyId: Nullable<number>;
+  company: Nullable<CompanyListData>;
   label: JSX.Element;
   value: string;
 };

@@ -14,7 +14,6 @@ function CreateCompanyForm({ isOpen, closeForm, onCreate }: Props) {
     form.validateFields().then((values) => {
       companiesApi.createCompany(values).then((resp) => {
         form.resetFields();
-        alert('Company created succesfully');
         closeForm();
         onCreate(resp.payload);
       });

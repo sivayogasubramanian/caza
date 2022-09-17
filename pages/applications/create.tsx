@@ -5,18 +5,20 @@ import companiesApi, { COMPANIES_API_ENDPOINT } from '../../api/companiesApi';
 import rolesApi, { ROLES_API_ENDPOINT } from '../../api/rolesApi';
 import CompanyOption from '../../components/CompanyOption';
 import CreateCompanyForm from '../../components/forms/CreateCompanyForm';
+import CreateRoleForm from '../../components/forms/CreateRoleForm';
 import { ApiResponse } from '../../types/apiResponse';
 import { CompanyAutocompleteOption, CompanyListData, CompanyQueryParams } from '../../types/company';
-import { RoleAutocompleteOption, RoleListData, RoleQueryParams, RoleTypeToLabelMap } from '../../types/role';
+import { RoleAutocompleteOption, RoleData, RoleListData, RoleQueryParams, RoleTypeToLabelMap } from '../../types/role';
 import { Nullable } from '../../types/utils';
 import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 
 function ApplicationCreate() {
   const [isCreateCompanyFormOpen, setIsCreateCompanyFormOpen] = useState<boolean>(false);
+  const [isCreateRoleFormOpen, setIsCreateRoleFormOpen] = useState<boolean>(false);
 
   const [companySearchParams, setCompanySearchParams] = useState<CompanyQueryParams>({ companyNames: [] });
-  const [selectedCompanyId, setSelectedCompanyId] = useState<Nullable<number>>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Nullable<CompanyListData>>(null);
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [] });
   const [selectedRoleId, setSelectedRoleId] = useState<Nullable<number>>(null);
@@ -27,28 +29,27 @@ function ApplicationCreate() {
   );
   const companies = companiesData?.payload || [];
   const companyOptions: CompanyAutocompleteOption[] = companies.map((company) => ({
-    companyId: company.id,
+    company,
     label: <CompanyOption company={company} />,
     value: company.name,
   }));
   const companyOptionsWithAdd: CompanyAutocompleteOption[] = [
     ...companyOptions,
-    { companyId: null, label: <div>Add new company</div>, value: 'Add new company' },
+    { company: null, label: <div>Add new company</div>, value: 'Add new company' },
   ];
 
-  const onSelectCompany = (value: string, { companyId }: CompanyAutocompleteOption) => {
-    setSelectedCompanyId(companyId);
+  const onSelectCompany = (value: string, { company }: CompanyAutocompleteOption) => {
+    setSelectedCompany(company);
 
     // Update role search params to filter for roles of the currently selected company
-    setRoleSearchParams((prevState) => ({ ...prevState, companyId: companyId ?? undefined }));
+    setRoleSearchParams((prevState) => ({ ...prevState, companyId: company?.id ?? undefined }));
 
-    if (companyId !== selectedCompanyId) {
+    if (company !== selectedCompany) {
       // Unselect role that belongs to another company
       setSelectedRoleId(null);
     }
 
-    if (companyId === null) {
-      // TODO: Bring up dialog
+    if (company === null) {
       setIsCreateCompanyFormOpen(true);
     }
   };
@@ -58,7 +59,7 @@ function ApplicationCreate() {
   };
 
   const onCreateCompany = (company: CompanyListData) => {
-    setSelectedCompanyId(company.id);
+    setSelectedCompany(company);
   };
 
   const { data: rolesData } = useSWR<ApiResponse<RoleListData[]>>(
@@ -75,8 +76,7 @@ function ApplicationCreate() {
 
   const onSelectRole = (value: string, { roleId }: RoleAutocompleteOption) => {
     if (roleId === null) {
-      // TODO: Bring up dialog
-      alert('Add new role');
+      setIsCreateRoleFormOpen(true);
     }
 
     setSelectedRoleId(roleId);
@@ -94,6 +94,13 @@ function ApplicationCreate() {
         onCreate={onCreateCompany}
       />
 
+      <CreateRoleForm
+        company={selectedCompany}
+        isOpen={isCreateRoleFormOpen}
+        closeForm={() => setIsCreateRoleFormOpen(false)}
+        onCreate={(createdRole: RoleData) => setSelectedRoleId(createdRole.id)}
+      />
+
       <Form labelCol={{ span: 6 }} wrapperCol={{ span: 12 }} className="p-8">
         <Form.Item label={'Company'}>
           <Select
@@ -102,7 +109,7 @@ function ApplicationCreate() {
             onSelect={onSelectCompany}
             onSearch={onSearchCompany}
             filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
-            value={companyOptions.find((option) => option.companyId === selectedCompanyId)?.value}
+            value={companyOptions.find((option) => option.company === selectedCompany)?.value}
             loading={!companiesData}
           />
         </Form.Item>
