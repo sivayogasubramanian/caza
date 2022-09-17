@@ -61,6 +61,7 @@ const companies: Prisma.CompanyCreateInput[] = [
           title: 'Software Engineering Intern, 2023',
           type: 'SUMMER_INTERNSHIP',
           year: 2023,
+          isVerified: true,
           applications: {
             create: [
               {
@@ -77,6 +78,16 @@ const companies: Prisma.CompanyCreateInput[] = [
                       date: new Date(2022, 8, 7),
                       emojiUnicodeHex: '1f604', // 😄
                       remark: 'Passed all test cases!',
+                    },
+                    {
+                      type: 'OFFERED',
+                      date: new Date(2022, 9, 1),
+                      emojiUnicodeHex: '1f604', // 😄
+                      remark: 'OFFER!!.',
+                    },
+                    {
+                      type: 'ACCEPTED',
+                      date: new Date(2022, 9, 1),
                     },
                     {
                       type: 'TECHNICAL',
@@ -114,6 +125,10 @@ const companies: Prisma.CompanyCreateInput[] = [
                       type: 'ONLINE_ASSESSMENT',
                       date: new Date(2022, 8, 7),
                     },
+                    {
+                      type: 'REJECTED',
+                      date: new Date(2022, 8, 12),
+                    },
                   ],
                 },
               },
@@ -129,6 +144,10 @@ const companies: Prisma.CompanyCreateInput[] = [
                       type: 'ONLINE_ASSESSMENT',
                       date: new Date(2022, 8, 7),
                     },
+                    {
+                      type: 'REJECTED',
+                      date: new Date(2022, 8, 10),
+                    },
                   ],
                 },
               },
@@ -139,6 +158,10 @@ const companies: Prisma.CompanyCreateInput[] = [
                     {
                       type: 'APPLIED',
                       date: new Date(2022, 7, 30),
+                    },
+                    {
+                      type: 'REJECTED',
+                      date: new Date(2022, 8, 3),
                     },
                   ],
                 },
@@ -165,6 +188,10 @@ const companies: Prisma.CompanyCreateInput[] = [
                     {
                       type: 'ONLINE_ASSESSMENT',
                       date: new Date(2022, 6, 7),
+                    },
+                    {
+                      type: 'REJECTED',
+                      date: new Date(2022, 6, 10),
                     },
                   ],
                 },
