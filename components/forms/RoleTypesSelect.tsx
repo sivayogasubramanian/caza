@@ -1,6 +1,6 @@
 import { RoleType } from '@prisma/client';
 import { Select } from 'antd';
-import { RoleTypeToLabelMap } from '../../types/role';
+import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
 
 const { Option } = Select;
 
@@ -11,8 +11,8 @@ type Props = {
 
 function RoleTypesSelect({ isMultiselect = false, onChange }: Props) {
   const mode = isMultiselect ? 'multiple' : undefined;
-  const options = Object.entries(RoleTypeToLabelMap).map(([stage, label], index) => (
-    <Option key={index} value={stage}>
+  const options = roleTypeToDisplayStringMap.map((label, role) => (
+    <Option key={role} value={role}>
       {label}
     </Option>
   ));
