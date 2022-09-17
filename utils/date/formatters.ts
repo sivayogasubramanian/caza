@@ -19,6 +19,11 @@ export function makeDisplayNotificationDatetime(notificationDatetime: Date, dueD
   return `On day of event at ${notificationTime}`;
 }
 
+export function getCountOfDaysTillTodayFrom(date: Date): number {
+  const differenceInTime = Date.now() - date.getTime();
+  return Math.ceil(differenceInTime / (1000 * 3600 * 24));
+}
+
 // Formats the time portion in datetime into hh:mm AM/PM format
 function makeDisplayTime(dateTime: Date) {
   const notificationHourNumber = dateTime.getHours() % 12;
