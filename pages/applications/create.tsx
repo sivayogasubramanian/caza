@@ -21,9 +21,9 @@ function ApplicationCreate() {
   const [selectedCompany, setSelectedCompany] = useState<Nullable<CompanyListData>>(null);
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [] });
-  const [selectedRoleId, setSelectedRoleId] = useState<Nullable<number>>(null);
+  const [selectedRole, setSelectedRole] = useState<Nullable<RoleData>>(null);
 
-  const { data: companiesData, mutate } = useSWR<ApiResponse<CompanyListData[]>>(
+  const { data: companiesData, mutate: mutateCompaniesData } = useSWR<ApiResponse<CompanyListData[]>>(
     [COMPANIES_API_ENDPOINT, companySearchParams],
     (url: string, companySearchParams: CompanyQueryParams) => companiesApi.getCompanies(companySearchParams),
   );
@@ -46,7 +46,7 @@ function ApplicationCreate() {
 
     if (company !== selectedCompany) {
       // Unselect role that belongs to another company
-      setSelectedRoleId(null);
+      setSelectedRole(null);
     }
 
     if (company === null) {
@@ -59,31 +59,37 @@ function ApplicationCreate() {
   };
 
   const onCreateCompany = (company: CompanyListData) => {
+    mutateCompaniesData();
     setSelectedCompany(company);
   };
 
-  const { data: rolesData } = useSWR<ApiResponse<RoleListData[]>>(
+  const { data: rolesData, mutate: mutateRolesData } = useSWR<ApiResponse<RoleListData[]>>(
     [ROLES_API_ENDPOINT, roleSearchParams],
     (url: string, roleSearchParams: RoleQueryParams) =>
       roleSearchParams.companyId !== undefined ? rolesApi.getRoles(roleSearchParams) : createJsonResponse([]),
   );
   const roles = rolesData?.payload || [];
   const roleOptions: RoleAutocompleteOption[] = roles.map((role) => ({
-    roleId: role.id,
+    role,
     value: `${role.title} [${role.year} ${RoleTypeToLabelMap[role.type]}]`,
   }));
-  const roleOptionsWithAdd: RoleAutocompleteOption[] = [...roleOptions, { roleId: null, value: 'Add new role' }];
+  const roleOptionsWithAdd: RoleAutocompleteOption[] = [...roleOptions, { role: null, value: 'Add new role' }];
 
-  const onSelectRole = (value: string, { roleId }: RoleAutocompleteOption) => {
-    if (roleId === null) {
+  const onSelectRole = (value: string, { role }: RoleAutocompleteOption) => {
+    if (role === null && selectedCompany !== null) {
       setIsCreateRoleFormOpen(true);
     }
 
-    setSelectedRoleId(roleId);
+    setSelectedRole(role);
   };
 
   const onSearchRole = (inputValue: string) => {
     setRoleSearchParams((prevState) => ({ ...prevState, searchWords: splitByWhitespaces(inputValue) }));
+  };
+
+  const onCreateRole = (createdRole: RoleData) => {
+    mutateRolesData();
+    setSelectedRole(createdRole);
   };
 
   return (
@@ -98,7 +104,7 @@ function ApplicationCreate() {
         company={selectedCompany}
         isOpen={isCreateRoleFormOpen}
         closeForm={() => setIsCreateRoleFormOpen(false)}
-        onCreate={(createdRole: RoleData) => setSelectedRoleId(createdRole.id)}
+        onCreate={onCreateRole}
       />
 
       <Form labelCol={{ span: 6 }} wrapperCol={{ span: 12 }} className="p-8">
@@ -109,7 +115,7 @@ function ApplicationCreate() {
             onSelect={onSelectCompany}
             onSearch={onSearchCompany}
             filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
-            value={companyOptions.find((option) => option.company === selectedCompany)?.value}
+            value={companyOptions.find((option) => option.company?.id === selectedCompany?.id)?.value}
             loading={!companiesData}
           />
         </Form.Item>
@@ -120,7 +126,7 @@ function ApplicationCreate() {
             onSelect={onSelectRole}
             onSearch={onSearchRole}
             filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
-            value={roleOptions.find((option) => option.roleId === selectedRoleId)?.value}
+            value={roleOptions.find((option) => option.role?.id === selectedRole?.id)?.value}
             loading={!rolesData}
           />
         </Form.Item>

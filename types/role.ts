@@ -37,6 +37,6 @@ export type WorldRoleQueryParams = {
 };
 
 export type RoleAutocompleteOption = {
-  roleId: Nullable<number>;
+  role: Nullable<RoleData>;
   value: string;
 };
