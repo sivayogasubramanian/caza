@@ -96,7 +96,19 @@ function ApplicationCreate() {
     role,
     value: `${role.title} [${role.year} ${roleTypeToDisplayStringMap.get(role.type)}]`,
   }));
-  const roleOptionsWithAdd: RoleAutocompleteOption[] = [...roleOptions, { role: null, value: 'Add new role' }];
+  const roleOptionsWithAdd: RoleAutocompleteOption[] = [
+    ...roleOptions,
+    {
+      role: null,
+      label: (
+        <Space>
+          <PlusCircleOutlined />
+          Add new role
+        </Space>
+      ),
+      value: 'Add new role',
+    },
+  ];
 
   const onSelectRole = (role: Nullable<RoleData>) => {
     if (role === null && selectedCompany !== null) {

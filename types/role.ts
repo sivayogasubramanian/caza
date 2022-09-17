@@ -38,5 +38,6 @@ export type WorldRoleQueryParams = {
 
 export type RoleAutocompleteOption = {
   role: Nullable<RoleData>;
+  label?: JSX.Element;
   value: string;
 };
