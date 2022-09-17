@@ -14,6 +14,15 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
     return <div></div>;
   }
 
+  if (data.edges.length === 0) {
+    return (
+      <div className="w-full h-40 p-8">
+        <RoleCard role={data.role} />
+        <div className="text-2xl">The role you have selected does not have enough data to be displayed.</div>
+      </div>
+    );
+  }
+
   const sankeyData = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
     (data as unknown as RoleWorldStatsData).edges.map((e) => {
       return [e.source, e.dest, e.userCount];
