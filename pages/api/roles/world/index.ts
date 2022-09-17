@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse } from '../../../../types/apiResponse';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../../../types/role';
 import { getNonEmptyArrayOrUndefined, combineDefinedArrays, buildFrequencyMap } from '../../../../utils/arrays';
-import { withAuthUser } from '../../../../utils/auth/jwtHelpers';
+import { withVerifiedUser } from '../../../../utils/auth/jwtHelpers';
 import {
   makeCompanyNameFilters,
   makeRoleTitleFilters,
@@ -102,4 +102,4 @@ function parseGetQueryParams(req: NextApiRequest): WorldRoleQueryParams {
   return { searchWords: searchWordsArr, roleTypeWords };
 }
 
-export default withPrismaErrorHandling(withAuthUser(handler));
+export default withPrismaErrorHandling(withVerifiedUser(handler));
