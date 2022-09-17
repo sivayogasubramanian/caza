@@ -1,18 +1,27 @@
-import { Button, Checkbox, DatePicker, Form, Input, InputNumber, Select, TimePicker } from 'antd';
+import { Checkbox, DatePicker, Form, FormInstance, Input, InputNumber, Select, TimePicker } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { NotificationDateTimeType, TaskFormData } from '../../types/task';
+import { Nullable } from '../../types/utils';
 
 interface Props {
   initialValues: TaskFormData;
   shouldTouchAllCompulsoryFields: boolean;
   shouldAllowMarkDone: boolean;
-  onCancel: () => void;
-  onSubmit: (values: TaskFormData) => void;
+  shouldSubmit: boolean;
+  setShouldDisableSaveButton: React.Dispatch<React.SetStateAction<boolean>>;
+  setTaskFormData: React.Dispatch<React.SetStateAction<Nullable<TaskFormData>>>;
 }
 
 const { Option } = Select;
 
-function TaskForm({ initialValues, shouldTouchAllCompulsoryFields, shouldAllowMarkDone, onCancel, onSubmit }: Props) {
+function TaskForm({
+  initialValues,
+  shouldTouchAllCompulsoryFields,
+  shouldAllowMarkDone,
+  shouldSubmit,
+  setShouldDisableSaveButton,
+  setTaskFormData,
+}: Props) {
   const [form] = Form.useForm();
 
   const [shouldShowNotificationTimePicker, setShouldShowNotificationTimePicker] = useState(false);
@@ -23,6 +32,12 @@ function TaskForm({ initialValues, shouldTouchAllCompulsoryFields, shouldAllowMa
     form.resetFields();
     onSelectNotificationDateTimeType(initialValues.notificationDateTimeType ?? NotificationDateTimeType.NONE);
   }, [initialValues]);
+
+  useEffect(() => {
+    if (shouldSubmit) {
+      setTaskFormData(form.getFieldsValue());
+    }
+  }, [shouldSubmit]);
 
   const onSelectNotificationDateTimeType = (value: NotificationDateTimeType) => {
     setShouldShowNotificationTimePicker(
@@ -46,7 +61,7 @@ function TaskForm({ initialValues, shouldTouchAllCompulsoryFields, shouldAllowMa
     </Form.Item>
   );
 
-  const shouldDisableSaveButton = () => {
+  const shouldDisableSaveButton = (form: FormInstance) => {
     const formHasSomeUntouchedField = shouldTouchAllCompulsoryFields
       ? !form.isFieldsTouched(['title', 'dueDate'], true)
       : !form.isFieldsTouched();
@@ -54,8 +69,10 @@ function TaskForm({ initialValues, shouldTouchAllCompulsoryFields, shouldAllowMa
     return formHasSomeUntouchedField || formHasSomeError;
   };
 
+  const onFormFieldsChange = () => setShouldDisableSaveButton(shouldDisableSaveButton(form));
+
   return (
-    <Form form={form} initialValues={initialValues} onFinish={onSubmit} className="mt-1 mb-1 ml-2 mr-2">
+    <Form form={form} initialValues={initialValues} onFieldsChange={onFormFieldsChange} className="mt-1 mb-1 ml-2 mr-2">
       <Form.Item
         label="Task"
         name="title"
@@ -114,29 +131,6 @@ function TaskForm({ initialValues, shouldTouchAllCompulsoryFields, shouldAllowMa
           <Checkbox>Done</Checkbox>
         </Form.Item>
       )}
-
-      <div className="flex justify-end gap-2">
-        <Form.Item>
-          <Button shape="round" size="large" className="text-blue-400 border-blue-400" onClick={onCancel}>
-            Cancel
-          </Button>
-        </Form.Item>
-
-        <Form.Item shouldUpdate>
-          {() => (
-            <Button
-              type="primary"
-              htmlType="submit"
-              shape="round"
-              size="large"
-              className="bg-blue-400"
-              disabled={shouldDisableSaveButton()}
-            >
-              Save
-            </Button>
-          )}
-        </Form.Item>
-      </div>
     </Form>
   );
 }
