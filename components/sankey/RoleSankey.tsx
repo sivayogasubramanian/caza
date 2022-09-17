@@ -5,7 +5,6 @@ import { RoleWorldStatsData } from '../../types/world';
 import CompanyLogo from '../company/CompanyLogo';
 
 export type RoleSankeyProps = { data: RoleWorldStatsData };
-type SankeyMouseEvent = { row: number; name?: string };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const [edgeIndex, setEdgeIndex] = useState<number>(-1);
@@ -92,6 +91,8 @@ const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
     </div>
   );
 };
+
+type SankeyMouseEvent = { row: number; name?: string };
 
 // Typing for Google Chart is very suspect.
 /* eslint-disable */
