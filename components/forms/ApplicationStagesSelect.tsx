@@ -1,6 +1,6 @@
 import { ApplicationStageType } from '@prisma/client';
 import { Select } from 'antd';
-import { ApplicationStageTypeToLabelMap } from '../../types/applicationStage';
+import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 
 const { Option } = Select;
 
@@ -11,8 +11,8 @@ type Props = {
 
 function ApplicationStagesSelect({ isMultiselect = false, onChange }: Props) {
   const mode = isMultiselect ? 'multiple' : undefined;
-  const options = Object.entries(ApplicationStageTypeToLabelMap).map(([stage, label], index) => (
-    <Option key={index} value={stage}>
+  const options = stageTypeToDisplayStringMap.map((label, stage) => (
+    <Option key={stage} value={stage}>
       {label}
     </Option>
   ));
