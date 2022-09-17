@@ -7,16 +7,21 @@ const SAMPLE: PathData[] = [
   createSampleData('ONLINE_ASSESSMENT'),
   createSampleData('ONLINE_ASSESSMENT', 'NON_TECHNICAL'),
   createSampleData('ONLINE_ASSESSMENT', 'NON_TECHNICAL', 'TECHNICAL'),
-  { stages: ['APPLIED'], daysToNext: [] },
-  { stages: ['APPLIED', 'REJECTED'], daysToNext: [5] },
-  { stages: ['APPLIED', 'ONLINE_ASSESSMENT', 'REJECTED'], daysToNext: [5, 7] },
-  { stages: ['APPLIED', 'ONLINE_ASSESSMENT', 'NON_TECHNICAL', 'REJECTED'], daysToNext: [5, 3, 8] },
+  { stages: ['APPLIED'], daysToNext: [], userCounts: [] },
+  { stages: ['APPLIED', 'REJECTED'], daysToNext: [5], userCounts: [7] },
+  { stages: ['APPLIED', 'ONLINE_ASSESSMENT', 'REJECTED'], daysToNext: [5, 7], userCounts: [9, 4] },
+  {
+    stages: ['APPLIED', 'ONLINE_ASSESSMENT', 'NON_TECHNICAL', 'REJECTED'],
+    daysToNext: [5, 3, 8],
+    userCounts: [12, 10, 7],
+  },
 ];
 
 function createSampleData(...stages: ApplicationStageType[]): PathData {
   return {
     stages: ['APPLIED', ...stages, 'ACCEPTED'] as ApplicationStageType[],
     daysToNext: [5, ...stages.map(() => 1)],
+    userCounts: [20, ...stages.map(() => 5)],
   };
 }
 
@@ -37,17 +42,21 @@ interface Edge {
   previous: NodeIdentifier;
   next: NodeIdentifier;
   numberOfDays: number;
+  userCount: number;
 }
 
 interface PathData {
   stages: ApplicationStageType[];
+  // Represents number of users who finished each stage.
+  // has exactly one less element than stages.
+  userCounts: number[];
 
   // Represents number of days in interval
   // has exactly one less element than stages.
   daysToNext: number[];
 }
 
-function convertPathToEdges({ stages, daysToNext }: PathData): Edge[] {
+function convertPathToEdges({ stages, userCounts, daysToNext }: PathData): Edge[] {
   // Assumes the order makes sense (only one APPLIED, maximum of one FINAL_STAGE, and APPLIED is source, FINAL_STAGE
   // if it exists is destination)
   // Assumes the stages.length === daysToNext.length + 1
@@ -65,16 +74,17 @@ function convertPathToEdges({ stages, daysToNext }: PathData): Edge[] {
   for (let x = 0; x < n - 1; x++) {
     const rawNext = stages[x + 1];
     const numberOfDays = daysToNext[x];
+    const userCount = userCounts[x];
 
     let next: NodeIdentifier;
     let edge: Edge;
 
     if (FINAL_STAGES.includes(rawNext)) {
       next = rawNext as FINAL_STAGE;
-      edge = { previous, next, numberOfDays };
+      edge = { previous, next, numberOfDays, userCount };
     } else if (INTERMEDIATE_STAGES.includes(rawNext)) {
       next = { stage: rawNext as INTERMEDIATE_STAGE, previousStages: [...stagesSoFar] };
-      edge = { previous, next, numberOfDays };
+      edge = { previous, next, numberOfDays, userCount };
 
       stagesSoFar = stagesSoFar.concat(rawNext as INTERMEDIATE_STAGE);
     } else {
@@ -99,23 +109,23 @@ function nodeIdentifierToString(node: NodeIdentifier): string {
 function convertEdgesToSankeyData(edges: Edge[]): (string | number)[][] {
   const map: Record<string, Record<string, { sum: number; count: number }>> = {};
   for (const edge of edges) {
-    const { next, previous, numberOfDays } = edge;
+    const { next, previous, numberOfDays, userCount } = edge;
     const src = nodeIdentifierToString(previous);
     const dest = nodeIdentifierToString(next);
     const srcEdges = map[src] ?? {};
     const srcDestAmount = srcEdges[dest] ?? { sum: 0, count: 0 };
-    srcEdges[dest] = { sum: srcDestAmount.sum + numberOfDays, count: srcDestAmount.count + 1 };
+    srcEdges[dest] = { sum: srcDestAmount.sum + numberOfDays * userCount, count: srcDestAmount.count + userCount };
     map[src] = srcEdges;
   }
 
-  let result: { src: string; dest: string; avgNumDays: number }[] = [];
+  let result: { src: string; dest: string; avgNumDays: number; userCount: number }[] = [];
   for (const src in map) {
     for (const dest in map[src]) {
       const { sum, count } = map[src][dest];
-      result = result.concat({ src, dest, avgNumDays: sum / count });
+      result = result.concat({ src, dest, avgNumDays: sum / count, userCount: count });
     }
   }
-  return result.map((res) => [res.src, res.dest, res.avgNumDays]);
+  return result.map((res) => [res.src, res.dest, res.userCount]);
 }
 
 export type RoleSankeyProps = Record<string, never>; // for now.
