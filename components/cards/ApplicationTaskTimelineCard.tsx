@@ -27,7 +27,7 @@ function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData, 
   };
 
   return (
-    <div className="shadow-md rounded-lg">
+    <div className="shadow-md rounded-lg" onClick={onClick}>
       <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex items-center gap-2 col-span-3">
