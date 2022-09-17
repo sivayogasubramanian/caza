@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
 import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } from '../../types/company';
 import { Nullable } from '../../types/utils';
-import { withAuth, withAuthUser } from '../../utils/auth/jwtHelpers';
+import { withAuthUser } from '../../utils/auth/jwtHelpers';
 import { makeCompanyNameFilters } from '../../utils/filters/filterHelpers';
 import {
   convertQueryParamToStringArray,

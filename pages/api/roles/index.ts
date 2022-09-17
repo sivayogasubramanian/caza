@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
 import { Nullable } from '../../../types/utils';
-import { withAuth, withAuthUser } from '../../../utils/auth/jwtHelpers';
+import { withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { MIN_YEAR } from '../../../utils/constants';
 import {
   convertQueryParamToStringArray,
