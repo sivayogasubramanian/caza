@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import TaskForm from '../forms/TaskForm';
-import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData, TaskPostData } from '../../types/task';
+import { NotificationDateTimeType, TaskFormData, TaskPostData } from '../../types/task';
 import moment from 'moment';
 import Modal from './Modal';
 import tasksApi from '../../api/tasksApi';
