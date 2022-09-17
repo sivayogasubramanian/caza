@@ -159,7 +159,7 @@ function analyzeStages(data: { applicationId: number; type: ApplicationStageType
   return { nodes: Array.from(nodes), edges, numberOfApplications: 0 };
 }
 
-function getNodeId(type: ApplicationStageType, lastNodeId: string): string {
+function getNodeId(type: ApplicationStageType, lastNodeId: string): NodeId {
   switch (type) {
     case ApplicationStageType.ACCEPTED:
     // fallthrough
