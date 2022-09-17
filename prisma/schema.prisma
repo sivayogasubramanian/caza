@@ -19,6 +19,7 @@ model User {
 
   applications         Application[]
   contributedCompanies Company[]
+  contributedRoles     Role[]
 
   @@map("users")
 }
@@ -48,13 +49,15 @@ enum RoleType {
 }
 
 model Role {
-  id         Int      @id @default(autoincrement())
-  company    Company  @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  companyId  Int      @map("company_id")
-  title      String
-  type       RoleType
-  year       Int
-  isVerified Boolean  @default(false) @map("is_verified")
+  id            Int      @id @default(autoincrement())
+  company       Company  @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  companyId     Int      @map("company_id")
+  title         String
+  type          RoleType
+  year          Int
+  isVerified    Boolean  @default(false) @map("is_verified")
+  contributor   User?    @relation(fields: [contributorId], references: [uid], onUpdate: Cascade)
+  contributorId String?  @map("contributor_id")
 
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
