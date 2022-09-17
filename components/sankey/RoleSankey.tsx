@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import Chart, { GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
+import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
 import { RoleWorldStatsData } from '../../types/world';
 
 export type RoleSankeyProps = { data: RoleWorldStatsData };
@@ -7,8 +7,8 @@ type SankeyMouseEvent = { row: number; name?: string };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const [edgeIndex, setEdgeIndex] = useState<number>(-1);
-  const [nodeTitle, setNodeTitle] = useState<string | undefined>();
   if (!data) {
+    // This should be hidden with a antd Spinner element.
     return <div></div>;
   }
 
@@ -35,32 +35,22 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const chartEvents: ReactGoogleChartEvent[] = [
     {
       eventName: 'ready' as GoogleVizEventName,
-      callback: ({ chartWrapper, google }) => {
-        google.visualization.events.addListener(
-          chartWrapper.getChart() as any,
-          'onmouseover' as GoogleVizEventName,
-          (e: any) => {
-            const { row, name } = e as SankeyMouseEvent;
-            setEdgeIndex(row);
-            setNodeTitle(name);
-          },
-        );
-        google.visualization.events.addListener(chartWrapper.getChart() as any, 'onmouseout' as any, (e: any) => {});
-      },
+      callback: ({ chartWrapper, google }) =>
+        addMouseListeners(chartWrapper, google, [({ row }) => setEdgeIndex(row)], []),
     },
   ];
 
   return (
     <div className="w-full h-40 p-8">
       <Chart chartType="Sankey" data={sankeyData} options={option} chartEvents={chartEvents} />
-      <MouseOverOverlay data={data} edgeIndex={edgeIndex} nodeTitle={nodeTitle} />
+      <MouseOverOverlay data={data} edgeIndex={edgeIndex} />
     </div>
   );
 };
 
 type MouseOverOverlayProps = { data: RoleWorldStatsData; edgeIndex: number; nodeTitle?: string };
 
-const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex, nodeTitle }) => {
+const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
   if (edgeIndex < 0) {
     return <div>Nothing in focus.</div>;
   }
@@ -73,5 +63,25 @@ const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex, nodeTitl
     </div>
   );
 };
+
+/* eslint-disable */
+function addMouseListeners(
+  chartWrapper: GoogleChartWrapper,
+  google: GoogleViz,
+  mouseOutListeners: ((e: SankeyMouseEvent) => void)[],
+  mouseOverListeners: ((e: SankeyMouseEvent) => void)[],
+) {
+  google.visualization.events.addListener(
+    chartWrapper.getChart() as any,
+    'onmouseover' as GoogleVizEventName,
+    (e: any) => {
+      mouseOverListeners.forEach((fn) => fn(e as SankeyMouseEvent));
+    },
+  );
+  google.visualization.events.addListener(chartWrapper.getChart() as any, 'onmouseout' as any, (e: any) => {
+    mouseOutListeners.forEach((fn) => fn(e as SankeyMouseEvent));
+  });
+}
+/* eslint-enable */
 
 export default RoleSankey;
