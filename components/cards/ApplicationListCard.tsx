@@ -24,7 +24,7 @@ function ApplicationListCard({ application }: Props) {
       : undefined;
 
   return (
-    <div className="shadow-md rounded-lg ml-2 mr-2">
+    <div className="shadow-md rounded-lg ml-2 mr-2 mt-2">
       <div className="p-4 flex items-center">
         <CompanyLogo companyUrl={application.role.company.companyUrl} className="rounded-full max-w-[3rem]" />
 
