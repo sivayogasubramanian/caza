@@ -35,8 +35,9 @@ function ApplicationCreate() {
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [] });
   const [selectedRole, setSelectedRole] = useState<Nullable<RoleData>>(null);
-
   const [applicationDate, setApplicationDate] = useState<Nullable<moment.Moment>>(moment(new Date()));
+
+  const [shouldShowValidationErrors, setShouldShowValidationErrors] = useState(false);
 
   const { data: companiesData, mutate: mutateCompaniesData } = useSWR<ApiResponse<CompanyListData[]>>(
     [COMPANIES_API_ENDPOINT, companySearchParams],
@@ -108,6 +109,8 @@ function ApplicationCreate() {
   };
 
   const onSubmit = () => {
+    setShouldShowValidationErrors(true);
+
     if (selectedRole === null || applicationDate === null) {
       return;
     }
@@ -146,7 +149,12 @@ function ApplicationCreate() {
         className="flex flex-col p-8"
         onFinish={onSubmit}
       >
-        <Form.Item label={'Company'}>
+        <Form.Item
+          label={'Company'}
+          required
+          validateStatus={shouldShowValidationErrors && !selectedCompany ? 'error' : 'validating'}
+          help={shouldShowValidationErrors && !selectedCompany ? 'Please select a company!' : ''}
+        >
           <Select
             showSearch
             options={companyOptionsWithAdd}
@@ -157,7 +165,12 @@ function ApplicationCreate() {
             loading={!companiesData}
           />
         </Form.Item>
-        <Form.Item label={'Role'}>
+        <Form.Item
+          label={'Role'}
+          required
+          validateStatus={shouldShowValidationErrors && !selectedRole ? 'error' : 'validating'}
+          help={shouldShowValidationErrors && !selectedRole ? 'Please select a role!' : ''}
+        >
           <Select
             showSearch
             options={roleOptionsWithAdd}
