@@ -4,13 +4,13 @@ import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
 import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
-import { ApplicationListData, ApplicationQueryParams } from '../../types/application';
 import api from '../api/api';
 import { APPLICATIONS_API_ENDPOINT } from '../api/applicationsApi';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
 import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect';
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import { ApiResponse } from '../types/apiResponse';
+import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
