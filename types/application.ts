@@ -1,11 +1,8 @@
-import { ApplicationStageApplicationData } from './applicationStage';
-import { CompanyData } from './company';
-import { RoleData } from './role';
-import { TaskData } from './task';
-import { RoleApplicationListData } from './role';
-import { ApplicationStageApplicationListData } from './applicationStage';
 import { ApplicationStageType, RoleType } from '@prisma/client';
-import { Nullable } from './utils';
+import { ApplicationStageApplicationData, ApplicationStageApplicationListData } from './applicationStage';
+import { CompanyData } from './company';
+import { RoleApplicationListData, RoleData } from './role';
+import { TaskData } from './task';
 
 export type ApplicationData = {
   id: number;
