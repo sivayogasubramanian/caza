@@ -20,6 +20,28 @@ import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
 import { HOMEPAGE_ROUTE } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
 
+const addNewCompanyOption: CompanyAutocompleteOption = {
+  company: null,
+  label: (
+    <Space>
+      <PlusCircleOutlined />
+      Add new company
+    </Space>
+  ),
+  value: 'Add new company',
+};
+
+const addNewRoleOption: RoleAutocompleteOption = {
+  role: null,
+  label: (
+    <Space>
+      <PlusCircleOutlined />
+      Add new role
+    </Space>
+  ),
+  value: 'Add new role',
+};
+
 function ApplicationCreate() {
   const router = useRouter();
 
@@ -45,31 +67,18 @@ function ApplicationCreate() {
     label: <CompanyOption company={company} />,
     value: company.name,
   }));
-  const companyOptionsWithAdd: CompanyAutocompleteOption[] = [
-    ...companyOptions,
-    {
-      company: null,
-      label: (
-        <Space>
-          <PlusCircleOutlined />
-          Add new company
-        </Space>
-      ),
-      value: 'Add new company',
-    },
-  ];
+  const companyOptionsWithAdd = [...companyOptions, addNewCompanyOption];
 
   const onSelectCompany = (company: Nullable<CompanyListData>) => {
+    if (company !== selectedCompany) {
+      setSelectedRole(null);
+    }
+
     setSelectedCompany(company);
     setCompanySearchParams({ companyNames: company ? [company.name] : [] });
 
     // Update role search params to filter for roles of the currently selected company
     setRoleSearchParams((prevState) => ({ ...prevState, companyId: company?.id ?? undefined }));
-
-    if (company !== selectedCompany) {
-      // Unselect role that belongs to another company
-      setSelectedRole(null);
-    }
 
     if (company === null) {
       setIsCreateCompanyFormOpen(true);
@@ -96,19 +105,7 @@ function ApplicationCreate() {
     role,
     value: `${role.title} [${role.year} ${roleTypeToDisplayStringMap.get(role.type)}]`,
   }));
-  const roleOptionsWithAdd: RoleAutocompleteOption[] = [
-    ...roleOptions,
-    {
-      role: null,
-      label: (
-        <Space>
-          <PlusCircleOutlined />
-          Add new role
-        </Space>
-      ),
-      value: 'Add new role',
-    },
-  ];
+  const roleOptionsWithAdd = [...roleOptions, addNewRoleOption];
 
   const onSelectRole = (role: Nullable<RoleData>) => {
     if (role === null && selectedCompany !== null) {
