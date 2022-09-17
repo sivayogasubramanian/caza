@@ -1,11 +1,11 @@
-import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import AuthContext from '../context/AuthContext';
-import useAnonymousLoginIfNeeded from '../hooks/useAnonymousLoginIfNeeded';
-import { AxiosInterceptor } from '../api/interceptor';
 import { SWRConfig } from 'swr';
 import api from '../api/api';
+import { AxiosInterceptor } from '../api/interceptor';
 import Header from '../components/header/Header';
+import AuthContext from '../context/AuthContext';
+import useAnonymousLoginIfNeeded from '../hooks/useAnonymousLoginIfNeeded';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const authContextValue = useAnonymousLoginIfNeeded();
