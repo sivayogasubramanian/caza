@@ -1,5 +1,6 @@
 import { Form, DatePicker, Select, Col, Button } from 'antd';
 import Title from 'antd/lib/typography/Title';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../api/applicationsApi';
@@ -23,6 +24,8 @@ import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 
 function ApplicationCreate() {
+  const router = useRouter();
+
   const [isCreateCompanyFormOpen, setIsCreateCompanyFormOpen] = useState<boolean>(false);
   const [isCreateRoleFormOpen, setIsCreateRoleFormOpen] = useState<boolean>(false);
 
@@ -106,9 +109,13 @@ function ApplicationCreate() {
       return;
     }
 
-    applicationsApi.createApplication({
-      roleId: selectedRole.id,
-    });
+    applicationsApi
+      .createApplication({
+        roleId: selectedRole.id,
+      })
+      .then(() => {
+        router.push('/applications');
+      });
   };
 
   return (
