@@ -1,4 +1,3 @@
-import { Payload } from './apiResponse';
 import { RoleApplicationListData } from './role';
 
 export interface RoleWorldStatsQueryParam {
