@@ -6,7 +6,7 @@ import { calculateDaysOffset } from '../../utils/date/formatters';
 import { Nullable } from '../../types/utils';
 import TaskForm from '../forms/TaskForm';
 import tasksApi from '../../api/tasksApi';
-import { getNotificationDateTime } from '../../utils/applicationStage/applicationStageUtils';
+import { getNotificationDateTime } from '../../utils/task/taskUtils';
 import { Modal } from 'antd';
 
 interface Props {
@@ -48,11 +48,10 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
     setInitialValues({
       title: task.title,
       dueDate: taskDueDateMoment,
-      notificationTime: taskNotificationDateTimeMoment,
-      notificationDateTime: taskNotificationDateTimeMoment,
       notificationDaysOffset: Math.abs(calculatedNotificationDaysOffset),
       notificationDateTimeType: notificationDateTimeType,
       notificationDate: taskNotificationDateTimeMoment,
+      notificationTime: taskNotificationDateTimeMoment,
       isDone: task.isDone,
     });
   }, [task]);

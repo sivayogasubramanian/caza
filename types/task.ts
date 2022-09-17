@@ -38,10 +38,9 @@ export enum NotificationDateTimeType {
 export type TaskFormData = {
   title?: string;
   dueDate?: Moment;
-  notificationTime?: Moment;
-  notificationDateTime?: Moment;
   notificationDaysOffset: number;
   notificationDateTimeType?: NotificationDateTimeType;
   notificationDate?: Moment;
+  notificationTime?: Moment;
   isDone?: boolean;
 };
