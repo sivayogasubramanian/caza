@@ -7,8 +7,8 @@ export interface RoleWorldStatsQueryParam {
 export type NodeId = string;
 
 export type EdgeData = {
-  source: string;
-  dest: string;
+  source: NodeId;
+  dest: NodeId;
   userCount: number;
   totalNumHours: number;
 };
@@ -16,6 +16,6 @@ export type EdgeData = {
 export type RoleWorldStatsData = {
   role: RoleApplicationListData;
   numberOfApplications: number;
-  nodes: string[];
+  nodes: NodeId[];
   edges: EdgeData[];
 };
