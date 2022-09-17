@@ -1,10 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-  ApplicationListData,
-  ApplicationPostData,
-  ApplicationQueryParams,
-  ApplicationRoleData,
-} from '../../../types/application';
+import { ApplicationListData, ApplicationQueryParams, ApplicationRoleData } from '../../../types/application';
 import { ApplicationStage, ApplicationStageType, Company, Prisma, PrismaClient, Role, RoleType } from '@prisma/client';
 import {
   convertQueryParamToStringArray,
@@ -27,12 +22,14 @@ import {
 import { combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../utils/arrays';
 import { splitByCommaRemovingWhitespacesAround, splitByWhitespaces } from '../../../utils/strings/formatters';
 import { convertApplicationStageToPayload } from '../../../utils/applicationStage/converter';
+import { isValidDate } from '../../../utils/date/validations';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
   DUPLICATE_APPLICATION,
   MISSING_ROLE_ID,
   INVALID_ROLE_ID,
+  INVALID_DATE,
 }
 
 const prisma = new PrismaClient();
@@ -48,6 +45,7 @@ const messages = Object.freeze({
   },
   [MessageType.MISSING_ROLE_ID]: { type: StatusMessageType.ERROR, message: 'Application role id is missing.' },
   [MessageType.INVALID_ROLE_ID]: { type: StatusMessageType.ERROR, message: 'Application role id is invalid.' },
+  [MessageType.INVALID_DATE]: { type: StatusMessageType.ERROR, message: 'Application date is invalid.' },
 });
 
 async function handler(
@@ -138,8 +136,9 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return;
   }
 
-  const applicationPostData: ApplicationPostData = {
+  const applicationPostData = {
     roleId: req.body.roleId,
+    applicationDate: new Date(req.body.applicationDate),
   };
 
   const duplicateCount = await prisma.application.count({
@@ -158,6 +157,12 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     data: {
       roleId: applicationPostData.roleId,
       userId: userId,
+      applicationStages: {
+        create: {
+          type: ApplicationStageType.APPLIED,
+          date: applicationPostData.applicationDate,
+        },
+      },
     },
     select: {
       id: true,
@@ -198,12 +203,17 @@ function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
-  if (req.body.roleId === undefined) {
+  const { roleId, applicationDate } = req.body;
+  if (roleId === undefined) {
     return MessageType.MISSING_ROLE_ID;
   }
 
-  if (req.body.roleId === null || !Number.isInteger(req.body.roleId)) {
+  if (roleId === null || !Number.isInteger(roleId)) {
     return MessageType.INVALID_ROLE_ID;
+  }
+
+  if (applicationDate === null || applicationDate === undefined || !isValidDate(applicationDate + '')) {
+    return MessageType.INVALID_DATE;
   }
 
   return null;

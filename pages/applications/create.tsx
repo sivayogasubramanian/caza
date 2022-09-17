@@ -136,7 +136,7 @@ function ApplicationCreate() {
     applicationsApi
       .createApplication({
         roleId: selectedRole.id,
-        // TODO: applicationDate: values.applyDate.toISOString(),
+        applicationDate: applicationDate.toISOString(),
       })
       .then(() => {
         router.push(HOMEPAGE_ROUTE);
