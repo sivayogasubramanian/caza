@@ -3,10 +3,10 @@ import { Badge } from 'antd';
 import { ReactNode } from 'react';
 import { ApplicationListData } from '../../types/application';
 import { stageTypeToBadgeMap } from '../../utils/applicationStage/applicationStageUtils';
-import { COMPANY_LOGO_API_URL } from '../../utils/constants';
 import { getCountOfDaysTillTodayFrom } from '../../utils/date/formatters';
 import { isValidDate } from '../../utils/date/validations';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
+import CompanyLogo from '../company/CompanyLogo';
 
 interface Props {
   application: ApplicationListData;
@@ -26,10 +26,7 @@ function ApplicationListCard({ application }: Props) {
   return (
     <div className="shadow-md rounded-lg ml-2 mr-2">
       <div className="p-4 flex items-center">
-        <img
-          src={`${COMPANY_LOGO_API_URL}${application.role.company.companyUrl}`}
-          className="rounded-full max-w-[3rem]"
-        />
+        <CompanyLogo companyUrl={application.role.company.companyUrl} className="rounded-full max-w-[3rem]" />
 
         <div className="ml-5 w-[100%] flex flex-col gap-0.5">
           <div className="flex items-start justify-between">
@@ -38,7 +35,7 @@ function ApplicationListCard({ application }: Props) {
             <Badge count={application.taskNotificationCount} />
           </div>
 
-          <div className="text-gray-400">{`${application.role.company.name}, ${roleTypeToDisplayStringMap.get(
+          <div className="text-gray-500 text-xs">{`${application.role.company.name}, ${roleTypeToDisplayStringMap.get(
             application.role.type,
           )}, ${application.role.year}`}</div>
 
