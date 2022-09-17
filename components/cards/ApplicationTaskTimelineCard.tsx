@@ -27,20 +27,22 @@ function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData }
 
   return (
     <div className="shadow-md rounded-lg">
-      <div className="mt-1 mb-1 ml-1 mr-1">
+      <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
-          <div className="flex items-start gap-1 col-span-3">
-            <Checkbox className="mt-1 rounded-full" checked={task.isDone} onChange={onToggleCheckbox} />
-            <div className="text-lg font-bold">{task.title}</div>
+          <div className="flex items-center gap-2 col-span-3">
+            <Checkbox className="rounded-full" checked={task.isDone} onChange={onToggleCheckbox} />
+            <div className="font-bold">{task.title}</div>
           </div>
 
-          {dueDate && <div className="flex items-start justify-end">{makeDisplayDate(dueDate)}</div>}
+          {dueDate && <div className="flex items-start justify-end text-xs">{makeDisplayDate(dueDate)}</div>}
         </div>
 
         {notificationDateTime && dueDate && (
-          <div className="flex justify-end items-center gap-1">
+          <div className="mt-2 flex justify-end items-center gap-1">
             <NotificationBell />
-            <div className="text-gray-700">{makeDisplayNotificationDatetime(notificationDateTime, dueDate)}</div>
+            <div className="text-xs text-gray-700">
+              {makeDisplayNotificationDatetime(notificationDateTime, dueDate)}
+            </div>
           </div>
         )}
       </div>
