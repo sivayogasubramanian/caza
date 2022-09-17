@@ -179,11 +179,9 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
-  const searchQuery = req.query.searchWords;
-  const roleTypes = req.query.roleTypeWords;
-  const stageTypes = req.query.stageTypeWords;
+  const { roleTypes, stageTypes, searchWords } = req.query;
 
-  const searchWords = convertQueryParamToStringArray(searchQuery, splitByWhitespaces);
+  const searchWordsArr = convertQueryParamToStringArray(searchWords, splitByWhitespaces);
   const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypes, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
@@ -196,7 +194,7 @@ function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
     (word) => word in ApplicationStageType,
   ) as ApplicationStageType[];
 
-  return { searchWords, roleTypeWords, stageTypeWords };
+  return { searchWords: searchWordsArr, roleTypeWords, stageTypeWords };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
