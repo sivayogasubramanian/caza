@@ -1,8 +1,9 @@
 import React from 'react';
 import TaskForm from '../forms/TaskForm';
-import { NotificationDateTimeType, TaskFormData } from '../../types/task';
+import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData } from '../../types/task';
 import moment from 'moment';
 import Modal from './Modal';
+import tasksApi from '../../api/tasksApi';
 
 interface Props {
   setIsAddingNewTask: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,12 +24,17 @@ function NewTaskModal({ setIsAddingNewTask }: Props) {
     setIsAddingNewTask(false);
   };
 
+  const onSubmit = (values: TaskFormData) => {
+    // TODO
+  };
+
   const formContent = () => (
     <TaskForm
       initialValues={initialValues}
-      onCancel={onCancel}
       shouldTouchAllCompulsoryFields={true}
       shouldAllowMarkDone={false}
+      onCancel={onCancel}
+      onSubmit={onSubmit}
     />
   );
 

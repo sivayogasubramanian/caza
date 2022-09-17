@@ -91,7 +91,9 @@ function Application() {
       )}
 
       {isAddingNewTask && <NewTaskModal setIsAddingNewTask={setIsAddingNewTask} />}
-      {selectedTask && <EditTaskModal initialTask={selectedTask} setSelectedTask={setSelectedTask} />}
+      {selectedTask && applicationId && (
+        <EditTaskModal applicationId={applicationId} initialTask={selectedTask} setSelectedTask={setSelectedTask} />
+      )}
 
       {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
         <Timeline className="m-4" reverse={true}>
