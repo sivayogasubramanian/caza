@@ -6,7 +6,11 @@ import { calculateDaysOffset } from '../../utils/date/formatters';
 import { Nullable } from '../../types/utils';
 import TaskForm from '../forms/TaskForm';
 import tasksApi from '../../api/tasksApi';
-import { getNotificationDateTime } from '../../utils/task/taskUtils';
+import {
+  DEFAULT_NOTIFICATION_DAYS_OFFSET,
+  DEFAULT_NOTIFICATION_TIME,
+  getNotificationDateTime,
+} from '../../utils/task/taskUtils';
 import { Button, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
@@ -38,7 +42,9 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
     const taskNotificationDateTimeMoment =
       taskNotificationDateTime !== undefined ? moment(taskNotificationDateTime) : undefined;
     const calculatedNotificationDaysOffset =
-      taskDueDate && taskNotificationDateTime ? calculateDaysOffset(taskNotificationDateTime, taskDueDate) : 1;
+      taskDueDate && taskNotificationDateTime
+        ? calculateDaysOffset(taskNotificationDateTime, taskDueDate)
+        : DEFAULT_NOTIFICATION_DAYS_OFFSET;
     const notificationDateTimeType =
       taskNotificationDateTime === undefined
         ? NotificationDateTimeType.NONE
@@ -54,7 +60,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
       notificationDaysOffset: Math.abs(calculatedNotificationDaysOffset),
       notificationDateTimeType: notificationDateTimeType,
       notificationDate: taskNotificationDateTimeMoment,
-      notificationTime: taskNotificationDateTimeMoment,
+      notificationTime: taskNotificationDateTimeMoment ?? DEFAULT_NOTIFICATION_TIME,
       isDone: task.isDone,
     });
   }, [task]);

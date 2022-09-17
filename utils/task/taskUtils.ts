@@ -1,4 +1,8 @@
 import { NotificationDateTimeType, TaskFormData } from '../../types/task';
+import moment from 'moment';
+
+export const DEFAULT_NOTIFICATION_TIME = moment('09:00:00', 'hh:mm:ss');
+export const DEFAULT_NOTIFICATION_DAYS_OFFSET = 1;
 
 export function getNotificationDateTime(values: TaskFormData) {
   const notificationTime = values.notificationTime?.utc().format('HH:mm:ss');

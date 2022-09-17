@@ -1,9 +1,12 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import TaskForm from '../forms/TaskForm';
 import { NotificationDateTimeType, TaskFormData, TaskPostData } from '../../types/task';
-import moment from 'moment';
 import tasksApi from '../../api/tasksApi';
-import { getNotificationDateTime } from '../../utils/task/taskUtils';
+import {
+  DEFAULT_NOTIFICATION_DAYS_OFFSET,
+  DEFAULT_NOTIFICATION_TIME,
+  getNotificationDateTime,
+} from '../../utils/task/taskUtils';
 import { Nullable } from '../../types/utils';
 import { Modal } from 'antd';
 
@@ -14,15 +17,12 @@ interface Props {
 }
 
 function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }: Props) {
-  const defaultNotificationTime = moment('09:00:00', 'hh:mm:ss');
-  const defaultNotificationDaysOffset = 1;
-
   const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
   const [initialValues] = useState<TaskFormData>({
-    notificationTime: defaultNotificationTime,
-    notificationDaysOffset: defaultNotificationDaysOffset,
+    notificationTime: DEFAULT_NOTIFICATION_TIME,
+    notificationDaysOffset: DEFAULT_NOTIFICATION_DAYS_OFFSET,
     notificationDateTimeType: NotificationDateTimeType.NONE,
     isDone: false,
   });
