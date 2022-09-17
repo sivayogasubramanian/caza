@@ -1,4 +1,5 @@
 import { Nullable } from './utils';
+import { Moment } from 'moment';
 
 export type TaskQueryParams = {
   applicationId: string;
@@ -24,4 +25,23 @@ export type TaskData = {
   dueDate: string;
   notificationDateTime: Nullable<string>;
   isDone: boolean;
+};
+
+export enum NotificationDateTimeType {
+  NONE = 'NONE',
+  DAY_OF_EVENT = 'DAY_OF_EVENT',
+  DAYS_BEFORE = 'DAYS_BEFORE',
+  DAYS_AFTER = 'DAYS_AFTER',
+  ON_SELECTED_DATE = 'ON_SELECTED_DATE',
+}
+
+export type TaskFormData = {
+  title?: string;
+  dueDate?: Moment;
+  notificationTime?: Moment;
+  notificationDateTime?: Moment;
+  notificationDaysOffset?: number;
+  notificationDateTimeType?: NotificationDateTimeType;
+  notificationDate?: Moment;
+  isDone?: boolean;
 };
