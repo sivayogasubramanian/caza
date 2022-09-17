@@ -1,7 +1,7 @@
-import { Form, InputNumber, Input, Button, Modal } from 'antd';
+import { Form, InputNumber, Input, Modal } from 'antd';
 import rolesApi from '../../api/rolesApi';
 import { CompanyListData } from '../../types/company';
-import { RoleData, RolePostData } from '../../types/role';
+import { RoleData } from '../../types/role';
 import { Nullable } from '../../types/utils';
 import { DEFAULT_NUM_MONTHS_BEFORE_ROLE_START } from '../../utils/constants';
 import CompanyOption from '../CompanyOption';
