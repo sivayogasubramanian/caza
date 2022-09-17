@@ -1,6 +1,8 @@
-import { Form, DatePicker, Select } from 'antd';
+import { Form, DatePicker, Select, Col, Button } from 'antd';
+import Title from 'antd/lib/typography/Title';
 import { useState } from 'react';
 import useSWR from 'swr';
+import applicationsApi from '../../api/applicationsApi';
 import companiesApi, { COMPANIES_API_ENDPOINT } from '../../api/companiesApi';
 import rolesApi, { ROLES_API_ENDPOINT } from '../../api/rolesApi';
 import CompanyOption from '../../components/CompanyOption';
@@ -8,7 +10,14 @@ import CreateCompanyForm from '../../components/forms/CreateCompanyForm';
 import CreateRoleForm from '../../components/forms/CreateRoleForm';
 import { ApiResponse } from '../../types/apiResponse';
 import { CompanyAutocompleteOption, CompanyListData, CompanyQueryParams } from '../../types/company';
-import { RoleAutocompleteOption, RoleData, RoleListData, RoleQueryParams, RoleTypeToLabelMap } from '../../types/role';
+import {
+  RoleAutocompleteOption,
+  RoleData,
+  RoleListData,
+  RolePostData,
+  RoleQueryParams,
+  RoleTypeToLabelMap,
+} from '../../types/role';
 import { Nullable } from '../../types/utils';
 import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
@@ -92,8 +101,20 @@ function ApplicationCreate() {
     setSelectedRole(createdRole);
   };
 
+  const onSubmit = () => {
+    if (selectedRole === null) {
+      return;
+    }
+
+    applicationsApi.createApplication({
+      roleId: selectedRole.id,
+    });
+  };
+
   return (
-    <>
+    <div className="flex flex-col justify-center items-stretch min-h-screen p-8">
+      <Title className="text-center">Add Application</Title>
+
       <CreateCompanyForm
         isOpen={isCreateCompanyFormOpen}
         closeForm={() => setIsCreateCompanyFormOpen(false)}
@@ -107,7 +128,13 @@ function ApplicationCreate() {
         onCreate={onCreateRole}
       />
 
-      <Form labelCol={{ span: 6 }} wrapperCol={{ span: 12 }} className="p-8">
+      <Form
+        labelCol={{ span: 6 }}
+        wrapperCol={{ span: 12 }}
+        size="large"
+        className="flex flex-col p-8"
+        onFinish={onSubmit}
+      >
         <Form.Item label={'Company'}>
           <Select
             showSearch
@@ -133,8 +160,13 @@ function ApplicationCreate() {
         <Form.Item label={'Date Applied'}>
           <DatePicker />
         </Form.Item>
+        <Form.Item className="self-center">
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
       </Form>
-    </>
+    </div>
   );
 }
 

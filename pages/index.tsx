@@ -53,6 +53,7 @@ function Applications() {
     <div className="p-5">
       <Title>My Applications</Title>
 
+      {/* TODO: Move this to bottom navbar */}
       <Button type="primary" onClick={onClickAddApplication} className="mb-3">
         Add application
       </Button>
