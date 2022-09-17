@@ -1,4 +1,4 @@
-import { Form, DatePicker, Select, Button } from 'antd';
+import { Form, DatePicker, Select, Button, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -17,6 +17,8 @@ import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 import moment from 'moment';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
+import { HOMEPAGE_ROUTE } from '../../utils/constants';
+import { PlusCircleOutlined } from '@ant-design/icons';
 
 function ApplicationCreate() {
   const router = useRouter();
@@ -45,7 +47,16 @@ function ApplicationCreate() {
   }));
   const companyOptionsWithAdd: CompanyAutocompleteOption[] = [
     ...companyOptions,
-    { company: null, label: <div>Add new company</div>, value: 'Add new company' },
+    {
+      company: null,
+      label: (
+        <Space>
+          <PlusCircleOutlined />
+          Add new company
+        </Space>
+      ),
+      value: 'Add new company',
+    },
   ];
 
   const onSelectCompany = (company: Nullable<CompanyListData>) => {
@@ -119,7 +130,7 @@ function ApplicationCreate() {
         // TODO: applicationDate: values.applyDate.toISOString(),
       })
       .then(() => {
-        router.push('/applications');
+        router.push(HOMEPAGE_ROUTE);
       });
   };
 

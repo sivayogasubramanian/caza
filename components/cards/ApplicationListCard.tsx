@@ -33,7 +33,7 @@ function ApplicationListCard({ application }: Props) {
       onClick={() => router.push(`${APPLICATIONS_ROUTE}/${application.id}`)}
     >
       <div className="p-4 flex items-center">
-        <CompanyLogo companyUrl={application.role.company.companyUrl} className="rounded-full max-w-[3rem]" />
+        <CompanyLogo company={application.role.company} className="rounded-full max-w-[3rem]" />
 
         <div className="ml-5 w-[100%] flex flex-col gap-0.5">
           <div className="flex items-start justify-between">
