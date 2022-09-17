@@ -90,7 +90,14 @@ function Application() {
         </div>
       )}
 
-      {isAddingNewTask && <NewTaskModal setIsAddingNewTask={setIsAddingNewTask} />}
+      {isAddingNewTask && applicationId && (
+        <NewTaskModal
+          applicationId={applicationId}
+          setIsAddingNewTask={setIsAddingNewTask}
+          setShouldFetchData={setShouldFetchData}
+        />
+      )}
+
       {selectedTask && applicationId && (
         <EditTaskModal applicationId={applicationId} initialTask={selectedTask} setSelectedTask={setSelectedTask} />
       )}

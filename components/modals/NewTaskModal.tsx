@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import TaskForm from '../forms/TaskForm';
-import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData } from '../../types/task';
+import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData, TaskPostData } from '../../types/task';
 import moment from 'moment';
 import Modal from './Modal';
 import tasksApi from '../../api/tasksApi';
+import { getNotificationDateTime } from '../../utils/applicationStage/applicationStageUtils';
 
 interface Props {
+  applicationId: number;
   setIsAddingNewTask: React.Dispatch<React.SetStateAction<boolean>>;
+  setShouldFetchData: Dispatch<SetStateAction<boolean>>;
 }
 
-function NewTaskModal({ setIsAddingNewTask }: Props) {
+function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }: Props) {
   const defaultNotificationTime = moment('09:00:00', 'hh:mm:ss');
   const defaultNotificationDaysOffset = 1;
 
@@ -25,7 +28,19 @@ function NewTaskModal({ setIsAddingNewTask }: Props) {
   };
 
   const onSubmit = (values: TaskFormData) => {
-    // TODO
+    const notificationDateTime = getNotificationDateTime(values);
+
+    // Note: notificationDateTime can be null
+    const taskPostData: TaskPostData = {
+      title: values.title ?? 'Task',
+      dueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
+      notificationDateTime: notificationDateTime === undefined ? new Date().toISOString() : notificationDateTime,
+    };
+
+    tasksApi.createTask(applicationId, taskPostData).then(() => {
+      setShouldFetchData(true);
+      setIsAddingNewTask(false);
+    });
   };
 
   const formContent = () => (
