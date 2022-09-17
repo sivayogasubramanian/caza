@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import moment from 'moment';
 import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData } from '../../types/task';
 import { isValidDate } from '../../utils/date/validations';
@@ -13,9 +13,10 @@ interface Props {
   applicationId: number;
   initialTask: TaskData;
   setSelectedTask: React.Dispatch<React.SetStateAction<Nullable<TaskData>>>;
+  setShouldFetchData: Dispatch<SetStateAction<boolean>>;
 }
 
-function EditTaskModal({ applicationId, initialTask, setSelectedTask }: Props) {
+function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldFetchData }: Props) {
   const [task, setTask] = useState(initialTask);
   const [initialValues, setInitialValues] = useState<TaskFormData>({
     notificationDaysOffset: 1,
@@ -68,6 +69,8 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask }: Props) {
     tasksApi.editTask(applicationId, task.id, taskPatchData).then((value) => {
       const updatedTask = value.payload as TaskData;
       setTask(updatedTask);
+      setShouldFetchData(true);
+      setSelectedTask(null);
     });
   };
 

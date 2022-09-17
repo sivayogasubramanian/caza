@@ -99,7 +99,12 @@ function Application() {
       )}
 
       {selectedTask && applicationId && (
-        <EditTaskModal applicationId={applicationId} initialTask={selectedTask} setSelectedTask={setSelectedTask} />
+        <EditTaskModal
+          applicationId={applicationId}
+          initialTask={selectedTask}
+          setSelectedTask={setSelectedTask}
+          setShouldFetchData={setShouldFetchData}
+        />
       )}
 
       {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
