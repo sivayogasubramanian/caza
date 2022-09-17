@@ -26,7 +26,7 @@ export type ApplicationPostData = {
 export type ApplicationListData = {
   id: number;
   role: RoleApplicationListData;
-  latestStage: Nullable<ApplicationStageApplicationListData>;
+  latestStage?: ApplicationStageApplicationListData;
   taskNotificationCount: number;
 };
 
