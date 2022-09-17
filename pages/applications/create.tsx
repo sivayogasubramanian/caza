@@ -22,6 +22,7 @@ import {
 import { Nullable } from '../../types/utils';
 import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
+import moment from 'moment';
 
 function ApplicationCreate() {
   const router = useRouter();
@@ -34,6 +35,8 @@ function ApplicationCreate() {
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [] });
   const [selectedRole, setSelectedRole] = useState<Nullable<RoleData>>(null);
+
+  const [applicationDate, setApplicationDate] = useState<Nullable<moment.Moment>>(moment(new Date()));
 
   const { data: companiesData, mutate: mutateCompaniesData } = useSWR<ApiResponse<CompanyListData[]>>(
     [COMPANIES_API_ENDPOINT, companySearchParams],
@@ -105,13 +108,14 @@ function ApplicationCreate() {
   };
 
   const onSubmit = () => {
-    if (selectedRole === null) {
+    if (selectedRole === null || applicationDate === null) {
       return;
     }
 
     applicationsApi
       .createApplication({
         roleId: selectedRole.id,
+        // TODO: applicationDate: values.applyDate.toISOString(),
       })
       .then(() => {
         router.push('/applications');
@@ -164,8 +168,14 @@ function ApplicationCreate() {
             loading={!rolesData}
           />
         </Form.Item>
-        <Form.Item label={'Date Applied'}>
-          <DatePicker />
+        <Form.Item label="Date Applied" required>
+          <DatePicker
+            allowClear={false}
+            defaultValue={applicationDate ?? undefined}
+            onChange={(dateMoment) => {
+              setApplicationDate(dateMoment);
+            }}
+          />
         </Form.Item>
         <Form.Item className="self-center">
           <Button type="primary" htmlType="submit">

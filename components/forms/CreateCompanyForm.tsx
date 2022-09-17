@@ -27,11 +27,19 @@ function CreateCompanyForm({ isOpen, closeForm, onCreate }: Props) {
 
   return (
     <Modal title={'Add new company'} open={isOpen} onOk={onSubmit} onCancel={closeForm}>
-      <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-        <Form.Item name="name" label="Company name">
+      <Form form={form} labelCol={{ span: 7 }} wrapperCol={{ span: 17 }}>
+        <Form.Item
+          name="name"
+          label="Company name"
+          rules={[{ required: true, message: 'Please input the company name!' }]}
+        >
           <Input />
         </Form.Item>
-        <Form.Item name="companyUrl" label="Company URL">
+        <Form.Item
+          name="companyUrl"
+          label="Company website"
+          rules={[{ required: true, message: 'Please input the company website!' }]}
+        >
           <Input />
         </Form.Item>
       </Form>
