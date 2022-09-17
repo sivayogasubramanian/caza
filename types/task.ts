@@ -40,7 +40,7 @@ export type TaskFormData = {
   dueDate?: Moment;
   notificationTime?: Moment;
   notificationDateTime?: Moment;
-  notificationDaysOffset?: number;
+  notificationDaysOffset: number;
   notificationDateTimeType?: NotificationDateTimeType;
   notificationDate?: Moment;
   isDone?: boolean;

@@ -4,14 +4,15 @@ import { NotificationDateTimeType, TaskFormData } from '../../types/task';
 
 interface Props {
   initialValues: TaskFormData;
-  onCancel: () => void;
   shouldTouchAllCompulsoryFields: boolean;
   shouldAllowMarkDone: boolean;
+  onCancel: () => void;
+  onSubmit: (values: TaskFormData) => void;
 }
 
 const { Option } = Select;
 
-function TaskForm({ initialValues, onCancel, shouldTouchAllCompulsoryFields, shouldAllowMarkDone }: Props) {
+function TaskForm({ initialValues, shouldTouchAllCompulsoryFields, shouldAllowMarkDone, onCancel, onSubmit }: Props) {
   const [form] = Form.useForm();
 
   const [shouldShowNotificationTimePicker, setShouldShowNotificationTimePicker] = useState(false);
@@ -24,7 +25,11 @@ function TaskForm({ initialValues, onCancel, shouldTouchAllCompulsoryFields, sho
   }, [initialValues]);
 
   const onSelectNotificationDateTimeType = (value: NotificationDateTimeType) => {
-    setShouldShowNotificationTimePicker(value === NotificationDateTimeType.DAY_OF_EVENT);
+    setShouldShowNotificationTimePicker(
+      value === NotificationDateTimeType.DAY_OF_EVENT ||
+        value === NotificationDateTimeType.DAYS_BEFORE ||
+        value === NotificationDateTimeType.DAYS_AFTER,
+    );
     setShouldShowNotificationDaysInput(
       value === NotificationDateTimeType.DAYS_BEFORE || value === NotificationDateTimeType.DAYS_AFTER,
     );
@@ -50,7 +55,7 @@ function TaskForm({ initialValues, onCancel, shouldTouchAllCompulsoryFields, sho
   };
 
   return (
-    <Form form={form} initialValues={initialValues} className="mt-1 mb-1 ml-2 mr-2">
+    <Form form={form} initialValues={initialValues} onFinish={onSubmit} className="mt-1 mb-1 ml-2 mr-2">
       <Form.Item
         label="Task"
         name="title"
