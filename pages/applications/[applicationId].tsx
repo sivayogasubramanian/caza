@@ -79,7 +79,7 @@ function Application() {
         </div>
       )}
 
-      {hasValidApplicationId && hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
+      {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
         <Timeline className="m-4" reverse={true}>
           {timelineItems.map((item, index) => (
             <Timeline.Item key={index} dot={getTimelineIcon(item)}>
@@ -97,7 +97,7 @@ function Application() {
         </Timeline>
       )}
 
-      {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
+      {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
     </Spinner>
   );
 }
