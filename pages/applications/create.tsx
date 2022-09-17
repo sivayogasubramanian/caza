@@ -178,10 +178,17 @@ function ApplicationCreate() {
           label={'Role'}
           required
           validateStatus={shouldShowValidationErrors && !selectedRole ? 'error' : 'validating'}
-          help={shouldShowValidationErrors && !selectedRole ? 'Please select a role!' : ''}
+          help={
+            !selectedCompany
+              ? 'Please select a company first!'
+              : shouldShowValidationErrors && !selectedRole
+              ? 'Please select a role!'
+              : ''
+          }
         >
           <Select
             showSearch
+            disabled={!selectedCompany}
             options={roleOptionsWithAdd}
             onSelect={(value: string, { role }: RoleAutocompleteOption) => onSelectRole(role)}
             onSearch={onSearchRole}
