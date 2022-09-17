@@ -2,8 +2,10 @@ import { User } from 'firebase/auth';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, useEffect, useState } from 'react';
+import ApplicationListCard from '../components/cards/ApplicationListCard';
 import Header from '../components/header/Header';
 import AuthContext from '../context/AuthContext';
+import { testApplicationList } from '../utils/testData';
 
 const Home: NextPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -24,7 +26,9 @@ const Home: NextPage = () => {
       <main>
         <Header />
 
-        <h1 className="text-3xl italic text-rose-500 bg-amber-300 rounded-md p-2">
+        {/* TODO: Revert this */}
+
+        {/* <h1 className="text-3xl italic text-rose-500 bg-amber-300 rounded-md p-2">
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
@@ -37,7 +41,10 @@ const Home: NextPage = () => {
               jwt.io
             </a>
           </p>
-        </div>
+        </div> */}
+        {testApplicationList.map((application, index) => (
+          <ApplicationListCard key={index} application={application} />
+        ))}
       </main>
     </div>
   );
