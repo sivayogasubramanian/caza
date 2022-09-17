@@ -1,7 +1,8 @@
 import { ApplicationStageType, RoleType } from '@prisma/client';
-import { Col, Form, Row, Spin } from 'antd';
+import { Button, Col, Form, Row, Space, Spin, Table } from 'antd';
 import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
+import { useRouter } from 'next/router';
 import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
 import api from '../api/api';
@@ -14,6 +15,8 @@ import { ApplicationListData, ApplicationQueryParams } from '../types/applicatio
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
+  const router = useRouter();
+
   const [searchParams, setSearchParams] = useState<ApplicationQueryParams>({
     searchWords: [],
     roleTypeWords: [],
@@ -32,6 +35,11 @@ function Applications() {
     setSearchParams({ ...searchParams, stageTypeWords: stageTypes });
   };
 
+  const onClickAddApplication: React.MouseEventHandler<HTMLElement> = (e) => {
+    e.preventDefault();
+    router.push('/applications/create');
+  };
+
   const { data } = useSWR<ApiResponse<ApplicationListData[]>>(
     [APPLICATIONS_API_ENDPOINT, searchParams],
     (url, searchParams) => api.get(url, { params: searchParams }),
@@ -44,6 +52,10 @@ function Applications() {
   return (
     <div className="p-5">
       <Title>My Applications</Title>
+
+      <Button type="primary" onClick={onClickAddApplication} className="mb-3">
+        Add application
+      </Button>
 
       {/* Search and Filters */}
       <Form>
