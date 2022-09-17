@@ -3,7 +3,6 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useContext, useEffect, useState } from 'react';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
-import Header from '../components/header/Header';
 import AuthContext from '../context/AuthContext';
 import { testApplicationList } from '../utils/testData';
 
@@ -24,8 +23,6 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <Header />
-
         {/* TODO: Revert this */}
 
         {/* <h1 className="text-3xl italic text-rose-500 bg-amber-300 rounded-md p-2">

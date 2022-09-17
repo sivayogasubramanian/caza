@@ -1,18 +1,20 @@
+import { Timeline } from 'antd';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
+import applicationsApi from '../../api/applicationsApi';
+import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
+import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
+import TaskIcon from '../../components/icons/timeline/TaskIcon';
+import NotFound from '../../components/notFound/NotFound';
+import Spinner from '../../components/spinner/Spinner';
+import { ApplicationData } from '../../types/application';
 import { ApplicationStageApplicationData } from '../../types/applicationStage';
 import { TaskData } from '../../types/task';
 import { TimelineData, TimelineType } from '../../types/timeline';
-import { Timeline } from 'antd';
-import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
-import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
-import TaskIcon from '../../components/icons/timeline/TaskIcon';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
-import useSWR from 'swr';
-import { useRouter } from 'next/router';
-import { canBecomeInteger } from '../../utils/numbers/validations';
-import applicationsApi from '../../api/applicationsApi';
-import { ApplicationData } from '../../types/application';
-import { useEffect, useState } from 'react';
 import { isValidDate } from '../../utils/date/validations';
+import { canBecomeInteger } from '../../utils/numbers/validations';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -30,6 +32,10 @@ function Application() {
   const applicationId = canBecomeInteger(router.query.applicationId) ? Number(router.query.applicationId) : undefined;
   const hasValidApplicationId = applicationId !== undefined;
 
+  if (!hasValidApplicationId) {
+    return <NotFound message="The application id is invalid and cannot be found." />;
+  }
+
   const response = hasValidApplicationId
     ? useSWR([applicationId], applicationsApi.getApplication, { revalidateOnMount: true })
     : undefined;
@@ -43,6 +49,7 @@ function Application() {
       type: TimelineType.STAGE,
       data: stage,
     })) ?? [];
+
   const timelineApplicationTasks: TimelineData[] =
     application?.tasks.map((task) => ({
       date: isValidDate(task.dueDate) ? new Date(task.dueDate) : new Date(),
@@ -65,13 +72,15 @@ function Application() {
   }, [shouldFetchData]);
 
   return (
-    <>
-      {isLoading && <div>Loading...</div>}
-
-      {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && <div>Add your first stage or task!</div>}
+    <Spinner isLoading={isLoading}>
+      {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
+        <div className="mr-5 ml-5 flex justify-center text-center text-gray-300">
+          This application seems very empty. Add you first stage or task now!
+        </div>
+      )}
 
       {hasValidApplicationId && hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
-        <Timeline className="mt-4 mb-4 ml-4 mr-2" reverse={true}>
+        <Timeline className="m-4" reverse={true}>
           {timelineItems.map((item, index) => (
             <Timeline.Item key={index} dot={getTimelineIcon(item)}>
               {item.type === TimelineType.STAGE ? (
@@ -88,8 +97,8 @@ function Application() {
         </Timeline>
       )}
 
-      {!hasSuccessfullyFetchedApplication && !isLoading && <div>Not found</div>}
-    </>
+      {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
+    </Spinner>
   );
 }
 
