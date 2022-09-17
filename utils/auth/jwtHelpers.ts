@@ -100,6 +100,23 @@ export function withAuth<D extends Payload>(
   return withAuthUser((_, req, res) => handler(req, res));
 }
 
+/**
+ * Utility function that takes care of authenticating a verified user.
+ * The user's UID is not returned to the handler.
+ * Use withVerifiedUser instead if you need the UID.
+ *
+ * Only calls the provided handler if the user has been successfully authenticated and is verified. Returns a 401
+ * Unauthorized response if requirements are not met.
+ *
+ * @param handler Takes in an API handler function that needs a verified user.
+ * @returns NextApiHandler function.
+ */
+export function withVerified<D extends Payload>(
+  handler: (req: NextApiRequest, res: NextApiResponse<ApiResponse<D>>) => void,
+): NextApiHandler<ApiResponse<D>> {
+  return withVerifiedUser((_, req, res) => handler(req, res));
+}
+
 export async function getUserFromJwt(token: string): Promise<UserDetailsFromRequest> {
   // If you are running this in development mode, JWT token verification and decoding can be skipped.
   // Use bearer token 'devUserFoo' to get { uid: 'devUserFoo', isAnonymous: true }
