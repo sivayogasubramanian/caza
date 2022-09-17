@@ -4,10 +4,10 @@ import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData } from 
 import { isValidDate } from '../../utils/date/validations';
 import { calculateDaysOffset } from '../../utils/date/formatters';
 import { Nullable } from '../../types/utils';
-import Modal from './Modal';
 import TaskForm from '../forms/TaskForm';
 import tasksApi from '../../api/tasksApi';
 import { getNotificationDateTime } from '../../utils/applicationStage/applicationStageUtils';
+import { Modal } from 'antd';
 
 interface Props {
   applicationId: number;
@@ -21,6 +21,9 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
   const [initialValues, setInitialValues] = useState<TaskFormData>({
     notificationDaysOffset: 1,
   });
+  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
+  const [shouldSubmit, setShouldSubmit] = useState(false);
+  const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
 
   useEffect(() => {
     const taskDueDate = isValidDate(task.dueDate) ? new Date(task.dueDate) : undefined;
@@ -54,11 +57,21 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
     });
   }, [task]);
 
+  useEffect(() => {
+    if (taskFormData !== null) {
+      submit(taskFormData);
+    }
+  }, [taskFormData]);
+
   const onCancel = () => {
     setSelectedTask(null);
   };
 
-  const onSubmit = (values: TaskFormData) => {
+  const onSubmit = () => {
+    setShouldSubmit(true);
+  };
+
+  const submit = (values: TaskFormData) => {
     const taskPatchData: TaskPatchData = {
       title: values.title,
       dueDate: values.dueDate?.toISOString(),
@@ -66,25 +79,35 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
       isDone: values.isDone,
     };
 
-    tasksApi.editTask(applicationId, task.id, taskPatchData).then((value) => {
-      const updatedTask = value.payload as TaskData;
-      setTask(updatedTask);
-      setShouldFetchData(true);
-      setSelectedTask(null);
-    });
+    tasksApi
+      .editTask(applicationId, task.id, taskPatchData)
+      .then((value) => {
+        const updatedTask = value.payload as TaskData;
+        setTask(updatedTask);
+        setShouldFetchData(true);
+        setSelectedTask(null);
+      })
+      .finally(() => setShouldSubmit(false));
   };
 
-  const formContent = () => (
-    <TaskForm
-      initialValues={initialValues}
-      shouldTouchAllCompulsoryFields={false}
-      shouldAllowMarkDone={true}
+  return (
+    <Modal
+      open
+      title="Edit Task"
+      okButtonProps={{ disabled: shouldDisableSaveButton }}
       onCancel={onCancel}
-      onSubmit={onSubmit}
-    />
+      onOk={onSubmit}
+    >
+      <TaskForm
+        initialValues={initialValues}
+        shouldTouchAllCompulsoryFields={false}
+        shouldAllowMarkDone={true}
+        shouldSubmit={shouldSubmit}
+        setShouldDisableSaveButton={setShouldDisableSaveButton}
+        setTaskFormData={setTaskFormData}
+      />
+    </Modal>
   );
-
-  return <Modal title="Edit Task" content={formContent()} />;
 }
 
 export default EditTaskModal;
