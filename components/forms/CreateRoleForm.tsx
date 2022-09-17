@@ -1,45 +1,53 @@
-import { Form, InputNumber, Input, Button } from 'antd';
+import { Form, InputNumber, Input, Button, Modal } from 'antd';
 import rolesApi from '../../api/rolesApi';
-import { RolePostData } from '../../types/role';
+import { CompanyListData } from '../../types/company';
+import { RoleData, RolePostData } from '../../types/role';
+import { Nullable } from '../../types/utils';
+import CompanyOption from '../CompanyOption';
 import RoleTypesSelect from './RoleTypesSelect';
 
-function CreateRoleForm() {
+type Props = {
+  company: Nullable<CompanyListData>;
+
+  isOpen: boolean;
+  closeForm: () => void;
+  onCreate: (role: RoleData) => void;
+};
+
+function CreateRoleForm({ company, isOpen, closeForm, onCreate }: Props) {
   const [form] = Form.useForm();
 
-  const onSubmit = (values: RolePostData) => {
-    rolesApi
-      .createRole(values)
-      .then(() => {
+  const onSubmit = (companyId: number) => {
+    form.validateFields().then(({ title, type, year }) => {
+      rolesApi.createRole({ companyId, title, type, year }).then((resp) => {
         form.resetFields();
-        alert('Role created successfully!');
-      })
-      .catch((error) => alert(error)); // temporarily while we set up error displays
+        closeForm();
+        onCreate(resp.payload);
+      });
+    });
   };
 
+  if (company === null) {
+    return null;
+  }
+
   return (
-    <Form name="Create New Role" form={form} labelCol={{ span: 4 }} className="flex flex-col" onFinish={onSubmit}>
-      <Form.Item
-        label="Company ID"
-        name="companyId"
-        rules={[{ required: true, message: 'Please input the company ID!' }]}
-      >
-        <InputNumber />
-      </Form.Item>
-      <Form.Item label="Title" name="title" rules={[{ required: true, message: 'Please input a title!' }]}>
-        <Input />
-      </Form.Item>
-      <Form.Item label="Type" name="type" rules={[{ required: true }]}>
-        <RoleTypesSelect />
-      </Form.Item>
-      <Form.Item label="Year" name="year" rules={[{ required: true, message: 'Please input the year!' }]}>
-        <InputNumber />
-      </Form.Item>
-      <Form.Item className="self-center">
-        <Button type="primary" htmlType="submit" className="bg-black hover:bg-slate-600 ">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+    <Modal title={'Add new role'} open={isOpen} onOk={() => onSubmit(company.id)} onCancel={closeForm}>
+      <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+        <Form.Item label="Company" name="companyName">
+          <CompanyOption company={company} />
+        </Form.Item>
+        <Form.Item label="Title" name="title" rules={[{ required: true, message: 'Please input a title!' }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Type" name="type" rules={[{ required: true, message: 'Please select a role type!' }]}>
+          <RoleTypesSelect />
+        </Form.Item>
+        <Form.Item label="Year" name="year" rules={[{ required: true, message: 'Please input the year!' }]}>
+          <InputNumber />
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 }
 
