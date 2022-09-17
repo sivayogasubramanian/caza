@@ -1,6 +1,5 @@
 import { Timeline } from 'antd';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../api/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
@@ -13,9 +12,11 @@ import { ApplicationStageApplicationData } from '../../types/applicationStage';
 import { TaskData } from '../../types/task';
 import { TimelineData, TimelineType } from '../../types/timeline';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
+import React, { useEffect, useState } from 'react';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
 import EditTaskModal from '../../components/modals/EditTaskModal';
+import { Nullable } from '../../types/utils';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -64,6 +65,7 @@ function Application() {
   );
 
   const [shouldFetchData, setShouldFetchData] = useState(true);
+  const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
 
   useEffect(() => {
     if (shouldFetchData) {
@@ -71,6 +73,10 @@ function Application() {
       setShouldFetchData(false);
     }
   }, [shouldFetchData]);
+
+  const onClickTask = (taskData: TaskData) => {
+    setSelectedTask(taskData);
+  };
 
   return (
     <Spinner isLoading={isLoading}>
@@ -80,7 +86,7 @@ function Application() {
         </div>
       )}
 
-      <EditTaskModal />
+      {selectedTask && <EditTaskModal initialTask={selectedTask} setSelectedTask={setSelectedTask} />}
 
       {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
         <Timeline className="m-4" reverse={true}>
@@ -93,6 +99,7 @@ function Application() {
                   applicationId={applicationId}
                   task={item.data as TaskData}
                   setShouldFetchData={setShouldFetchData}
+                  onClick={() => onClickTask(item.data as TaskData)}
                 />
               )}
             </Timeline.Item>

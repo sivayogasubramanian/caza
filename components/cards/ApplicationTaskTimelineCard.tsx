@@ -5,15 +5,16 @@ import { Checkbox } from 'antd';
 import { isValidDate } from '../../utils/date/validations';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import tasksApi from '../../api/tasksApi';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, MouseEventHandler, SetStateAction } from 'react';
 
 interface Props {
   applicationId: number;
   task: TaskData;
   setShouldFetchData: Dispatch<SetStateAction<boolean>>;
+  onClick: MouseEventHandler<HTMLDivElement> | undefined;
 }
 
-function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData }: Props) {
+function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData, onClick }: Props) {
   const dueDate = isValidDate(task.dueDate) ? new Date(task.dueDate) : undefined;
 
   const notificationDateTime =

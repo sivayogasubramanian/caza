@@ -3,8 +3,7 @@ export function makeDisplayDate(date: Date) {
 }
 
 export function makeDisplayNotificationDatetime(notificationDatetime: Date, dueDate: Date) {
-  const differenceInTime = dueDate.getTime() - notificationDatetime.getTime();
-  const numberOfDaysBeforeDueDate = differenceInTime / (1000 * 3600 * 24);
+  const numberOfDaysBeforeDueDate = calculateDaysOffset(notificationDatetime, dueDate);
   const notificationTime = makeDisplayTime(notificationDatetime);
   const dayWord = Math.abs(numberOfDaysBeforeDueDate) === 1 ? 'day' : 'days';
 
@@ -22,6 +21,11 @@ export function makeDisplayNotificationDatetime(notificationDatetime: Date, dueD
 export function getCountOfDaysTillTodayFrom(date: Date): number {
   const differenceInTime = Date.now() - date.getTime();
   return Math.ceil(differenceInTime / (1000 * 3600 * 24));
+}
+
+export function calculateDaysOffset(currentDate: Date, referenceDate: Date) {
+  const differenceInTime = referenceDate.getTime() - currentDate.getTime();
+  return differenceInTime / (1000 * 3600 * 24);
 }
 
 // Formats the time portion in datetime into hh:mm AM/PM format
