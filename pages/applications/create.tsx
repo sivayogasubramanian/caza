@@ -11,11 +11,12 @@ import CreateCompanyForm from '../../components/forms/CreateCompanyForm';
 import CreateRoleForm from '../../components/forms/CreateRoleForm';
 import { ApiResponse } from '../../types/apiResponse';
 import { CompanyAutocompleteOption, CompanyListData, CompanyQueryParams } from '../../types/company';
-import { RoleAutocompleteOption, RoleData, RoleListData, RoleQueryParams, RoleTypeToLabelMap } from '../../types/role';
+import { RoleAutocompleteOption, RoleData, RoleListData, RoleQueryParams } from '../../types/role';
 import { Nullable } from '../../types/utils';
 import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 import moment from 'moment';
+import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
 
 function ApplicationCreate() {
   const router = useRouter();
@@ -80,7 +81,7 @@ function ApplicationCreate() {
   const roles = rolesData?.payload || [];
   const roleOptions: RoleAutocompleteOption[] = roles.map((role) => ({
     role,
-    value: `${role.title} [${role.year} ${RoleTypeToLabelMap[role.type]}]`,
+    value: `${role.title} [${role.year} ${roleTypeToDisplayStringMap.get(role.type)}]`,
   }));
   const roleOptionsWithAdd: RoleAutocompleteOption[] = [...roleOptions, { role: null, value: 'Add new role' }];
 
