@@ -105,7 +105,7 @@ function TaskForm({ initialValues, onCancel, shouldTouchAllCompulsoryFields, sho
       </Form.Item>
 
       {shouldAllowMarkDone && (
-        <Form.Item name="isDone">
+        <Form.Item name="isDone" valuePropName="checked">
           <Checkbox>Done</Checkbox>
         </Form.Item>
       )}
