@@ -87,13 +87,13 @@ function ApplicationCreate() {
   }));
   const roleOptionsWithAdd: RoleAutocompleteOption[] = [...roleOptions, { role: null, value: 'Add new role' }];
 
-  const onSelectRole = (value: string, { role }: RoleAutocompleteOption) => {
-    setRoleSearchParams({ ...roleSearchParams, searchWords: [] });
+  const onSelectRole = (role: Nullable<RoleData>) => {
     if (role === null && selectedCompany !== null) {
       setIsCreateRoleFormOpen(true);
     }
 
     setSelectedRole(role);
+    setRoleSearchParams({ ...roleSearchParams, searchWords: role ? [role.title] : [] });
   };
 
   const onSearchRole = (inputValue: string) => {
@@ -101,8 +101,9 @@ function ApplicationCreate() {
   };
 
   const onCreateRole = (createdRole: RoleData) => {
-    mutateRolesData();
-    setSelectedRole(createdRole);
+    mutateRolesData().then(() => {
+      onSelectRole(createdRole);
+    });
   };
 
   const onSubmit = () => {
@@ -171,7 +172,7 @@ function ApplicationCreate() {
           <Select
             showSearch
             options={roleOptionsWithAdd}
-            onSelect={onSelectRole}
+            onSelect={(value: string, { role }: RoleAutocompleteOption) => onSelectRole(role)}
             onSearch={onSearchRole}
             filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
             value={roleOptions.find((option) => option.role?.id === selectedRole?.id)?.value}
