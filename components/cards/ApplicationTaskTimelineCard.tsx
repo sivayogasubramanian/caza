@@ -1,6 +1,6 @@
 import { TaskData } from '../../types/task';
 import { makeDisplayDate, makeDisplayNotificationDatetime } from '../../utils/date/formatters';
-import NotificationBell from '../icons/notifiationBellIcon';
+import NotificationBell from '../icons/NotificationBellIcon';
 import { Checkbox } from 'antd';
 import { isValidDate } from '../../utils/date/validations';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
