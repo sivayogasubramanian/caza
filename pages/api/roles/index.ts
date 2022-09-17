@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
 import { Nullable } from '../../../types/utils';
-import { withAuth } from '../../../utils/auth/jwtHelpers';
+import { withAuth, withAuthUser } from '../../../utils/auth/jwtHelpers';
 import { MIN_YEAR } from '../../../utils/constants';
 import {
   convertQueryParamToStringArray,
@@ -61,29 +61,32 @@ const messages = Object.freeze({
   },
 });
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
 
   switch (method) {
     case HttpMethod.GET:
-      return handleGet(req, res);
+      return handleGet(userId, req, res);
     case HttpMethod.POST:
-      return handlePost(req, res);
+      return handlePost(userId, req, res);
     default:
       return rejectHttpMethod(res, method);
   }
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
   const queryParams: RoleQueryParams = parseGetQueryParams(req);
   const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
 
   const roles: RoleListData[] = await prisma.role.findMany({
     where: {
-      isVerified: true,
       companyId: queryParams.companyId,
-      AND: [{ OR: roleYearFilters }, { OR: roleTitleFilters }],
+      AND: [
+        { OR: [{ isVerified: true }, { contributorId: userId }] },
+        { OR: roleYearFilters },
+        { OR: roleTitleFilters },
+      ],
     },
     take: 5,
     select: {
@@ -99,7 +102,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<R
   res.status(HttpStatus.OK).json(createJsonResponse(roles));
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData>>) {
+async function handlePost(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleData>>) {
   const errorMessageType = validatePostRequest(req);
   if (errorMessageType !== null) {
     res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[errorMessageType]));
@@ -120,7 +123,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
   }
 
   const newRole: RoleData = await prisma.role.create({
-    data: rolePostData,
+    data: { ...rolePostData, contributorId: userId },
     select: { id: true, title: true, type: true, year: true },
   });
 
@@ -187,4 +190,4 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   return null;
 }
 
-export default withPrismaErrorHandling(withAuth(handler));
+export default withPrismaErrorHandling(withAuthUser(handler));
