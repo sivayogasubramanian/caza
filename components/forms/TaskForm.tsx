@@ -7,7 +7,7 @@ interface Props {
   initialValues: TaskFormData;
   shouldTouchAllCompulsoryFields: boolean;
   shouldAllowMarkDone: boolean;
-  shouldSubmit: boolean;
+  isSubmitting: boolean;
   setShouldDisableSaveButton: React.Dispatch<React.SetStateAction<boolean>>;
   setTaskFormData: React.Dispatch<React.SetStateAction<Nullable<TaskFormData>>>;
 }
@@ -18,7 +18,7 @@ function TaskForm({
   initialValues,
   shouldTouchAllCompulsoryFields,
   shouldAllowMarkDone,
-  shouldSubmit,
+  isSubmitting,
   setShouldDisableSaveButton,
   setTaskFormData,
 }: Props) {
@@ -34,10 +34,10 @@ function TaskForm({
   }, [initialValues]);
 
   useEffect(() => {
-    if (shouldSubmit) {
+    if (isSubmitting) {
       setTaskFormData(form.getFieldsValue());
     }
-  }, [shouldSubmit]);
+  }, [isSubmitting]);
 
   const onSelectNotificationDateTimeType = (value: NotificationDateTimeType) => {
     setShouldShowNotificationTimePicker(

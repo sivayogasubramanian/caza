@@ -65,6 +65,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
       open
       title="New Task"
       okButtonProps={{ disabled: shouldDisableSaveButton }}
+      okText="Create"
       onCancel={onCancel}
       onOk={onSubmit}
       maskClosable={false}
@@ -73,7 +74,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
         initialValues={initialValues}
         shouldTouchAllCompulsoryFields={true}
         shouldAllowMarkDone={false}
-        shouldSubmit={shouldSubmit}
+        isSubmitting={shouldSubmit}
         setShouldDisableSaveButton={setShouldDisableSaveButton}
         setTaskFormData={setTaskFormData}
       />

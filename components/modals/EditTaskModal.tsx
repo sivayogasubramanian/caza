@@ -7,7 +7,10 @@ import { Nullable } from '../../types/utils';
 import TaskForm from '../forms/TaskForm';
 import tasksApi from '../../api/tasksApi';
 import { getNotificationDateTime } from '../../utils/task/taskUtils';
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { confirm } = Modal;
 
 interface Props {
   applicationId: number;
@@ -22,7 +25,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
     notificationDaysOffset: 1,
   });
   const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
-  const [shouldSubmit, setShouldSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
 
   useEffect(() => {
@@ -58,7 +61,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
 
   useEffect(() => {
     if (taskFormData !== null) {
-      submit(taskFormData);
+      handleSubmit(taskFormData);
     }
   }, [taskFormData]);
 
@@ -67,10 +70,21 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
   };
 
   const onSubmit = () => {
-    setShouldSubmit(true);
+    setIsSubmitting(true);
   };
 
-  const submit = (values: TaskFormData) => {
+  const onDelete = () => {
+    confirm({
+      title: 'Are you sure about deleting this task?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'This action is irreversible',
+      onOk() {
+        handleDelete();
+      },
+    });
+  };
+
+  const handleSubmit = (values: TaskFormData) => {
     const taskPatchData: TaskPatchData = {
       title: values.title,
       dueDate: values.dueDate?.toISOString(),
@@ -86,23 +100,37 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
         setShouldFetchData(true);
         setSelectedTask(null);
       })
-      .finally(() => setShouldSubmit(false));
+      .finally(() => setIsSubmitting(false));
   };
+
+  const handleDelete = () =>
+    tasksApi.deleteTask(applicationId, task.id).then(() => {
+      setShouldFetchData(true);
+      setSelectedTask(null);
+    });
 
   return (
     <Modal
       open
       title="Edit Task"
-      okButtonProps={{ disabled: shouldDisableSaveButton }}
-      onCancel={onCancel}
-      onOk={onSubmit}
       maskClosable={false}
+      footer={[
+        <Button key="delete" danger onClick={onDelete}>
+          Delete
+        </Button>,
+        <Button key="cancel" onClick={onCancel}>
+          Cancel
+        </Button>,
+        <Button key="save" type="primary" loading={isSubmitting} onClick={onSubmit} disabled={shouldDisableSaveButton}>
+          Save
+        </Button>,
+      ]}
     >
       <TaskForm
         initialValues={initialValues}
         shouldTouchAllCompulsoryFields={false}
         shouldAllowMarkDone={true}
-        shouldSubmit={shouldSubmit}
+        isSubmitting={isSubmitting}
         setShouldDisableSaveButton={setShouldDisableSaveButton}
         setTaskFormData={setTaskFormData}
       />
