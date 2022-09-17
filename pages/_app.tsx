@@ -5,6 +5,7 @@ import useAnonymousLoginIfNeeded from '../hooks/useAnonymousLoginIfNeeded';
 import { AxiosInterceptor } from '../api/interceptor';
 import { SWRConfig } from 'swr';
 import api from '../api/api';
+import Header from '../components/header/Header';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const authContextValue = useAnonymousLoginIfNeeded();
@@ -16,7 +17,9 @@ function MyApp({ Component, pageProps }: AppProps) {
             fetcher: (url) => api.get(url),
           }}
         >
-          <Component {...pageProps} />
+          <Header>
+            <Component {...pageProps} />
+          </Header>
         </SWRConfig>
       </AxiosInterceptor>
     </AuthContext.Provider>
