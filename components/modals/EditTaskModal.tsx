@@ -97,6 +97,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
       okButtonProps={{ disabled: shouldDisableSaveButton }}
       onCancel={onCancel}
       onOk={onSubmit}
+      maskClosable={false}
     >
       <TaskForm
         initialValues={initialValues}

@@ -72,7 +72,7 @@ function TaskForm({
   const onFormFieldsChange = () => setShouldDisableSaveButton(shouldDisableSaveButton(form));
 
   return (
-    <Form form={form} initialValues={initialValues} onFieldsChange={onFormFieldsChange} className="mt-1 mb-1 ml-2 mr-2">
+    <Form form={form} initialValues={initialValues} onFieldsChange={onFormFieldsChange}>
       <Form.Item
         label="Task"
         name="title"
@@ -89,41 +89,39 @@ function TaskForm({
       </Form.Item>
 
       <Form.Item label="Notification date" name="notificationDateTime">
-        <div className="grid">
-          <div className="flex">
-            {shouldShowNotificationDaysInput && (
-              <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>
-                <InputNumber precision={0} min={0} max={400} />
-              </Form.Item>
-            )}
-
-            <Form.Item name="notificationDateTimeType">
-              <Select onSelect={onSelectNotificationDateTimeType}>
-                <Option value={NotificationDateTimeType.NONE}>None</Option>
-                <Option value={NotificationDateTimeType.DAY_OF_EVENT}>On day of event</Option>
-                <Option value={NotificationDateTimeType.DAYS_BEFORE}>Day(s) before</Option>
-                <Option value={NotificationDateTimeType.DAYS_AFTER}>Day(s) after</Option>
-                <Option value={NotificationDateTimeType.ON_SELECTED_DATE}>On selected date</Option>
-              </Select>
+        <div className="flex items-stretch">
+          {shouldShowNotificationDaysInput && (
+            <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>
+              <InputNumber precision={0} min={0} max={400} />
             </Form.Item>
-          </div>
-
-          {shouldShowNotificationDatePicker && (
-            <div className="flex justify-between">
-              <Form.Item
-                name="notificationDate"
-                style={{ width: '50%' }}
-                rules={[{ required: true, message: 'Please select a date.' }]}
-              >
-                <DatePicker style={{ width: '100%' }} />
-              </Form.Item>
-
-              {getTimePickerComponent({ width: '50%' })}
-            </div>
           )}
 
-          {shouldShowNotificationTimePicker && getTimePickerComponent()}
+          <Form.Item name="notificationDateTimeType" className="flex-grow">
+            <Select onSelect={onSelectNotificationDateTimeType}>
+              <Option value={NotificationDateTimeType.NONE}>None</Option>
+              <Option value={NotificationDateTimeType.DAY_OF_EVENT}>On day of event</Option>
+              <Option value={NotificationDateTimeType.DAYS_BEFORE}>Day(s) before</Option>
+              <Option value={NotificationDateTimeType.DAYS_AFTER}>Day(s) after</Option>
+              <Option value={NotificationDateTimeType.ON_SELECTED_DATE}>On selected date</Option>
+            </Select>
+          </Form.Item>
         </div>
+
+        {shouldShowNotificationDatePicker && (
+          <div className="flex justify-between">
+            <Form.Item
+              name="notificationDate"
+              style={{ width: '50%' }}
+              rules={[{ required: true, message: 'Please select a date.' }]}
+            >
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+
+            {getTimePickerComponent({ width: '50%' })}
+          </div>
+        )}
+
+        {shouldShowNotificationTimePicker && getTimePickerComponent()}
       </Form.Item>
 
       {shouldAllowMarkDone && (

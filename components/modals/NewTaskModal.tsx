@@ -67,6 +67,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
       okButtonProps={{ disabled: shouldDisableSaveButton }}
       onCancel={onCancel}
       onOk={onSubmit}
+      maskClosable={false}
     >
       <TaskForm
         initialValues={initialValues}
