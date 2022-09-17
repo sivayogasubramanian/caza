@@ -46,7 +46,7 @@ function Header() {
   };
 
   return (
-    <div className="pl-5 pr-5 pt-3 pb-3 flex justify-between items-center sticky top-0 bg-slate-100">
+    <div className="z-50 pl-5 pr-5 pt-3 pb-3 flex justify-between items-center sticky top-0 bg-slate-100">
       <img src={logo.src} width="175px" />
 
       {currentUser?.isAnonymous && (
