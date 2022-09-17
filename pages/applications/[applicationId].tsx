@@ -1,4 +1,4 @@
-import { Timeline } from 'antd';
+import { Affix, Button, Timeline } from 'antd';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import applicationsApi from '../../api/applicationsApi';
@@ -17,6 +17,7 @@ import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
 import EditTaskModal from '../../components/modals/EditTaskModal';
 import { Nullable } from '../../types/utils';
+import NewTaskModal from '../../components/modals/NewTaskModal';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -66,6 +67,7 @@ function Application() {
 
   const [shouldFetchData, setShouldFetchData] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
+  const [isAddingNewTask, setIsAddingNewTask] = useState(false);
 
   useEffect(() => {
     if (shouldFetchData) {
@@ -73,6 +75,8 @@ function Application() {
       setShouldFetchData(false);
     }
   }, [shouldFetchData]);
+
+  const onClickCreateNewTask = () => setIsAddingNewTask(true);
 
   const onClickTask = (taskData: TaskData) => {
     setSelectedTask(taskData);
@@ -86,6 +90,7 @@ function Application() {
         </div>
       )}
 
+      {isAddingNewTask && <NewTaskModal setIsAddingNewTask={setIsAddingNewTask} />}
       {selectedTask && <EditTaskModal initialTask={selectedTask} setSelectedTask={setSelectedTask} />}
 
       {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
@@ -108,6 +113,12 @@ function Application() {
       )}
 
       {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
+
+      <Affix offsetBottom={10}>
+        <Button type="primary" className="bg-blue-400" onClick={onClickCreateNewTask}>
+          Create new task
+        </Button>
+      </Affix>
     </Spinner>
   );
 }

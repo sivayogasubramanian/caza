@@ -53,18 +53,15 @@ function EditTaskModal({ initialTask, setSelectedTask }: Props) {
   };
 
   const formContent = () => (
-    <>
-      <div className="text-lg font-bold mt-1 mb-1 ml-2 mr-2">Edit Task</div>
-      <TaskForm
-        initialValues={initialValues}
-        onCancel={onCancel}
-        shouldTouchAllCompulsoryFields={false}
-        shouldAllowMarkDone={true}
-      />
-    </>
+    <TaskForm
+      initialValues={initialValues}
+      onCancel={onCancel}
+      shouldTouchAllCompulsoryFields={false}
+      shouldAllowMarkDone={true}
+    />
   );
 
-  return <Modal content={formContent()} />;
+  return <Modal title="Edit Task" content={formContent()} />;
 }
 
 export default EditTaskModal;
