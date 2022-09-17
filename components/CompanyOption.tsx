@@ -1,14 +1,10 @@
 import { Col, Row } from 'antd';
 import { CompanyData } from '../types/company';
-import { COMPANY_LOGO_API_URL } from '../utils/constants';
+import CompanyLogo from './company/CompanyLogo';
 
 type Props = {
   company: CompanyData;
 };
-
-function makeLogoUrl(companyUrl: string): string {
-  return `${COMPANY_LOGO_API_URL}/${companyUrl}?size=${25}`;
-}
 
 function CompanyOption({ company }: Props) {
   const { name, companyUrl } = company;
@@ -16,7 +12,7 @@ function CompanyOption({ company }: Props) {
   return (
     <Row gutter={18} align="middle">
       <Col>
-        <img src={makeLogoUrl(companyUrl)} />
+        <CompanyLogo companyUrl={companyUrl} />
       </Col>
       <Col>{name}</Col>
     </Row>
