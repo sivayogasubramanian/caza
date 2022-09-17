@@ -88,7 +88,7 @@ function TaskForm({
         <DatePicker style={{ width: '100%' }} />
       </Form.Item>
 
-      <Form.Item label="Notification date" name="notificationDateTime">
+      <Form.Item label="Notification date">
         <div className="flex items-stretch">
           {shouldShowNotificationDaysInput && (
             <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>

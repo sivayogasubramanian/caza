@@ -3,7 +3,7 @@ import TaskForm from '../forms/TaskForm';
 import { NotificationDateTimeType, TaskFormData, TaskPostData } from '../../types/task';
 import moment from 'moment';
 import tasksApi from '../../api/tasksApi';
-import { getNotificationDateTime } from '../../utils/applicationStage/applicationStageUtils';
+import { getNotificationDateTime } from '../../utils/task/taskUtils';
 import { Nullable } from '../../types/utils';
 import { Modal } from 'antd';
 
