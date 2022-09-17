@@ -48,8 +48,9 @@ function ApplicationCreate() {
     { company: null, label: <div>Add new company</div>, value: 'Add new company' },
   ];
 
-  const onSelectCompany = (value: string, { company }: CompanyAutocompleteOption) => {
+  const onSelectCompany = (company: Nullable<CompanyListData>) => {
     setSelectedCompany(company);
+    setCompanySearchParams({ companyNames: company ? [company.name] : [] });
 
     // Update role search params to filter for roles of the currently selected company
     setRoleSearchParams((prevState) => ({ ...prevState, companyId: company?.id ?? undefined }));
@@ -69,8 +70,9 @@ function ApplicationCreate() {
   };
 
   const onCreateCompany = (company: CompanyListData) => {
-    mutateCompaniesData();
-    setSelectedCompany(company);
+    mutateCompaniesData().then(() => {
+      onSelectCompany(company);
+    });
   };
 
   const { data: rolesData, mutate: mutateRolesData } = useSWR<ApiResponse<RoleListData[]>>(
@@ -86,6 +88,7 @@ function ApplicationCreate() {
   const roleOptionsWithAdd: RoleAutocompleteOption[] = [...roleOptions, { role: null, value: 'Add new role' }];
 
   const onSelectRole = (value: string, { role }: RoleAutocompleteOption) => {
+    setRoleSearchParams({ ...roleSearchParams, searchWords: [] });
     if (role === null && selectedCompany !== null) {
       setIsCreateRoleFormOpen(true);
     }
@@ -152,7 +155,7 @@ function ApplicationCreate() {
           <Select
             showSearch
             options={companyOptionsWithAdd}
-            onSelect={onSelectCompany}
+            onSelect={(value: string, { company }: CompanyAutocompleteOption) => onSelectCompany(company)}
             onSearch={onSearchCompany}
             filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
             value={companyOptions.find((option) => option.company?.id === selectedCompany?.id)?.value}
