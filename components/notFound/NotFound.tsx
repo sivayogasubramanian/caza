@@ -9,7 +9,7 @@ function NotFound({ message }: Props) {
     <div className="flex flex-col justify-center items-center mt-10">
       <RandomKawaii size={100} />
 
-      {message && <p className="text-gray-400">{message}</p>}
+      {message && <p className="mt-1 text-gray-400">{message}</p>}
     </div>
   );
 }
