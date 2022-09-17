@@ -50,6 +50,10 @@ function ApplicationCreate() {
     }
   };
 
+  const onSearchCompany = (inputValue: string) => {
+    setCompanySearchParams({ companyNames: splitByWhitespaces(inputValue) });
+  };
+
   const { data: rolesData } = useSWR<ApiResponse<RoleListData[]>>(
     [ROLES_API_ENDPOINT, roleSearchParams],
     (url: string, roleSearchParams: RoleQueryParams) =>
@@ -71,6 +75,10 @@ function ApplicationCreate() {
     setSelectedRoleId(roleId);
   };
 
+  const onSearchRole = (inputValue: string) => {
+    setRoleSearchParams((prevState) => ({ ...prevState, searchWords: splitByWhitespaces(inputValue) }));
+  };
+
   return (
     <Form labelCol={{ span: 6 }} wrapperCol={{ span: 12 }} className="p-8">
       <Form.Item label={'Company'}>
@@ -78,7 +86,8 @@ function ApplicationCreate() {
           showSearch
           options={companyOptionsWithAdd}
           onSelect={onSelectCompany}
-          onSearch={(value) => setCompanySearchParams({ companyNames: splitByWhitespaces(value) })}
+          onSearch={onSearchCompany}
+          filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
           value={companyOptions.find((option) => option.companyId === selectedCompanyId)?.value}
           loading={!companiesData}
         />
@@ -88,6 +97,8 @@ function ApplicationCreate() {
           showSearch
           options={roleOptionsWithAdd}
           onSelect={onSelectRole}
+          onSearch={onSearchRole}
+          filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
           value={roleOptions.find((option) => option.roleId === selectedRoleId)?.value}
           loading={!rolesData}
         />
