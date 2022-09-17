@@ -4,7 +4,12 @@ import React from 'react';
 import { stageTypeToDisplayStringMap } from '../../../utils/applicationStage/applicationStageUtils';
 
 function OnlineAssessmentBadge() {
-  return <Badge count={stageTypeToDisplayStringMap.get(ApplicationStageType.ONLINE_ASSESSMENT)} />;
+  return (
+    <Badge
+      style={{ backgroundColor: '#ACF8FF', color: '#000000' }}
+      count={stageTypeToDisplayStringMap.get(ApplicationStageType.ONLINE_ASSESSMENT)}
+    />
+  );
 }
 
 export default OnlineAssessmentBadge;
