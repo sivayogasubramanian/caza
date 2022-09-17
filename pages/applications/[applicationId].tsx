@@ -86,7 +86,7 @@ function Application() {
     <Spinner isLoading={isLoading}>
       {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
         <div className="mr-5 ml-5 flex justify-center text-center text-gray-300">
-          This application seems very empty. Add you first stage or task now!
+          This application seems very empty. Add your first stage or task now!
         </div>
       )}
 
