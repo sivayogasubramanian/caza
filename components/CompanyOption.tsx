@@ -12,7 +12,7 @@ function CompanyOption({ company }: Props) {
   return (
     <Row gutter={18} align="middle">
       <Col>
-        <CompanyLogo companyUrl={companyUrl} />
+        <CompanyLogo company={company} className="rounded-full w-8" />
       </Col>
       <Col>{name}</Col>
     </Row>

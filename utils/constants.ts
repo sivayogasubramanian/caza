@@ -4,7 +4,7 @@ export const MIN_YEAR = 1970;
 export const MIN_DATE = new Date(-8640000000000000);
 
 export const COMPANY_LOGO_API_URL = 'https://logo.clearbit.com/';
-export const DEFAULT_LOGO_SIZE = 25;
+export const DEFAULT_LOGO_SIZE = 40;
 
 /**
  * Default number of months before the start of role.
@@ -15,4 +15,6 @@ export const DEFAULT_LOGO_SIZE = 25;
 export const DEFAULT_NUM_MONTHS_BEFORE_ROLE_START = 6;
 
 // Routes
+export const HOMEPAGE_ROUTE = '/';
 export const APPLICATIONS_ROUTE = '/applications';
+export const CREATE_APPLICATION_ROUTE = APPLICATIONS_ROUTE + '/create';

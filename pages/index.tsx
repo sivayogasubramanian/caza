@@ -12,6 +12,7 @@ import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
+import { CREATE_APPLICATION_ROUTE } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
@@ -37,7 +38,7 @@ function Applications() {
 
   const onClickAddApplication: React.MouseEventHandler<HTMLElement> = (e) => {
     e.preventDefault();
-    router.push('/applications/create');
+    router.push(CREATE_APPLICATION_ROUTE);
   };
 
   const { data } = useSWR<ApiResponse<ApplicationListData[]>>(
