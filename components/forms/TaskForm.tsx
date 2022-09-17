@@ -92,7 +92,7 @@ function TaskForm({
         <div className="flex items-stretch">
           {shouldShowNotificationDaysInput && (
             <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>
-              <InputNumber precision={0} min={0} max={400} />
+              <InputNumber precision={0} />
             </Form.Item>
           )}
 
