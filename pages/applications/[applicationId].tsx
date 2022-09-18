@@ -68,12 +68,6 @@ function Application() {
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
   const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
 
-  const onClickCreateNewTask = () => setIsAddingNewTask(true);
-
-  const onClickTask = (taskData: TaskData) => {
-    setSelectedTask(taskData);
-  };
-
   return (
     <Spinner isLoading={isLoading}>
       {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
@@ -82,7 +76,7 @@ function Application() {
         </div>
       )}
 
-      {isAddingNewTask && applicationId && (
+      {isAddingNewTask && (
         <NewTaskModal
           applicationId={applicationId}
           setIsAddingNewTask={setIsAddingNewTask}
@@ -90,7 +84,7 @@ function Application() {
         />
       )}
 
-      {selectedTask && applicationId && (
+      {selectedTask && (
         <EditTaskModal
           applicationId={applicationId}
           initialTask={selectedTask}
@@ -110,7 +104,7 @@ function Application() {
                   applicationId={applicationId}
                   task={item.data as TaskData}
                   mutateApplicationData={mutateApplicationData}
-                  onClick={() => onClickTask(item.data as TaskData)}
+                  onClick={() => setSelectedTask(item.data as TaskData)}
                 />
               )}
             </Timeline.Item>
@@ -121,7 +115,7 @@ function Application() {
       {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
 
       <Affix offsetBottom={10}>
-        <Button type="primary" className="bg-blue-400" onClick={onClickCreateNewTask}>
+        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
           Create new task
         </Button>
       </Affix>
