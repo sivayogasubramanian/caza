@@ -9,14 +9,17 @@ import {
 } from '../../utils/task/taskUtils';
 import { Nullable } from '../../types/utils';
 import { Modal } from 'antd';
+import { KeyedMutator } from 'swr';
+import { ApiResponse } from '../../types/apiResponse';
+import { ApplicationData } from '../../types/application';
 
 interface Props {
   applicationId: number;
   setIsAddingNewTask: Dispatch<SetStateAction<boolean>>;
-  setShouldFetchData: Dispatch<SetStateAction<boolean>>;
+  mutateApplicationData: KeyedMutator<ApiResponse<ApplicationData>>;
 }
 
-function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }: Props) {
+function NewTaskModal({ applicationId, setIsAddingNewTask, mutateApplicationData }: Props) {
   const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
@@ -46,7 +49,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
     tasksApi
       .createTask(applicationId, taskPostData)
       .then(() => {
-        setShouldFetchData(true);
+        mutateApplicationData();
         setIsAddingNewTask(false);
       })
       .finally(() => setIsSubmitting(false));

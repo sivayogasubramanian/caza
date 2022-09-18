@@ -12,7 +12,7 @@ import { ApplicationStageApplicationData } from '../../types/applicationStage';
 import { TaskData } from '../../types/task';
 import { TimelineData, TimelineType } from '../../types/timeline';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
 import EditTaskModal from '../../components/modals/EditTaskModal';
@@ -39,12 +39,12 @@ function Application() {
     return <NotFound message="The application id is invalid and cannot be found." />;
   }
 
-  const response = hasValidApplicationId
-    ? useSWR([applicationId], applicationsApi.getApplication, { revalidateOnMount: true })
-    : undefined;
-  const isLoading = response?.data === undefined;
-  const hasSuccessfullyFetchedApplication = response?.data?.payload?.id !== undefined;
-  const application = response?.data?.payload as ApplicationData;
+  const { data, mutate: mutateApplicationData } = useSWR([applicationId], applicationsApi.getApplication, {
+    revalidateOnMount: true,
+  });
+  const isLoading = data === undefined;
+  const hasSuccessfullyFetchedApplication = data?.payload?.id !== undefined;
+  const application = data?.payload as ApplicationData;
 
   const timelineApplicationStages: TimelineData[] =
     application?.applicationStages.map((stage) => ({
@@ -65,16 +65,8 @@ function Application() {
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
   );
 
-  const [shouldFetchData, setShouldFetchData] = useState<boolean>(true);
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
   const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (shouldFetchData) {
-      response?.mutate();
-      setShouldFetchData(false);
-    }
-  }, [shouldFetchData]);
 
   const onClickCreateNewTask = () => setIsAddingNewTask(true);
 
@@ -94,7 +86,7 @@ function Application() {
         <NewTaskModal
           applicationId={applicationId}
           setIsAddingNewTask={setIsAddingNewTask}
-          setShouldFetchData={setShouldFetchData}
+          mutateApplicationData={mutateApplicationData}
         />
       )}
 
@@ -103,7 +95,7 @@ function Application() {
           applicationId={applicationId}
           initialTask={selectedTask}
           setSelectedTask={setSelectedTask}
-          setShouldFetchData={setShouldFetchData}
+          mutateApplicationData={mutateApplicationData}
         />
       )}
 
@@ -117,7 +109,7 @@ function Application() {
                 <ApplicationTaskTimelineCard
                   applicationId={applicationId}
                   task={item.data as TaskData}
-                  setShouldFetchData={setShouldFetchData}
+                  mutateApplicationData={mutateApplicationData}
                   onClick={() => onClickTask(item.data as TaskData)}
                 />
               )}

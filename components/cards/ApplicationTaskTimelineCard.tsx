@@ -5,16 +5,18 @@ import { Checkbox } from 'antd';
 import { isValidDate } from '../../utils/date/validations';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import tasksApi from '../../api/tasksApi';
-import { Dispatch, SetStateAction } from 'react';
+import { KeyedMutator } from 'swr';
+import { ApplicationData } from '../../types/application';
+import { ApiResponse } from '../../types/apiResponse';
 
 interface Props {
   applicationId: number;
   task: TaskData;
-  setShouldFetchData: Dispatch<SetStateAction<boolean>>;
+  mutateApplicationData: KeyedMutator<ApiResponse<ApplicationData>>;
   onClick?: () => void;
 }
 
-function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData, onClick }: Props) {
+function ApplicationTaskTimelineCard({ applicationId, task, mutateApplicationData, onClick }: Props) {
   const dueDate = isValidDate(task.dueDate) ? new Date(task.dueDate) : undefined;
 
   const notificationDateTime =
@@ -23,7 +25,7 @@ function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData, 
       : undefined;
 
   const onToggleCheckbox = (e: CheckboxChangeEvent) => {
-    tasksApi.editTask(applicationId, task.id, { isDone: e.target.checked }).then(() => setShouldFetchData(true));
+    tasksApi.editTask(applicationId, task.id, { isDone: e.target.checked }).then(() => mutateApplicationData());
   };
 
   return (

@@ -13,16 +13,19 @@ import {
 } from '../../utils/task/taskUtils';
 import { Button, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { KeyedMutator } from 'swr';
+import { ApiResponse } from '../../types/apiResponse';
+import { ApplicationData } from '../../types/application';
 
 interface Props {
   applicationId: number;
   initialTask: TaskData;
   setSelectedTask: Dispatch<SetStateAction<Nullable<TaskData>>>;
-  setShouldFetchData: Dispatch<SetStateAction<boolean>>;
+  mutateApplicationData: KeyedMutator<ApiResponse<ApplicationData>>;
 }
 
-function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldFetchData }: Props) {
-  const [task, setTask] = useState<TaskData>(initialTask);
+function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateApplicationData }: Props) {
+  const [task] = useState<TaskData>(initialTask);
   const [initialValues, setInitialValues] = useState<TaskFormData>({
     notificationDaysOffset: DEFAULT_NOTIFICATION_DAYS_OFFSET,
   });
@@ -88,10 +91,8 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
 
     tasksApi
       .editTask(applicationId, task.id, taskPatchData)
-      .then((value) => {
-        const updatedTask = value.payload as TaskData;
-        setTask(updatedTask);
-        setShouldFetchData(true);
+      .then(() => {
+        mutateApplicationData();
         setSelectedTask(null);
       })
       .finally(() => setIsSubmitting(false));
@@ -99,7 +100,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
 
   const handleDelete = () =>
     tasksApi.deleteTask(applicationId, task.id).then(() => {
-      setShouldFetchData(true);
+      mutateApplicationData();
       setSelectedTask(null);
     });
 
