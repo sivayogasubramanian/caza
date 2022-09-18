@@ -42,3 +42,23 @@ export type RoleAutocompleteOption = {
   label?: JSX.Element;
   value: string;
 };
+
+export interface WorldRoleStatsQueryParam {
+  roleId: number;
+}
+
+export type RoleSankeyNodeId = string;
+
+export type RoleSankeyEdgeData = {
+  source: RoleSankeyNodeId;
+  dest: RoleSankeyNodeId;
+  userCount: number;
+  totalNumHours: number;
+};
+
+export type WorldRoleStatsData = {
+  role: RoleApplicationListData;
+  numberOfApplications: number;
+  nodes: RoleSankeyNodeId[];
+  edges: RoleSankeyEdgeData[];
+};
