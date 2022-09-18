@@ -127,6 +127,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
         initialValues={initialValues}
         shouldShowMarkDone={true}
         isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
         setTaskFormData={setTaskFormData}
       />
     </Modal>

@@ -9,10 +9,11 @@ import { ApplicationStageFormData } from '../../types/applicationStage';
 interface Props {
   initialValues: ApplicationStageFormData;
   isSubmitting: boolean;
+  setIsSubmitting: Dispatch<SetStateAction<boolean>>;
   setStageFormData: Dispatch<SetStateAction<Nullable<ApplicationStageFormData>>>;
 }
 
-function StageForm({ initialValues, isSubmitting, setStageFormData }: Props) {
+function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormData }: Props) {
   const [form] = Form.useForm();
 
   const [shouldShowEmojiPicker, setShouldShowEmojiPicker] = useState<boolean>(false);
@@ -35,7 +36,8 @@ function StageForm({ initialValues, isSubmitting, setStageFormData }: Props) {
     if (isSubmitting) {
       form
         .validateFields()
-        .then(() => setStageFormData({ ...form.getFieldsValue(), emojiUnicodeHex: selectedEmojiUnicode }));
+        .then(() => setStageFormData({ ...form.getFieldsValue(), emojiUnicodeHex: selectedEmojiUnicode }))
+        .catch(() => setIsSubmitting(false));
     }
   }, [isSubmitting]);
 

@@ -1,4 +1,4 @@
-import { Affix, Button, Timeline } from 'antd';
+import { Button, Timeline } from 'antd';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import applicationsApi from '../../api/applicationsApi';
@@ -19,6 +19,7 @@ import EditTaskModal from '../../components/modals/EditTaskModal';
 import { Nullable } from '../../types/utils';
 import NewTaskModal from '../../components/modals/NewTaskModal';
 import EditStageModal from '../../components/modals/EditStageModal';
+import NewStageModal from '../../components/modals/NewStageModal';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -66,9 +67,10 @@ function Application() {
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
   );
 
+  const [isAddingNewStage, setIsAddingNewStage] = useState<boolean>(false);
   const [selectedStage, setSelectedStage] = useState<Nullable<ApplicationStageApplicationData>>(null);
-  const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
   const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
+  const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
 
   return (
     <Spinner isLoading={isLoading}>
@@ -76,6 +78,14 @@ function Application() {
         <div className="mr-5 ml-5 flex justify-center text-center text-gray-300">
           This application seems very empty. Add your first stage or task now!
         </div>
+      )}
+
+      {isAddingNewStage && (
+        <NewStageModal
+          applicationId={applicationId}
+          setIsAddingNewStage={setIsAddingNewStage}
+          mutateApplicationData={mutateApplicationData}
+        />
       )}
 
       {selectedStage && (
@@ -128,11 +138,13 @@ function Application() {
 
       {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
 
-      <Affix offsetBottom={10}>
-        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
-          Create new task
-        </Button>
-      </Affix>
+      <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewStage(true)}>
+        Create new stage
+      </Button>
+
+      <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
+        Create new task
+      </Button>
     </Spinner>
   );
 }
