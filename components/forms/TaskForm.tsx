@@ -1,5 +1,5 @@
 import { Checkbox, DatePicker, Form, FormInstance, Input, InputNumber, Select, TimePicker } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { NotificationDateTimeType, TaskFormData } from '../../types/task';
 import { Nullable } from '../../types/utils';
 
@@ -8,8 +8,13 @@ interface Props {
   shouldTouchAllCompulsoryFields: boolean;
   shouldShowMarkDone: boolean;
   isSubmitting: boolean;
-  setShouldDisableSaveButton: React.Dispatch<React.SetStateAction<boolean>>;
-  setTaskFormData: React.Dispatch<React.SetStateAction<Nullable<TaskFormData>>>;
+  setShouldDisableSaveButton: Dispatch<SetStateAction<boolean>>;
+  setTaskFormData: Dispatch<SetStateAction<Nullable<TaskFormData>>>;
+}
+
+interface TaskFormTimePickerProps {
+  isOpen: boolean;
+  givenStyle?: CSSProperties;
 }
 
 const { Option } = Select;
@@ -50,16 +55,6 @@ function TaskForm({
     );
     setShouldShowNotificationDateTimePicker(value === NotificationDateTimeType.ON_SELECTED_DATE);
   };
-
-  const getTimePickerComponent = (givenStyle?: React.CSSProperties) => (
-    <Form.Item
-      name="notificationTime"
-      style={givenStyle && givenStyle}
-      rules={[{ required: true, message: 'Please select a time.' }]}
-    >
-      <TimePicker style={{ width: '100%' }} />
-    </Form.Item>
-  );
 
   const shouldDisableSaveButton = (form: FormInstance) => {
     const formHasSomeUntouchedField = shouldTouchAllCompulsoryFields
@@ -117,11 +112,11 @@ function TaskForm({
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
 
-            {getTimePickerComponent({ width: '50%' })}
+            <TaskFormTimePicker isOpen givenStyle={{ width: '50%' }} />
           </div>
         )}
 
-        {shouldShowNotificationTimePicker && getTimePickerComponent()}
+        <TaskFormTimePicker isOpen={shouldShowNotificationTimePicker} givenStyle={{ width: '50%' }} />
       </Form.Item>
 
       {shouldShowMarkDone && (
@@ -131,6 +126,19 @@ function TaskForm({
       )}
     </Form>
   );
+}
+
+function TaskFormTimePicker({ isOpen, givenStyle }: TaskFormTimePickerProps) {
+  return isOpen ? (
+    <Form.Item
+      name="notificationTime"
+      style={givenStyle && givenStyle}
+      rules={[{ required: true, message: 'Please select a time.' }]}
+      className="flex-grow"
+    >
+      <TimePicker />
+    </Form.Item>
+  ) : null;
 }
 
 export default TaskForm;
