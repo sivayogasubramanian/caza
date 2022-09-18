@@ -22,9 +22,11 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
     );
   }
 
-  const sankeyData = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
-    (data as unknown as WorldRoleStatsData).edges.map((e) => {
-      return [e.source, e.dest, e.userCount];
+  const sankeyData = [
+    ['FROM', 'TO', 'WEIGHT', { role: 'tooltip', type: 'string', p: { html: true } }] as unknown[],
+  ].concat(
+    (data as unknown as WorldRoleStatsData).edges.map((e, index) => {
+      return [e.source, e.dest, e.userCount, createTooltip(data, index)];
     }),
   );
 
@@ -54,7 +56,6 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
     <div className="w-full h-40 p-8">
       <RoleCard role={data.role} />
       <Chart chartType="Sankey" data={sankeyData} options={option} chartEvents={chartEvents} />
-      <MouseOverOverlay data={data} edgeIndex={edgeIndex} />
     </div>
   );
 };
@@ -76,21 +77,16 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
   );
 };
 
-type MouseOverOverlayProps = { data: WorldRoleStatsData; edgeIndex: number; nodeTitle?: string };
-
-const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
-  if (edgeIndex < 0) {
-    return <div className="text-lg">Nothing in focus.</div>;
-  }
+function createTooltip(data: WorldRoleStatsData, edgeIndex: number): JSX.Element {
   const targetEdge = data.edges[edgeIndex];
   const { source, dest, totalNumHours, userCount } = targetEdge;
   return (
-    <div className="text-lg">
-      Labels WIP: {source} to {dest}:<br /> based on {userCount} experience{userCount > 1 ? 's' : ''}, on average this
-      stage took {Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+    <div className="text-lg rotate-0 md:rotate-270">
+      {source} to {dest}:<br /> {userCount} user{userCount > 1 ? 's' : ''}
+      took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
     </div>
   );
-};
+}
 
 type SankeyMouseEvent = { row: number; name?: string };
 
