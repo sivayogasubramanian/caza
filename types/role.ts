@@ -32,4 +32,5 @@ export type WorldRoleListData = RoleData & {
 export type WorldRoleQueryParams = {
   searchWords: string[];
   roleTypeWords: RoleType[];
+  shouldFilterForCurrentUserApplications: boolean;
 };

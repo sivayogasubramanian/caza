@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse } from '../../../../types/apiResponse';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../../../types/role';
 import { getNonEmptyArrayOrUndefined, combineDefinedArrays, buildFrequencyMap } from '../../../../utils/arrays';
-import { withVerified } from '../../../../utils/auth/jwtHelpers';
+import { withVerifiedUser } from '../../../../utils/auth/jwtHelpers';
 import {
   makeCompanyNameFilters,
   makeRoleTitleFilters,
@@ -22,19 +22,18 @@ import { splitByWhitespaces, splitByCommaRemovingWhitespacesAround } from '../..
 
 const prisma = new PrismaClient();
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   switch (method) {
     case HttpMethod.GET:
-      return handleGet(req, res);
+      return handleGet(userId, req, res);
     default:
       return rejectHttpMethod(res, method);
   }
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleListData[]>>) {
-  const { searchWords, roleTypeWords } = parseGetQueryParams(req);
-
+async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleListData[]>>) {
+  const { searchWords, roleTypeWords, shouldFilterForCurrentUserApplications } = parseGetQueryParams(req);
   const companyNameFilters = makeCompanyNameFilters(searchWords);
   const roleTitleFilters = makeRoleTitleFilters(searchWords);
   const roleYearFilters = makeRoleYearFilters(searchWords);
@@ -48,6 +47,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<W
     where: {
       AND: [{ OR: roleTypeFilters }, { OR: roleTitleOrCompanyFilters }, { OR: roleYearFilters }],
       isVerified: true,
+      applications: shouldFilterForCurrentUserApplications ? { some: { userId } } : undefined,
     },
     select: {
       id: true,
@@ -91,15 +91,19 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<W
 }
 
 function parseGetQueryParams(req: NextApiRequest): WorldRoleQueryParams {
-  const { searchWords, roleTypes } = req.query;
+  const { searchWords, roleTypeWords, shouldFilterForCurrentUserApplications } = req.query;
 
   const searchWordsArr = convertQueryParamToStringArray(searchWords, splitByWhitespaces);
-  const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypes, splitByCommaRemovingWhitespacesAround);
+  const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypeWords, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
-  const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
+  const roleTypeWordsArr: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
 
-  return { searchWords: searchWordsArr, roleTypeWords };
+  return {
+    searchWords: searchWordsArr,
+    roleTypeWords: roleTypeWordsArr,
+    shouldFilterForCurrentUserApplications: shouldFilterForCurrentUserApplications === 'true',
+  };
 }
 
-export default withPrismaErrorHandling(withVerified(handler));
+export default withPrismaErrorHandling(withVerifiedUser(handler));
