@@ -1,4 +1,4 @@
-import { PrismaClient, RoleType } from '@prisma/client';
+import { PrismaClient, Role, RoleContribution, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../../types/apiResponse';
 import { RoleData, RoleListData, RolePostData, RoleQueryParams } from '../../../types/role';
@@ -34,6 +34,7 @@ enum MessageType {
   ROLE_YEAR_NAN,
   ROLE_YEAR_TOO_SMALL,
   ROLE_CREATED_SUCCESSFULLY,
+  ROLE_ALREADY_EXISTS,
 }
 
 const messages = Object.freeze({
@@ -41,7 +42,7 @@ const messages = Object.freeze({
   [MessageType.INVALID_COMPANY_ID]: { type: StatusMessageType.ERROR, message: 'Company id must be a number.' },
   [MessageType.COMPANY_DOES_NOT_EXIST]: {
     type: StatusMessageType.ERROR,
-    message: 'The company for this role does not exists.',
+    message: 'The company for this role does not exist.',
   },
   [MessageType.MISSING_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is missing.' },
   [MessageType.INVALID_TITLE]: { type: StatusMessageType.ERROR, message: 'Role title is invalid.' },
@@ -58,6 +59,10 @@ const messages = Object.freeze({
   [MessageType.ROLE_CREATED_SUCCESSFULLY]: {
     type: StatusMessageType.SUCCESS,
     message: 'Role was created successfully.',
+  },
+  [MessageType.ROLE_ALREADY_EXISTS]: {
+    type: StatusMessageType.SUCCESS,
+    message: 'Role already exists.',
   },
 });
 
@@ -136,12 +141,75 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return false;
   }
 
-  const newRole: RoleData = await prisma.role.create({
-    data: { ...rolePostData, contributorId: userId },
+  const duplicateRole = await findRole(rolePostData);
+
+  const isNewRole = duplicateRole === null;
+  if (isNewRole) {
+    const createdRole = await createRole(userId, rolePostData);
+
+    res
+      .status(HttpStatus.CREATED)
+      .json(createJsonResponse(createdRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+    return;
+  }
+
+  const isAlreadyContributedByUser = duplicateRole.contributions.some(
+    (contribution) => contribution.contributorId === userId,
+  );
+
+  if (duplicateRole.isVerified || isAlreadyContributedByUser) {
+    res.status(HttpStatus.OK).json(createJsonResponse(duplicateRole, messages[MessageType.ROLE_ALREADY_EXISTS]));
+    return;
+  }
+
+  await addRoleContribution(userId, duplicateRole.id);
+
+  res
+    .status(HttpStatus.CREATED)
+    .json(createJsonResponse(duplicateRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+
+  return;
+}
+
+async function findRole(role: Partial<Role>) {
+  return await prisma.role.findFirst({
+    where: role,
+    select: {
+      id: true,
+      title: true,
+      type: true,
+      year: true,
+      isVerified: true,
+      contributions: {
+        select: {
+          contributorId: true,
+        },
+      },
+    },
+  });
+}
+
+async function createRole(userId: string, rolePostData: RolePostData): Promise<RoleData> {
+  return prisma.role.create({
+    data: {
+      ...rolePostData,
+      contributions: {
+        create: {
+          contributorId: userId,
+        },
+      },
+    },
     select: { id: true, title: true, type: true, year: true },
   });
+}
 
-  res.status(HttpStatus.CREATED).json(createJsonResponse(newRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+async function addRoleContribution(userId: string, roleId: number): Promise<RoleContribution> {
+  return prisma.roleContribution.create({
+    data: {
+      contributorId: userId,
+      roleId,
+    },
+  });
 }
 
 function parseGetQueryParams(req: NextApiRequest): RoleQueryParams {
