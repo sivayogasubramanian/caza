@@ -46,6 +46,8 @@ model CompanyContribution {
   contributor   User   @relation(fields: [contributorId], references: [uid], onUpdate: Cascade, onDelete: Cascade)
   contributorId String @map("contributor_id")
 
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
   @@id([companyId, contributorId])
   @@map("companies_contributions")
 }
@@ -82,6 +84,8 @@ model RoleContribution {
 
   contributor   User   @relation(fields: [contributorId], references: [uid], onUpdate: Cascade, onDelete: Cascade)
   contributorId String @map("contributor_id")
+
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@id([roleId, contributorId])
   @@map("roles_contributions")
