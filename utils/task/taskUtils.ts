@@ -9,7 +9,7 @@ export function getIsoNotificationDateTime(values: TaskFormData) {
   const dateFormat = 'YYYY-MM-DD';
   const localDueDate = values.dueDate?.format(dateFormat);
   const localNotificationDate = values.notificationDate?.format(dateFormat);
-  const localNotificationTime = values.notificationTime?.format(dateFormat);
+  const localNotificationTime = values.notificationTime?.format(TIME_FORMAT);
   const localDueDateWithNotificationTime = moment(
     localDueDate + ' ' + localNotificationTime,
     `${dateFormat} ${TIME_FORMAT}`,
