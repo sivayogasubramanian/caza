@@ -71,6 +71,8 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
     }
   }, [taskFormData]);
 
+  const onCancel = () => setIsSubmitting(true);
+
   const onDelete = () => {
     Modal.confirm({
       title: 'Are you sure about deleting this task?',
@@ -107,6 +109,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
     <Modal
       open
       title="Edit Task"
+      onCancel={onCancel}
       maskClosable={false}
       footer={[
         <Button key="delete" danger onClick={onDelete}>
@@ -115,7 +118,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
         <Button key="cancel" onClick={() => setSelectedTask(null)}>
           Cancel
         </Button>,
-        <Button key="save" type="primary" loading={isSubmitting} onClick={() => setIsSubmitting(true)}>
+        <Button key="save" type="primary" loading={isSubmitting} onClick={onCancel}>
           Save
         </Button>,
       ]}
