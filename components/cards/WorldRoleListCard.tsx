@@ -95,7 +95,7 @@ function WorldRoleListCard({ role }: Props) {
         {stageColors
           .filter(({ stage }) => role.applicationStages.some(({ type }) => stage === type))
           .map(({ stage, color }) => (
-            <div className="flex gap-2">
+            <div key={stage} className="flex gap-2">
               <div className="w-4 h-4 rounded-md" style={{ backgroundColor: color }}>
                 &nbsp;
               </div>
