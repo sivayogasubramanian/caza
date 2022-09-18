@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
 import { RoleApplicationListData } from '../../types/role';
-import { RoleWorldStatsData } from '../../types/world';
+import { WorldRoleStatsData } from '../../types/role';
 import CompanyLogo from '../company/CompanyLogo';
 
-export type RoleSankeyProps = { data: RoleWorldStatsData };
+export type RoleSankeyProps = { data: WorldRoleStatsData };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const [edgeIndex, setEdgeIndex] = useState<number>(-1);
@@ -23,7 +23,7 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   }
 
   const sankeyData = [['FROM', 'TO', 'WEIGHT'] as (string | number)[]].concat(
-    (data as unknown as RoleWorldStatsData).edges.map((e) => {
+    (data as unknown as WorldRoleStatsData).edges.map((e) => {
       return [e.source, e.dest, e.userCount];
     }),
   );
@@ -76,7 +76,7 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
   );
 };
 
-type MouseOverOverlayProps = { data: RoleWorldStatsData; edgeIndex: number; nodeTitle?: string };
+type MouseOverOverlayProps = { data: WorldRoleStatsData; edgeIndex: number; nodeTitle?: string };
 
 const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
   if (edgeIndex < 0) {
