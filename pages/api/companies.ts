@@ -73,6 +73,7 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
         { OR: companyNamesFilters },
       ],
     },
+    take: 5,
     orderBy: {
       name: 'asc',
     },
