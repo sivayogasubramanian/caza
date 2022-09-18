@@ -7,6 +7,7 @@ import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
 import api from '../../../api/api';
 import { WORLD_API_ENDPOINT } from '../../../api/worldApi';
+import WorldRoleListCard from '../../../components/cards/WorldRoleListCard';
 import RoleTypesSelect from '../../../components/forms/RoleTypesSelect';
 import Spinner from '../../../components/spinner/Spinner';
 import { ApiResponse } from '../../../types/apiResponse';
@@ -63,18 +64,9 @@ function RolesWorld() {
 
       {/* World List */}
       <Spinner isLoading={!data}>
-        {/* TODO: Replace Table with World List Items */}
-        <Table
-          dataSource={worldRoles}
-          columns={[
-            { title: 'ID', dataIndex: 'id' },
-            { title: 'Title', dataIndex: 'title' },
-            { title: 'Type', dataIndex: 'type' },
-            { title: 'Year', dataIndex: 'year' },
-            { title: 'Company', render: (worldRole) => JSON.stringify(worldRole.company) },
-            { title: 'Stages', render: (worldRole) => JSON.stringify(worldRole.applicationStages) },
-          ]}
-        />
+        {worldRoles?.map((role, index) => (
+          <WorldRoleListCard key={index} role={role} />
+        ))}
       </Spinner>
     </div>
   );
