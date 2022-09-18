@@ -90,6 +90,11 @@ const companies: Prisma.CompanyCreateInput[] = [
                       date: new Date(2022, 9, 1),
                     },
                     {
+                      type: 'NON_TECHNICAL',
+                      date: new Date(2022, 8, 20),
+                      remark: 'Think it went well, was able to devise and implement optimal solution.',
+                    },
+                    {
                       type: 'TECHNICAL',
                       date: new Date(2022, 8, 20),
                       remark: 'Think it went well, was able to devise and implement optimal solution.',
