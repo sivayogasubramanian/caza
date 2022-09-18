@@ -9,8 +9,8 @@ function WorldRoles() {
   const roles = data?.payload ?? [];
   return (
     <div className="p-3">
-      {roles.map((role) => (
-        <WorldRoleListCard role={role} />
+      {roles.map((role, index) => (
+        <WorldRoleListCard key={index} role={role} />
       ))}
     </div>
   );

@@ -1,4 +1,4 @@
-import { RightCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { RightCircleOutlined } from '@ant-design/icons';
 import { ApplicationStageType } from '@prisma/client';
 import { Button, Tooltip } from 'antd';
 import { WorldRoleListData } from '../../types/role';
