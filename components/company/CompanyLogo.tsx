@@ -1,5 +1,5 @@
 import { Avatar } from 'antd';
-import React from 'react';
+import { useState } from 'react';
 import { CompanyData } from '../../types/company';
 import { COMPANY_LOGO_API_URL, DEFAULT_LOGO_SIZE } from '../../utils/constants';
 
@@ -11,7 +11,7 @@ interface Props {
 
 function CompanyLogo({ company, className, size = DEFAULT_LOGO_SIZE }: Props) {
   const logoProviderUrl = `${COMPANY_LOGO_API_URL}${company.companyUrl}?size=${size}`;
-  const [isLogoAvailable, setIsLogoAvailable] = React.useState<boolean>(true);
+  const [isLogoAvailable, setIsLogoAvailable] = useState<boolean>(true);
 
   if (!isLogoAvailable) {
     return <Avatar className={className}>{company.name.charAt(0)}</Avatar>;
