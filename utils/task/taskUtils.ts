@@ -1,26 +1,36 @@
 import { NotificationDateTimeType, TaskFormData } from '../../types/task';
 import moment from 'moment';
 
-export const DEFAULT_NOTIFICATION_TIME = moment('09:00:00', 'hh:mm:ss');
+const TIME_FORMAT = 'HH:mm:ss';
+export const DEFAULT_NOTIFICATION_TIME = moment('09:00:00', TIME_FORMAT);
 export const DEFAULT_NOTIFICATION_DAYS_OFFSET = 1;
 
 export function getNotificationDateTime(values: TaskFormData) {
-  const notificationTime = values.notificationTime?.utc().format('HH:mm:ss');
+  const dateFormat = 'YYYY-MM-DD';
+  const localDueDate = values.dueDate?.format(dateFormat);
+  const localNotificationDate = values.notificationDate?.format(dateFormat);
+  const localNotificationTime = values.notificationTime?.format(dateFormat);
+  const localDueDateWithNotificationTime = moment(
+    localDueDate + ' ' + localNotificationTime,
+    `${dateFormat} ${TIME_FORMAT}`,
+  );
+  const localNotificationDateWithNotificationTime = moment(
+    localNotificationDate + ' ' + localNotificationTime,
+    `${dateFormat} ${TIME_FORMAT}`,
+  );
 
   switch (values.notificationDateTimeType) {
     case NotificationDateTimeType.NONE:
       return null;
     case NotificationDateTimeType.DAY_OF_EVENT:
-      const dueDate = values.dueDate?.utc().format('YYYY-MM-DD');
-      return dueDate && notificationTime ? `${dueDate}T${notificationTime}Z` : undefined;
+      return localDueDateWithNotificationTime.toISOString();
     case NotificationDateTimeType.DAYS_BEFORE:
-      const beforeDueDate = values.dueDate?.subtract(values.notificationDaysOffset, 'days').utc().format('YYYY-MM-DD');
-      return beforeDueDate && notificationTime ? `${beforeDueDate}T${notificationTime}Z` : undefined;
+      const localBeforeDueDate = localDueDateWithNotificationTime.subtract(values.notificationDaysOffset, 'days');
+      return localBeforeDueDate.toISOString();
     case NotificationDateTimeType.DAYS_AFTER:
-      const afterDueDate = values.dueDate?.add(values.notificationDaysOffset, 'days').utc().format('YYYY-MM-DD');
-      return afterDueDate && notificationTime ? `${afterDueDate}T${notificationTime}Z` : undefined;
+      const localAfterDueDate = localDueDateWithNotificationTime.add(values.notificationDaysOffset, 'days');
+      return localAfterDueDate.toISOString();
     case NotificationDateTimeType.ON_SELECTED_DATE:
-      const notificationDate = values.notificationDate?.utc().format('YYYY-MM-DD');
-      return notificationDate && notificationTime ? `${notificationDate}T${notificationTime}Z` : undefined;
+      return localNotificationDateWithNotificationTime.toISOString();
   }
 }
