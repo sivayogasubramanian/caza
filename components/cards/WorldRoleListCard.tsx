@@ -8,44 +8,13 @@ import CompanyLogo from '../company/CompanyLogo';
 
 type Props = { role: WorldRoleListData };
 
-const stageColors = [
-  {
-    stage: ApplicationStageType.APPLIED,
-    color: '#e3342f',
-  },
-  {
-    stage: ApplicationStageType.ONLINE_ASSESSMENT,
-    color: '#f6993f',
-  },
-  {
-    stage: ApplicationStageType.TECHNICAL,
-    color: '#ffed4a',
-  },
-  {
-    stage: ApplicationStageType.NON_TECHNICAL,
-    color: '#38c172',
-  },
-  {
-    stage: ApplicationStageType.MIXED,
-    color: '#4dc0b5',
-  },
-  {
-    stage: ApplicationStageType.OFFERED,
-    color: '#3490dc',
-  },
-  {
-    stage: ApplicationStageType.ACCEPTED,
-    color: '#6574cd',
-  },
-  {
-    stage: ApplicationStageType.REJECTED,
-    color: '#9561e2',
-  },
-  {
-    stage: ApplicationStageType.WITHDRAWN,
-    color: '#f66d9b',
-  },
-];
+// Colors of the individual stage sections, should match the number of values in the ApplicationStageType enum.
+const colors = ['#fbb4ae', '#b3cde3', '#ccebc5', '#decbe4', '#fed9a6', '#ffffcc', '#e5d8bd', '#fddaec', '#ba7b7b'];
+
+const stageColors = Object.values(ApplicationStageType).map((stage, index) => ({
+  stage,
+  color: colors[index % colors.length], // Defensive modulo in case the number of colors is less than the number of stages.
+}));
 
 function WorldRoleListCard({ role }: Props) {
   const sumOfStageCounts = role.applicationStages.reduce((acc, stage) => acc + stage.count, 0);
