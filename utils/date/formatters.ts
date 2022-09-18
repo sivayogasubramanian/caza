@@ -19,8 +19,7 @@ export function makeDisplayNotificationDatetime(notificationDatetime: Date, dueD
 }
 
 export function getCountOfDaysTillTodayFrom(date: Date): number {
-  const differenceInTime = Date.now() - date.getTime();
-  return Math.ceil(differenceInTime / (1000 * 3600 * 24));
+  return calculateDaysOffset(new Date(), date);
 }
 
 export function calculateDaysOffset(currentDate: Date, referenceDate: Date) {

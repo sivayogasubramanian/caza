@@ -33,14 +33,6 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
     }
   }, [taskFormData]);
 
-  const onCancel = () => {
-    setIsAddingNewTask(false);
-  };
-
-  const onSubmit = () => {
-    setIsSubmitting(true);
-  };
-
   const submit = (values: TaskFormData) => {
     const notificationDateTime = getNotificationDateTime(values);
 
@@ -48,7 +40,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
     const taskPostData: TaskPostData = {
       title: values.title ?? 'Task',
       dueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
-      notificationDateTime: notificationDateTime === undefined ? new Date().toISOString() : notificationDateTime,
+      notificationDateTime: notificationDateTime === undefined ? null : notificationDateTime,
     };
 
     tasksApi
@@ -66,8 +58,8 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
       title="New Task"
       okButtonProps={{ disabled: shouldDisableSaveButton }}
       okText="Create"
-      onCancel={onCancel}
-      onOk={onSubmit}
+      onCancel={() => setIsAddingNewTask(false)}
+      onOk={() => setIsSubmitting(true)}
       maskClosable={false}
     >
       <TaskForm
