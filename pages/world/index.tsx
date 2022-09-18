@@ -5,14 +5,14 @@ import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
 import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
-import api from '../../../api/api';
-import { WORLD_API_ENDPOINT } from '../../../api/worldApi';
-import WorldRoleListCard from '../../../components/cards/WorldRoleListCard';
-import RoleTypesSelect from '../../../components/forms/RoleTypesSelect';
-import Spinner from '../../../components/spinner/Spinner';
-import { ApiResponse } from '../../../types/apiResponse';
-import { WorldRoleListData, WorldRoleQueryParams } from '../../../types/role';
-import { splitByWhitespaces } from '../../../utils/strings/formatters';
+import api from '../../api/api';
+import { WORLD_API_ENDPOINT } from '../../api/worldApi';
+import WorldRoleListCard from '../../components/cards/WorldRoleListCard';
+import RoleTypesSelect from '../../components/forms/RoleTypesSelect';
+import Spinner from '../../components/spinner/Spinner';
+import { ApiResponse } from '../../types/apiResponse';
+import { WorldRoleListData, WorldRoleQueryParams } from '../../types/role';
+import { splitByWhitespaces } from '../../utils/strings/formatters';
 
 function RolesWorld() {
   const [searchParams, setSearchParams] = useState<WorldRoleQueryParams>({
