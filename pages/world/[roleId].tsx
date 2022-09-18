@@ -22,7 +22,7 @@ const RoleWorldPage: NextPage = () => {
   }
 
   const roleId = Number(query.roleId);
-  const { data } = useSWR(`${ROLES_API_ENDPOINT}/${WORLD_API_ENDPOINT}/${roleId}`);
+  const { data } = useSWR(`${WORLD_API_ENDPOINT}/${roleId}`);
   return (
     <div>
       <Spin spinning={!data}>{data && <RoleSankey data={data.payload} />}</Spin>
