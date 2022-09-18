@@ -76,6 +76,11 @@ async function handler(userId: string, req: NextApiRequest, res: NextApiResponse
 
 async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleListData[]>>) {
   const queryParams: RoleQueryParams = parseGetQueryParams(req);
+  if (queryParams === undefined) {
+    res.status(HttpStatus.OK).json(createJsonResponse([]));
+    return;
+  }
+
   const roleTitleFilters = makeRoleTitleFilters(queryParams.searchWords);
   const roleYearFilters = makeRoleYearFilters(queryParams.searchWords);
 

@@ -13,7 +13,6 @@ import { ApiResponse } from '../../types/apiResponse';
 import { CompanyAutocompleteOption, CompanyListData, CompanyQueryParams } from '../../types/company';
 import { RoleAutocompleteOption, RoleData, RoleListData, RoleQueryParams } from '../../types/role';
 import { Nullable } from '../../types/utils';
-import { createJsonResponse } from '../../utils/http/httpHelpers';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 import moment from 'moment';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
@@ -97,8 +96,7 @@ function ApplicationCreate() {
 
   const { data: rolesData, mutate: mutateRolesData } = useSWR<ApiResponse<RoleListData[]>>(
     [ROLES_API_ENDPOINT, roleSearchParams],
-    (url: string, roleSearchParams: RoleQueryParams) =>
-      roleSearchParams.companyId !== undefined ? rolesApi.getRoles(roleSearchParams) : createJsonResponse([]),
+    (url: string, roleSearchParams: RoleQueryParams) => rolesApi.getRoles(roleSearchParams),
   );
   const roles = rolesData?.payload || [];
   const roleOptions: RoleAutocompleteOption[] = roles.map((role) => ({
