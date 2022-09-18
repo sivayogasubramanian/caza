@@ -5,7 +5,13 @@ import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } fro
 import { Nullable } from '../../types/utils';
 import { withAuth } from '../../utils/auth/jwtHelpers';
 import { makeCompanyNameFilters } from '../../utils/filters/filterHelpers';
-import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../utils/http/httpHelpers';
+import {
+  convertQueryParamToStringArray,
+  createJsonResponse,
+  HttpMethod,
+  HttpStatus,
+  rejectHttpMethod,
+} from '../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../utils/prisma/prismaHelpers';
 import { capitalizeEveryWord, removeProtocolAndWwwIfPresent, splitByWhitespaces } from '../../utils/strings/formatters';
 import { isEmpty, isValidUrl } from '../../utils/strings/validations';
@@ -111,10 +117,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse<ApiResponse<
 }
 
 function parseGetQueryParams(req: NextApiRequest): CompanyQueryParams {
-  const { companyNames } = req.query;
-  const names =
-    companyNames === undefined ? [] : Array.isArray(companyNames) ? companyNames : splitByWhitespaces(companyNames);
-  return { companyNames: names };
+  return { companyNames: convertQueryParamToStringArray(req.query.companyNames, splitByWhitespaces) };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
