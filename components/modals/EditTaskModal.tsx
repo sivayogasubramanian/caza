@@ -26,7 +26,7 @@ interface Props {
 function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldFetchData }: Props) {
   const [task, setTask] = useState(initialTask);
   const [initialValues, setInitialValues] = useState<TaskFormData>({
-    notificationDaysOffset: 1,
+    notificationDaysOffset: DEFAULT_NOTIFICATION_DAYS_OFFSET,
   });
   const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -135,7 +135,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
       <TaskForm
         initialValues={initialValues}
         shouldTouchAllCompulsoryFields={false}
-        shouldAllowMarkDone={true}
+        shouldShowMarkDone={true}
         isSubmitting={isSubmitting}
         setShouldDisableSaveButton={setShouldDisableSaveButton}
         setTaskFormData={setTaskFormData}
