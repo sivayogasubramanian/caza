@@ -78,7 +78,14 @@ function Application() {
         </div>
       )}
 
-      {selectedStage && <EditStageModal setSelectedStage={setSelectedStage} />}
+      {selectedStage && (
+        <EditStageModal
+          applicationId={applicationId}
+          initialStage={selectedStage}
+          setSelectedStage={setSelectedStage}
+          mutateApplicationData={mutateApplicationData}
+        />
+      )}
 
       {isAddingNewTask && (
         <NewTaskModal

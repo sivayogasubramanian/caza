@@ -1,5 +1,6 @@
 import { ApplicationStageType } from '@prisma/client';
 import { Nullable } from './utils';
+import { Moment } from 'moment';
 
 export type ApplicationStageApplicationData = {
   id: number;
@@ -30,4 +31,11 @@ export type ApplicationStageApplicationListData = {
   type: ApplicationStageType;
   date: string;
   emojiUnicodeHex: Nullable<string>;
+};
+
+export type ApplicationStageFormData = {
+  type?: ApplicationStageType;
+  date?: Moment;
+  emojiUnicodeHex?: Nullable<string>;
+  remark?: Nullable<string>;
 };
