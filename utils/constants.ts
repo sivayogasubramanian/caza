@@ -18,3 +18,4 @@ export const DEFAULT_NUM_MONTHS_BEFORE_ROLE_START = 6;
 export const HOMEPAGE_ROUTE = '/';
 export const APPLICATIONS_ROUTE = '/applications';
 export const CREATE_APPLICATION_ROUTE = APPLICATIONS_ROUTE + '/create';
+export const WORLD_ROUTE = '/world';

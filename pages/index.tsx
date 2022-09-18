@@ -11,7 +11,6 @@ import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
 import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect';
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
-import ApplicationNavBar from '../components/navigation/ApplicationNavBar';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { splitByWhitespaces } from '../utils/strings/formatters';
@@ -46,9 +45,10 @@ function Applications() {
 
   return (
     <div className="p-5">
-      <div className="flex flex-wrap space-x-5 relative">
+      <div className="flex items-center justify-between">
         <Title>Applications</Title>
-        <div className="invisible md:visible flex absolute right-0 space-x-5">
+
+        <div className="hidden md:flex mb-[0.5em] gap-3">
           <CreateApplicationButton />
           <GoToWorldViewButton />
         </div>
@@ -79,7 +79,6 @@ function Applications() {
           <ApplicationListCard key={index} application={application} />
         ))}
       </Spin>
-      <ApplicationNavBar visibilityModifier="visible md:invisible" location="USER_VIEW" />
     </div>
   );
 }
