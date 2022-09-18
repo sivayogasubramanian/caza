@@ -49,7 +49,7 @@ model CompanyContribution {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@id([companyId, contributorId])
-  @@map("companies_contributions")
+  @@map("company_contributions")
 }
 
 enum RoleType {
@@ -88,7 +88,7 @@ model RoleContribution {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@id([roleId, contributorId])
-  @@map("roles_contributions")
+  @@map("role_contributions")
 }
 
 model Application {
