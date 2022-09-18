@@ -88,7 +88,16 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
     where: {
       companyId: companyId,
       AND: [
-        { OR: [{ isVerified: true }, { contributorId: userId }] },
+        {
+          OR: [
+            { isVerified: true },
+            {
+              contributions: {
+                some: { contributorId: userId },
+              },
+            },
+          ],
+        },
         { OR: roleYearFilters },
         { OR: roleTitleFilters },
       ],
