@@ -24,9 +24,9 @@ function TaskForm({
 }: Props) {
   const [form] = Form.useForm();
 
-  const [shouldShowNotificationDaysOffsetInput, setShouldShowNotificationDaysOffsetInput] = useState(false);
-  const [shouldShowNotificationDateTimePicker, setShouldShowNotificationDateTimePicker] = useState(false);
-  const [shouldShowNotificationTimePicker, setShouldShowNotificationTimePicker] = useState(false);
+  const [shouldShowNotificationDaysOffsetInput, setShouldShowNotificationDaysOffsetInput] = useState<boolean>(false);
+  const [shouldShowNotificationDateTimePicker, setShouldShowNotificationDateTimePicker] = useState<boolean>(false);
+  const [shouldShowNotificationTimePicker, setShouldShowNotificationTimePicker] = useState<boolean>(false);
 
   useEffect(() => {
     form.resetFields();

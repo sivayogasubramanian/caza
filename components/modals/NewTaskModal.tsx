@@ -1,24 +1,24 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import TaskForm from '../forms/TaskForm';
 import { NotificationDateTimeType, TaskFormData, TaskPostData } from '../../types/task';
 import tasksApi from '../../api/tasksApi';
 import {
   DEFAULT_NOTIFICATION_DAYS_OFFSET,
   DEFAULT_NOTIFICATION_TIME,
-  getNotificationDateTime,
+  getIsoNotificationDateTime,
 } from '../../utils/task/taskUtils';
 import { Nullable } from '../../types/utils';
 import { Modal } from 'antd';
 
 interface Props {
   applicationId: number;
-  setIsAddingNewTask: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAddingNewTask: Dispatch<SetStateAction<boolean>>;
   setShouldFetchData: Dispatch<SetStateAction<boolean>>;
 }
 
 function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }: Props) {
-  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
   const [initialValues] = useState<TaskFormData>({
     notificationTime: DEFAULT_NOTIFICATION_TIME,
@@ -34,7 +34,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
   }, [taskFormData]);
 
   const submit = (values: TaskFormData) => {
-    const notificationDateTime = getNotificationDateTime(values);
+    const notificationDateTime = getIsoNotificationDateTime(values);
 
     // Note: notificationDateTime can be null
     const taskPostData: TaskPostData = {

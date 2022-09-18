@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import moment from 'moment';
 import { NotificationDateTimeType, TaskData, TaskFormData, TaskPatchData } from '../../types/task';
 import { isValidDate } from '../../utils/date/validations';
@@ -9,7 +9,7 @@ import tasksApi from '../../api/tasksApi';
 import {
   DEFAULT_NOTIFICATION_DAYS_OFFSET,
   DEFAULT_NOTIFICATION_TIME,
-  getNotificationDateTime,
+  getIsoNotificationDateTime,
 } from '../../utils/task/taskUtils';
 import { Button, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -17,17 +17,17 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 interface Props {
   applicationId: number;
   initialTask: TaskData;
-  setSelectedTask: React.Dispatch<React.SetStateAction<Nullable<TaskData>>>;
+  setSelectedTask: Dispatch<SetStateAction<Nullable<TaskData>>>;
   setShouldFetchData: Dispatch<SetStateAction<boolean>>;
 }
 
 function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldFetchData }: Props) {
-  const [task, setTask] = useState(initialTask);
+  const [task, setTask] = useState<TaskData>(initialTask);
   const [initialValues, setInitialValues] = useState<TaskFormData>({
     notificationDaysOffset: DEFAULT_NOTIFICATION_DAYS_OFFSET,
   });
-  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
     const taskPatchData: TaskPatchData = {
       title: values.title,
       dueDate: values.dueDate?.toISOString(),
-      notificationDateTime: getNotificationDateTime(values),
+      notificationDateTime: getIsoNotificationDateTime(values),
       isDone: values.isDone,
     };
 
