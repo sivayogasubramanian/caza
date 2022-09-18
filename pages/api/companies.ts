@@ -1,4 +1,4 @@
-import { Company, CompanyContribution, PrismaClient } from '@prisma/client';
+import { CompanyContribution, PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
 import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } from '../../types/company';
