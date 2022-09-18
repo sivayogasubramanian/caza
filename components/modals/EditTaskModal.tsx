@@ -14,8 +14,6 @@ import {
 import { Button, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-const { confirm } = Modal;
-
 interface Props {
   applicationId: number;
   initialTask: TaskData;
@@ -71,22 +69,12 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
     }
   }, [taskFormData]);
 
-  const onCancel = () => {
-    setSelectedTask(null);
-  };
-
-  const onSubmit = () => {
-    setIsSubmitting(true);
-  };
-
   const onDelete = () => {
-    confirm({
+    Modal.confirm({
       title: 'Are you sure about deleting this task?',
       icon: <ExclamationCircleOutlined />,
       content: 'This action is irreversible',
-      onOk() {
-        handleDelete();
-      },
+      onOk: handleDelete,
     });
   };
 
@@ -124,10 +112,16 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, setShouldF
         <Button key="delete" danger onClick={onDelete}>
           Delete
         </Button>,
-        <Button key="cancel" onClick={onCancel}>
+        <Button key="cancel" onClick={() => setSelectedTask(null)}>
           Cancel
         </Button>,
-        <Button key="save" type="primary" loading={isSubmitting} onClick={onSubmit} disabled={shouldDisableSaveButton}>
+        <Button
+          key="save"
+          type="primary"
+          loading={isSubmitting}
+          onClick={() => setIsSubmitting(true)}
+          disabled={shouldDisableSaveButton}
+        >
           Save
         </Button>,
       ]}
