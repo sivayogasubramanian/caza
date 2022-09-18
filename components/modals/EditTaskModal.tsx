@@ -71,7 +71,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
     }
   }, [taskFormData]);
 
-  const onCancel = () => setIsSubmitting(true);
+  const onCancel = () => setSelectedTask(null);
 
   const onDelete = () => {
     Modal.confirm({
@@ -115,10 +115,10 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
         <Button key="delete" danger onClick={onDelete}>
           Delete
         </Button>,
-        <Button key="cancel" onClick={() => setSelectedTask(null)}>
+        <Button key="cancel" onClick={onCancel}>
           Cancel
         </Button>,
-        <Button key="save" type="primary" loading={isSubmitting} onClick={onCancel}>
+        <Button key="save" type="primary" loading={isSubmitting} onClick={() => setIsSubmitting(true)}>
           Save
         </Button>,
       ]}

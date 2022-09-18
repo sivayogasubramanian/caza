@@ -1,12 +1,20 @@
 import { Button, DatePicker, Form, Input, Select } from 'antd';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import AddEmojiIcon from '../icons/AddEmojiIcon';
-import { MouseEvent, useState } from 'react';
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from 'react';
 import Picker, { IEmojiData } from 'emoji-picker-react';
 import { Nullable } from '../../types/utils';
+import { ApplicationStageFormData } from '../../types/applicationStage';
 
-function StageForm() {
+interface Props {
+  initialValues: ApplicationStageFormData;
+  isSubmitting: boolean;
+  setStageFormData: Dispatch<SetStateAction<Nullable<ApplicationStageFormData>>>;
+}
+
+function StageForm({ initialValues, isSubmitting, setStageFormData }: Props) {
   const [form] = Form.useForm();
+
   const [shouldShowEmojiPicker, setShouldShowEmojiPicker] = useState<boolean>(false);
   const [selectedEmojiUnicode, setSelectedEmojiUnicode] = useState<Nullable<string>>(null);
 
@@ -15,8 +23,24 @@ function StageForm() {
     setShouldShowEmojiPicker(false);
   };
 
+  useEffect(() => {
+    form.resetFields();
+
+    if (initialValues.emojiUnicodeHex !== undefined) {
+      setSelectedEmojiUnicode(initialValues.emojiUnicodeHex);
+    }
+  }, [initialValues]);
+
+  useEffect(() => {
+    if (isSubmitting) {
+      form
+        .validateFields()
+        .then(() => setStageFormData({ ...form.getFieldsValue(), emojiUnicodeHex: selectedEmojiUnicode }));
+    }
+  }, [isSubmitting]);
+
   return (
-    <Form form={form}>
+    <Form form={form} initialValues={initialValues}>
       <Form.Item name="type" label="Stage" rules={[{ required: true, message: 'Please choose a stage.' }]}>
         <Select placeholder="Select stage">
           {stageTypeToDisplayStringMap.map((value, key) => (
