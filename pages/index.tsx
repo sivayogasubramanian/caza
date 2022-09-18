@@ -14,7 +14,11 @@ import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { CREATE_APPLICATION_ROUTE } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
-import { ApplicationButtons, ApplicationNavBar } from '../components/navigation/applicationNavComponents';
+import {
+  ApplicationButtons,
+  ApplicationNavBar,
+  CreateApplicationButton,
+} from '../components/navigation/applicationNavComponents';
 
 function Applications() {
   const router = useRouter();
@@ -88,6 +92,7 @@ function Applications() {
           <ApplicationListCard key={index} application={application} />
         ))}
       </Spin>
+      <CreateApplicationButton />
       <ApplicationNavBar isYourList={true} />
     </div>
   );
