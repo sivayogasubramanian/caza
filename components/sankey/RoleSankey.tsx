@@ -31,6 +31,7 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   );
 
   const option = {
+    tooltip: { isHtml: true },
     sankey: {
       node: {
         label: {
@@ -77,15 +78,13 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
   );
 };
 
-function createTooltip(data: WorldRoleStatsData, edgeIndex: number): JSX.Element {
+function createTooltip(data: WorldRoleStatsData, edgeIndex: number): string {
   const targetEdge = data.edges[edgeIndex];
   const { source, dest, totalNumHours, userCount } = targetEdge;
-  return (
-    <div className="text-lg rotate-0 md:rotate-270">
-      {source} to {dest}:<br /> {userCount} user{userCount > 1 ? 's' : ''}
-      took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
-    </div>
-  );
+  return `<div class="text-lg rotate-0 md:rotate-270">
+      ${source} to ${dest}:<br /> ${userCount} user${userCount > 1 ? 's' : ''}
+      took ~${Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+    </div>`;
 }
 
 type SankeyMouseEvent = { row: number; name?: string };
