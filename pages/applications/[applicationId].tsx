@@ -1,6 +1,5 @@
-import { Timeline } from 'antd';
+import { Affix, Button, Timeline } from 'antd';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../api/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
@@ -13,8 +12,12 @@ import { ApplicationStageApplicationData } from '../../types/applicationStage';
 import { TaskData } from '../../types/task';
 import { TimelineData, TimelineType } from '../../types/timeline';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
+import React, { useState } from 'react';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
+import EditTaskModal from '../../components/modals/EditTaskModal';
+import { Nullable } from '../../types/utils';
+import NewTaskModal from '../../components/modals/NewTaskModal';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -36,12 +39,12 @@ function Application() {
     return <NotFound message="The application id is invalid and cannot be found." />;
   }
 
-  const response = hasValidApplicationId
-    ? useSWR([applicationId], applicationsApi.getApplication, { revalidateOnMount: true })
-    : undefined;
-  const isLoading = response?.data === undefined;
-  const hasSuccessfullyFetchedApplication = response?.data?.payload?.id !== undefined;
-  const application = response?.data?.payload as ApplicationData;
+  const { data, mutate: mutateApplicationData } = useSWR([applicationId], applicationsApi.getApplication, {
+    revalidateOnMount: true,
+  });
+  const isLoading = data === undefined;
+  const hasSuccessfullyFetchedApplication = data?.payload?.id !== undefined;
+  const application = data?.payload as ApplicationData;
 
   const timelineApplicationStages: TimelineData[] =
     application?.applicationStages.map((stage) => ({
@@ -62,21 +65,32 @@ function Application() {
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
   );
 
-  const [shouldFetchData, setShouldFetchData] = useState(true);
-
-  useEffect(() => {
-    if (shouldFetchData) {
-      response?.mutate();
-      setShouldFetchData(false);
-    }
-  }, [shouldFetchData]);
+  const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
+  const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
 
   return (
     <Spinner isLoading={isLoading}>
       {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
         <div className="mr-5 ml-5 flex justify-center text-center text-gray-300">
-          This application seems very empty. Add you first stage or task now!
+          This application seems very empty. Add your first stage or task now!
         </div>
+      )}
+
+      {isAddingNewTask && (
+        <NewTaskModal
+          applicationId={applicationId}
+          setIsAddingNewTask={setIsAddingNewTask}
+          mutateApplicationData={mutateApplicationData}
+        />
+      )}
+
+      {selectedTask && (
+        <EditTaskModal
+          applicationId={applicationId}
+          initialTask={selectedTask}
+          setSelectedTask={setSelectedTask}
+          mutateApplicationData={mutateApplicationData}
+        />
       )}
 
       {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
@@ -89,7 +103,8 @@ function Application() {
                 <ApplicationTaskTimelineCard
                   applicationId={applicationId}
                   task={item.data as TaskData}
-                  setShouldFetchData={setShouldFetchData}
+                  mutateApplicationData={mutateApplicationData}
+                  onClick={() => setSelectedTask(item.data as TaskData)}
                 />
               )}
             </Timeline.Item>
@@ -98,6 +113,12 @@ function Application() {
       )}
 
       {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
+
+      <Affix offsetBottom={10}>
+        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
+          Create new task
+        </Button>
+      </Affix>
     </Spinner>
   );
 }

@@ -5,15 +5,18 @@ import { Checkbox } from 'antd';
 import { isValidDate } from '../../utils/date/validations';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import tasksApi from '../../api/tasksApi';
-import { Dispatch, SetStateAction } from 'react';
+import { KeyedMutator } from 'swr';
+import { ApplicationData } from '../../types/application';
+import { ApiResponse } from '../../types/apiResponse';
 
 interface Props {
   applicationId: number;
   task: TaskData;
-  setShouldFetchData: Dispatch<SetStateAction<boolean>>;
+  mutateApplicationData: KeyedMutator<ApiResponse<ApplicationData>>;
+  onClick?: () => void;
 }
 
-function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData }: Props) {
+function ApplicationTaskTimelineCard({ applicationId, task, mutateApplicationData, onClick }: Props) {
   const dueDate = isValidDate(task.dueDate) ? new Date(task.dueDate) : undefined;
 
   const notificationDateTime =
@@ -22,15 +25,20 @@ function ApplicationTaskTimelineCard({ applicationId, task, setShouldFetchData }
       : undefined;
 
   const onToggleCheckbox = (e: CheckboxChangeEvent) => {
-    tasksApi.editTask(applicationId, task.id, { isDone: e.target.checked }).then(() => setShouldFetchData(true));
+    tasksApi.editTask(applicationId, task.id, { isDone: e.target.checked }).then(() => mutateApplicationData());
   };
 
   return (
-    <div className="shadow-md rounded-lg">
+    <div className="shadow-md rounded-lg" onClick={onClick}>
       <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex items-center gap-2 col-span-3">
-            <Checkbox className="rounded-full" checked={task.isDone} onChange={onToggleCheckbox} />
+            <Checkbox
+              className="rounded-full"
+              checked={task.isDone}
+              onChange={onToggleCheckbox}
+              onClick={(e) => e.stopPropagation()}
+            />
             <div className="font-bold">{task.title}</div>
           </div>
 
