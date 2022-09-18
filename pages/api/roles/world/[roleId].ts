@@ -6,7 +6,7 @@ import { canBecomeInteger } from '../../../../utils/numbers/validations';
 import { withPrismaErrorHandling } from '../../../../utils/prisma/prismaHelpers';
 import { Nullable } from '../../../../types/utils';
 import { ApplicationStageType, PrismaClient } from '@prisma/client';
-import { EdgeData, NodeId, RoleWorldStatsData } from '../../../../types/world';
+import { RoleSankeyEdgeData, RoleSankeyNodeId, WorldRoleStatsData } from '../../../../types/role';
 import { RoleApplicationListData } from '../../../../types/role';
 
 const prisma = new PrismaClient();
@@ -25,7 +25,7 @@ const Messages = Object.freeze({
   [MessageType.SUCCESS]: { type: StatusMessageType.SUCCESS, message: 'Role data found and returned.' },
 });
 
-async function handler(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleWorldStatsData>>) {
+async function handler(req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleStatsData>>) {
   switch (req.method) {
     case HttpMethod.GET:
       return handleGet(req, res);
@@ -34,7 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ApiResponse<Rol
   }
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<RoleWorldStatsData>>) {
+async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleStatsData>>) {
   const validationError = await validateGetRequest(req);
   if (validationError === MessageType.ROLE_NOT_VERIFIED) {
     return res.status(HttpStatus.TEAPOT).json(createJsonResponse({}, Messages[validationError]));
@@ -104,17 +104,17 @@ async function getApplicationStages(roleId: number) {
 
 function analyzeStages(data: { applicationId: number; type: ApplicationStageType; date: Date }[]): {
   numberOfApplications: number;
-  nodes: NodeId[];
-  edges: EdgeData[];
+  nodes: RoleSankeyNodeId[];
+  edges: RoleSankeyEdgeData[];
 } {
   if (data.length === 0) {
     return { nodes: [], edges: [], numberOfApplications: 0 };
   }
 
-  const result: Map<NodeId, Map<NodeId, { userCount: number; totalNumHours: number }>> = new Map();
+  const result: Map<RoleSankeyNodeId, Map<RoleSankeyNodeId, { userCount: number; totalNumHours: number }>> = new Map();
 
   let previousApplicationId = -1; // invalid number to ensure fresh start.
-  let lastNodeId: NodeId = '';
+  let lastRoleSankeyNodeId: RoleSankeyNodeId = '';
   let prevDate: Date = new Date();
   for (const row of data) {
     const { applicationId, date, type } = row;
@@ -122,27 +122,28 @@ function analyzeStages(data: { applicationId: number; type: ApplicationStageType
     if (applicationId !== previousApplicationId) {
       previousApplicationId = applicationId;
       prevDate = date;
-      lastNodeId = type;
+      lastRoleSankeyNodeId = type;
       continue;
     }
 
     const numberOfHours = (date.getTime() - prevDate.getTime()) / (1000 * 60 * 60);
-    const currNodeId = getNodeId(type, lastNodeId);
+    const currRoleSankeyNodeId = getRoleSankeyNodeId(type, lastRoleSankeyNodeId);
 
-    const destEdgeMap = result.get(lastNodeId) ?? new Map<NodeId, { userCount: number; totalNumHours: number }>();
-    const edge = destEdgeMap.get(currNodeId) ?? { userCount: 0, totalNumHours: 0 };
+    const destEdgeMap =
+      result.get(lastRoleSankeyNodeId) ?? new Map<RoleSankeyNodeId, { userCount: number; totalNumHours: number }>();
+    const edge = destEdgeMap.get(currRoleSankeyNodeId) ?? { userCount: 0, totalNumHours: 0 };
 
     edge.totalNumHours += numberOfHours;
     edge.userCount++;
 
-    destEdgeMap.set(currNodeId, edge);
-    result.set(lastNodeId, destEdgeMap);
+    destEdgeMap.set(currRoleSankeyNodeId, edge);
+    result.set(lastRoleSankeyNodeId, destEdgeMap);
     prevDate = date;
-    lastNodeId = currNodeId;
+    lastRoleSankeyNodeId = currRoleSankeyNodeId;
   }
 
-  let edges: EdgeData[] = [];
-  const nodes = new Set<NodeId>();
+  let edges: RoleSankeyEdgeData[] = [];
+  const nodes = new Set<RoleSankeyNodeId>();
 
   result.forEach((destEdgeMap, source) => {
     if (!destEdgeMap) return;
@@ -159,7 +160,7 @@ function analyzeStages(data: { applicationId: number; type: ApplicationStageType
   return { nodes: Array.from(nodes), edges, numberOfApplications: 0 };
 }
 
-function getNodeId(type: ApplicationStageType, lastNodeId: string): NodeId {
+function getRoleSankeyNodeId(type: ApplicationStageType, lastRoleSankeyNodeId: string): RoleSankeyNodeId {
   switch (type) {
     case ApplicationStageType.ACCEPTED:
     // fallthrough
@@ -170,7 +171,7 @@ function getNodeId(type: ApplicationStageType, lastNodeId: string): NodeId {
     case ApplicationStageType.REJECTED:
       return type;
     default:
-      return `${type}:${lastNodeId}`;
+      return `${type}:${lastRoleSankeyNodeId}`;
   }
 }
 
