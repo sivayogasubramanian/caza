@@ -5,10 +5,8 @@ import { Nullable } from '../../types/utils';
 
 interface Props {
   initialValues: TaskFormData;
-  shouldTouchAllCompulsoryFields: boolean;
   shouldShowMarkDone: boolean;
   isSubmitting: boolean;
-  setShouldDisableSaveButton: Dispatch<SetStateAction<boolean>>;
   setTaskFormData: Dispatch<SetStateAction<Nullable<TaskFormData>>>;
 }
 
@@ -19,14 +17,7 @@ interface TaskFormTimePickerProps {
 
 const { Option } = Select;
 
-function TaskForm({
-  initialValues,
-  shouldTouchAllCompulsoryFields,
-  shouldShowMarkDone,
-  isSubmitting,
-  setShouldDisableSaveButton,
-  setTaskFormData,
-}: Props) {
+function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setTaskFormData }: Props) {
   const [form] = Form.useForm();
 
   const [shouldShowNotificationDaysOffsetInput, setShouldShowNotificationDaysOffsetInput] = useState<boolean>(false);
@@ -56,18 +47,8 @@ function TaskForm({
     setShouldShowNotificationDateTimePicker(value === NotificationDateTimeType.ON_SELECTED_DATE);
   };
 
-  const shouldDisableSaveButton = (form: FormInstance) => {
-    const formHasSomeUntouchedField = shouldTouchAllCompulsoryFields
-      ? !form.isFieldsTouched(['title', 'dueDate'], true)
-      : !form.isFieldsTouched();
-    const formHasSomeError = form.getFieldsError().filter(({ errors }) => errors.length).length > 0;
-    return formHasSomeUntouchedField || formHasSomeError;
-  };
-
-  const onFormFieldsChange = () => setShouldDisableSaveButton(shouldDisableSaveButton(form));
-
   return (
-    <Form form={form} initialValues={initialValues} onFieldsChange={onFormFieldsChange}>
+    <Form form={form} initialValues={initialValues}>
       <Form.Item
         label="Task"
         name="title"
