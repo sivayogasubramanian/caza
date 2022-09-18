@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Company, CompanyContribution, PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
 import { CompanyData, CompanyListData, CompanyPostData, CompanyQueryParams } from '../../types/company';
@@ -68,7 +68,14 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
     where: {
       AND: [
         {
-          OR: [{ isVerified: true }, { contributorId: userId }],
+          OR: [
+            { isVerified: true },
+            {
+              contributions: {
+                some: { contributorId: userId },
+              },
+            },
+          ],
         },
         { OR: companyNamesFilters },
       ],
@@ -95,31 +102,77 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     companyUrl: removeProtocolAndWwwIfPresent(req.body.companyUrl),
   };
 
-  const duplicateCompany = await prisma.company.findFirst({
-    where: {
-      name: companyPostData.name,
-      companyUrl: companyPostData.companyUrl,
-    },
-    select: { id: true, name: true, companyUrl: true },
-  });
+  const duplicateCompany = await findCompany(companyPostData.name, companyPostData.companyUrl);
 
-  if (duplicateCompany) {
+  const isNewCompany = duplicateCompany === null;
+  if (isNewCompany) {
+    const createdCompany = await createCompany(userId, companyPostData);
+
+    res
+      .status(HttpStatus.CREATED)
+      .json(createJsonResponse(createdCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
+    return;
+  }
+
+  const isAlreadyContributedByUser = duplicateCompany.contributions.some(
+    (contribution) => contribution.contributorId === userId,
+  );
+
+  if (duplicateCompany.isVerified || isAlreadyContributedByUser) {
     res.status(HttpStatus.OK).json(createJsonResponse(duplicateCompany, messages[MessageType.COMPANY_ALREADY_EXISTS]));
     return;
   }
 
-  const newCompany = await prisma.company.create({
-    data: {
-      contributorId: userId,
-      name: companyPostData.name,
-      companyUrl: companyPostData.companyUrl,
-    },
-    select: { id: true, name: true, companyUrl: true },
-  });
+  await addCompanyContribution(userId, duplicateCompany.id);
 
   res
     .status(HttpStatus.CREATED)
-    .json(createJsonResponse(newCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
+    .json(createJsonResponse(duplicateCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
+  return;
+}
+
+async function findCompany(name: string, companyUrl: string) {
+  return await prisma.company.findFirst({
+    where: {
+      name: name,
+      companyUrl: companyUrl,
+    },
+    select: {
+      id: true,
+      name: true,
+      companyUrl: true,
+      isVerified: true,
+      contributions: {
+        select: {
+          contributorId: true,
+        },
+      },
+    },
+  });
+}
+
+async function createCompany(userId: string, companyPostData: CompanyPostData): Promise<CompanyData> {
+  return prisma.company.create({
+    data: {
+      name: companyPostData.name,
+      companyUrl: companyPostData.companyUrl,
+      contributions: {
+        create: {
+          contributorId: userId,
+        },
+      },
+    },
+    select: { id: true, name: true, companyUrl: true },
+  });
+}
+
+async function addCompanyContribution(userId: string, companyId: number): Promise<CompanyContribution> {
+  return prisma.companyContribution.create({
+    data: {
+      contributorId: userId,
+      companyId,
+    },
+  });
 }
 
 function parseGetQueryParams(req: NextApiRequest): CompanyQueryParams {
