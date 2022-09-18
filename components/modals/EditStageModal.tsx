@@ -96,7 +96,12 @@ function EditStageModal({ applicationId, initialStage, setSelectedStage, mutateA
         </Button>,
       ]}
     >
-      <StageForm initialValues={initialValues} isSubmitting={isSubmitting} setStageFormData={setStageFormData} />
+      <StageForm
+        initialValues={initialValues}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        setStageFormData={setStageFormData}
+      />
     </Modal>
   );
 }

@@ -67,6 +67,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, mutateApplicationData
         initialValues={initialValues}
         shouldShowMarkDone={false}
         isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
         setTaskFormData={setTaskFormData}
       />
     </Modal>

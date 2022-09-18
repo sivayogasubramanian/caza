@@ -7,6 +7,7 @@ interface Props {
   initialValues: TaskFormData;
   shouldShowMarkDone: boolean;
   isSubmitting: boolean;
+  setIsSubmitting: Dispatch<SetStateAction<boolean>>;
   setTaskFormData: Dispatch<SetStateAction<Nullable<TaskFormData>>>;
 }
 
@@ -15,7 +16,7 @@ interface TaskFormTimePickerProps {
   givenStyle?: CSSProperties;
 }
 
-function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setTaskFormData }: Props) {
+function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmitting, setTaskFormData }: Props) {
   const [form] = Form.useForm();
 
   const [shouldShowNotificationDaysOffsetInput, setShouldShowNotificationDaysOffsetInput] = useState<boolean>(false);
@@ -29,7 +30,10 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setTaskForm
 
   useEffect(() => {
     if (isSubmitting) {
-      form.validateFields().then(() => setTaskFormData(form.getFieldsValue()));
+      form
+        .validateFields()
+        .then(() => setTaskFormData(form.getFieldsValue()))
+        .catch(() => setIsSubmitting(false));
     }
   }, [isSubmitting]);
 
