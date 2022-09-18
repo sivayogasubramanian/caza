@@ -64,7 +64,7 @@ type RoleCardProps = { role: RoleApplicationListData };
 const RoleCard: FC<RoleCardProps> = ({ role }) => {
   return (
     <div className="p-4 flex items-center">
-      <CompanyLogo companyUrl={role.company.companyUrl} className="rounded-full max-w-[5rem]" />
+      <CompanyLogo company={role.company} className="rounded-full max-w-[5rem]" />
 
       <div className="ml-5 w-[100%] flex flex-col gap-0.5">
         <div className="text-sm">{role.company.name}</div>
