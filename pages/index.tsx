@@ -7,18 +7,16 @@ import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
 import api from '../api/api';
 import { APPLICATIONS_API_ENDPOINT } from '../api/applicationsApi';
+import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
+import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
 import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect';
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
+import ApplicationNavBar from '../components/navigation/ApplicationNavBar';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { CREATE_APPLICATION_ROUTE } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
-import {
-  ApplicationButtons,
-  ApplicationNavBar,
-  CreateApplicationButton,
-} from '../components/navigation/applicationNavComponents';
 
 function Applications() {
   const router = useRouter();
@@ -57,9 +55,12 @@ function Applications() {
 
   return (
     <div className="p-5">
-      <div className="flex space-x-5">
+      <div className="flex flex-wrap space-x-5 relative">
         <Title>Applications</Title>
-        <ApplicationButtons isYourList={true} />
+        <div className="invisible md:visible flex absolute right-0 space-x-5">
+          <CreateApplicationButton />
+          <GoToWorldViewButton />
+        </div>
       </div>
 
       {/* TODO: Move this to bottom navbar */}
@@ -92,8 +93,7 @@ function Applications() {
           <ApplicationListCard key={index} application={application} />
         ))}
       </Spin>
-      <CreateApplicationButton />
-      <ApplicationNavBar isYourList={true} />
+      <ApplicationNavBar visibilityModifier="visible md:invisible" location="USER_VIEW" />
     </div>
   );
 }
