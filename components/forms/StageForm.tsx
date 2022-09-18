@@ -2,7 +2,8 @@ import { Button, DatePicker, Form, Input, Select } from 'antd';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import AddEmojiIcon from '../icons/AddEmojiIcon';
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from 'react';
-import Picker, { IEmojiData } from 'emoji-picker-react';
+import dynamic from 'next/dynamic';
+import { IEmojiData } from 'emoji-picker-react';
 import { Nullable } from '../../types/utils';
 import { ApplicationStageFormData } from '../../types/applicationStage';
 
@@ -18,6 +19,8 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
 
   const [shouldShowEmojiPicker, setShouldShowEmojiPicker] = useState<boolean>(false);
   const [selectedEmojiUnicode, setSelectedEmojiUnicode] = useState<Nullable<string>>(null);
+
+  const DynamicPicker = dynamic(() => import('emoji-picker-react'));
 
   const onSelectEmoji = (event: MouseEvent, emojiObject: IEmojiData) => {
     setSelectedEmojiUnicode(emojiObject.unified);
@@ -75,7 +78,7 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
             </div>
           )}
 
-          {shouldShowEmojiPicker && <Picker onEmojiClick={onSelectEmoji} />}
+          {shouldShowEmojiPicker && <DynamicPicker onEmojiClick={onSelectEmoji} />}
         </div>
       </Form.Item>
 
