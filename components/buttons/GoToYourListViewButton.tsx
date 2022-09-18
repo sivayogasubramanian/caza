@@ -8,7 +8,7 @@ const GoToYourListViewButton: FC = () => (
     <Button
       type="primary"
       icon={<UserIcon side={15} />}
-      className="items-center h-10 flex w-fit bg-blue-400 text-white rounded-md hover:bg-blue-500 border-none hover:border-none"
+      className="items-center h-10 flex w-fit bg-blue-400 text-black hover:text-black rounded-md hover:bg-blue-500 border-none hover:border-none"
     >
       <span className="block p-2 text-xs">Go To Your List View</span>
     </Button>

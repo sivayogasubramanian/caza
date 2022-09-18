@@ -13,7 +13,7 @@ const CreateApplicationButton: FC = () => {
 
   return (
     <Button
-      className="bg-blue-400 hover:bg-blue-500 border-none hover:border-none"
+      className="text-black hover:text-black bg-blue-400 hover:bg-blue-500 border-none hover:border-none"
       type="primary"
       size="large"
       shape="round"
