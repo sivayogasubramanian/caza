@@ -1,5 +1,5 @@
 import { RoleType } from '@prisma/client';
-import { Checkbox, Col, Form, Row, Table } from 'antd';
+import { Checkbox, Col, Form, Row } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
