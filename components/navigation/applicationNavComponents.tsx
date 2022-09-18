@@ -1,60 +1,49 @@
-import { ReactElement } from 'react';
+import { Button } from 'antd';
+import Link from 'next/link';
 
-type Props = {
-  children: ReactElement[];
-};
-
-export function ResponsiveNavBar({ children }: Props): JSX.Element {
+export function ApplicationButtons({ isYourList }: { isYourList: boolean }) {
+  const activatedClass =
+    'items-center h-10 flex w-fit bg-black text-white rounded-md hover:bg-black border-black hover:border-black';
+  const inactivatedClass =
+    'items-center h-10 flex w-fit bg-white text-black rounded-md hover:bg-blue-400 hover:text-black focus:text-black border-black hover:border-black';
   return (
-    <div>
-      <section className="invisible md:visible w-20 ">{sideBar()}</section>
-      <section className="fixed top-0 left-0 md:left-20">{children}</section>
-      <section className="visible md:invisible h-20">{navBar()}</section>
+    <div className="invisible md:visible w-24 flex justify-between space-x-4">
+      <Link href="/">
+        <Button type="primary" icon={userIcon('h-6 w-6')} className={isYourList ? activatedClass : inactivatedClass}>
+          <span className="block p-2 text-xs">Your List</span>
+        </Button>
+      </Link>
+      <Link href="/world">
+        <Button type="primary" icon={globeIcon('h-5 w-5')} className={!isYourList ? activatedClass : inactivatedClass}>
+          <span className="block p-2 text-xs">Explore</span>
+        </Button>
+      </Link>
     </div>
   );
 }
 
-const sideBar = () => (
-  <aside className="fixed top-0 bottom-0 left-0 p-2 w-20 overflow-y-auto text-center text-gray-400 bg-gray-300">
-    <div id="tabs" className="flex flex-col justify-between">
-      <a
-        href="#"
-        className="w-full bg-red focus:text-purple hover:text-purple justify-center inline-block text-center pt-2 pb-1 hover:bg-white"
-      >
-        {userIcon('h-12 w-12')}
-        <span className="tab block text-xs">Me</span>
-      </a>
-      <a
-        href="#"
-        className=" card w-full focus:text-red hover:text-red justify-center inline-block text-center pt-2 pb-1 hover:bg-white"
-      >
-        {globeIcon('h-12 w-12')}
-        <span className="tab block text-xs">World</span>
-      </a>
-    </div>
-  </aside>
-);
-
-const navBar = () => (
-  <section className="block fixed bottom-0 inset-x-0 z-50 shadow-lg text-gray-400 bg-gray-300">
-    <div id="tabs" className="flex justify-between">
-      <a
-        href="#"
-        className="w-full bg-red focus:text-purple hover:text-purple justify-center inline-block text-center pt-2 pb-1 hover:bg-white"
-      >
-        {userIcon('h-6 w-6')}
-        <span className="block text-xs">Me</span>
-      </a>
-      <a
-        href="#"
-        className="w-full focus:text-red hover:text-red justify-center inline-block text-center pt-2 pb-1 hover:bg-white"
-      >
-        {globeIcon('h-6 w-6')}
-        <span className="block text-xs">World</span>
-      </a>
-    </div>
-  </section>
-);
+export function ApplicationNavBar({ isYourList }: { isYourList: boolean }) {
+  const activatedClass = 'w-full justify-center inline-block text-center pt-2 pb-1 text-blue-500 hover:bg-white';
+  const inactivatedClass = 'w-full justify-center inline-block text-center pt-2 pb-1 hover:bg-white';
+  return (
+    <section className="visible md:invisible h-16 block fixed bottom-0 inset-x-0 z-50 shadow-lg text-gray-400 bg-slate-100">
+      <div className="flex justify-between h-16">
+        <Link href="/">
+          <a href="#" className={isYourList ? activatedClass : inactivatedClass}>
+            {userIcon('h-8 w-8')}
+            <span className="block text-xs">Your List</span>
+          </a>
+        </Link>
+        <Link href="/world">
+          <a href="#" className={!isYourList ? activatedClass : inactivatedClass}>
+            {globeIcon('h-6 w-6')}
+            <span className="block text-xs">Explore</span>
+          </a>
+        </Link>
+      </div>
+    </section>
+  );
+}
 
 const userIcon = (heightWidthValues: string) => (
   <svg

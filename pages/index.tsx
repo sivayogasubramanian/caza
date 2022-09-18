@@ -11,10 +11,10 @@ import ApplicationListCard from '../components/cards/ApplicationListCard';
 import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect';
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import { ApiResponse } from '../types/apiResponse';
-import { ResponsiveNavBar } from '../components/responsiveNavBars/ResponsiveNavBar';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { CREATE_APPLICATION_ROUTE } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
+import { ApplicationButtons, ApplicationNavBar } from '../components/navigation/applicationNavComponents';
 
 function Applications() {
   const router = useRouter();
@@ -52,42 +52,44 @@ function Applications() {
     : [];
 
   return (
-    <ResponsiveNavBar>
-      <div className="p-5">
-        <Title>My Applications</Title>
-
-        {/* TODO: Move this to bottom navbar */}
-        <Button type="primary" onClick={onClickAddApplication} className="mb-3">
-          Add application
-        </Button>
-
-        {/* Search and Filters */}
-        <Form>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={18}>
-              <Search placeholder="Search..." onChange={onSearchBarChange} />
-            </Col>
-            <Col xs={12} md={3}>
-              <Form.Item>
-                <RoleTypesSelect isMultiselect onChange={onRoleTypesFilterChange} />
-              </Form.Item>
-            </Col>
-            <Col xs={12} md={3}>
-              <Form.Item>
-                <ApplicationStagesSelect isMultiselect onChange={onApplicationStageTypesFilterChange} />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-
-        {/* Application List */}
-        <Spin spinning={!data}>
-          {applications.map((application, index) => (
-            <ApplicationListCard key={index} application={application} />
-          ))}
-        </Spin>
+    <div className="p-5">
+      <div className="flex space-x-5">
+        <Title>Applications</Title>
+        <ApplicationButtons isYourList={true} />
       </div>
-    </ResponsiveNavBar>
+
+      {/* TODO: Move this to bottom navbar */}
+      <Button type="primary" onClick={onClickAddApplication} className="mb-3">
+        Add application
+      </Button>
+
+      {/* Search and Filters */}
+      <Form>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={18}>
+            <Search placeholder="Search..." onChange={onSearchBarChange} />
+          </Col>
+          <Col xs={12} md={3}>
+            <Form.Item>
+              <RoleTypesSelect isMultiselect onChange={onRoleTypesFilterChange} />
+            </Form.Item>
+          </Col>
+          <Col xs={12} md={3}>
+            <Form.Item>
+              <ApplicationStagesSelect isMultiselect onChange={onApplicationStageTypesFilterChange} />
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+
+      {/* Application List */}
+      <Spin spinning={!data}>
+        {applications.map((application, index) => (
+          <ApplicationListCard key={index} application={application} />
+        ))}
+      </Spin>
+      <ApplicationNavBar isYourList={true} />
+    </div>
   );
 }
 
