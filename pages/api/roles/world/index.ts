@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse } from '../../../../types/apiResponse';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../../../types/role';
 import { getNonEmptyArrayOrUndefined, combineDefinedArrays, buildFrequencyMap } from '../../../../utils/arrays';
-import { withVerifiedUser } from '../../../../utils/auth/jwtHelpers';
+import { withVerified } from '../../../../utils/auth/jwtHelpers';
 import {
   makeCompanyNameFilters,
   makeRoleTitleFilters,
@@ -22,7 +22,7 @@ import { splitByWhitespaces, splitByCommaRemovingWhitespacesAround } from '../..
 
 const prisma = new PrismaClient();
 
-async function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   switch (method) {
     case HttpMethod.GET:
@@ -102,4 +102,4 @@ function parseGetQueryParams(req: NextApiRequest): WorldRoleQueryParams {
   return { searchWords: searchWordsArr, roleTypeWords };
 }
 
-export default withPrismaErrorHandling(withVerifiedUser(handler));
+export default withPrismaErrorHandling(withVerified(handler));
