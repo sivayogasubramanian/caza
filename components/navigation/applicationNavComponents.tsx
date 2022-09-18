@@ -1,5 +1,19 @@
 import { Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+
 import Link from 'next/link';
+
+export function CreateApplicationButton() {
+  return (
+    <div className="flex fixed left-0 right-0 place-content-center bottom-20 md:bottom-4  w-full">
+      <Button
+        className="z-50 h-12 w-12 justify-center rounded-lg bg-blue-400 hover:bg-blue-500 border-none hover:border-none"
+        type="primary"
+        icon={<PlusOutlined />}
+      ></Button>
+    </div>
+  );
+}
 
 export function ApplicationButtons({ isYourList }: { isYourList: boolean }) {
   const activatedClass =
