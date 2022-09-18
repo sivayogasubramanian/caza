@@ -5,7 +5,7 @@ const TIME_FORMAT = 'HH:mm:ss';
 export const DEFAULT_NOTIFICATION_TIME = moment('09:00:00', TIME_FORMAT);
 export const DEFAULT_NOTIFICATION_DAYS_OFFSET = 1;
 
-export function getNotificationDateTime(values: TaskFormData) {
+export function getIsoNotificationDateTime(values: TaskFormData) {
   const dateFormat = 'YYYY-MM-DD';
   const localDueDate = values.dueDate?.format(dateFormat);
   const localNotificationDate = values.notificationDate?.format(dateFormat);

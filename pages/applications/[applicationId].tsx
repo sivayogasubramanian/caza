@@ -65,9 +65,9 @@ function Application() {
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
   );
 
-  const [shouldFetchData, setShouldFetchData] = useState(true);
+  const [shouldFetchData, setShouldFetchData] = useState<boolean>(true);
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
-  const [isAddingNewTask, setIsAddingNewTask] = useState(false);
+  const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
 
   useEffect(() => {
     if (shouldFetchData) {
