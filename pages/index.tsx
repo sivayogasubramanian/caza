@@ -1,8 +1,7 @@
 import { ApplicationStageType, RoleType } from '@prisma/client';
-import { Button, Col, Form, Row, Spin } from 'antd';
+import { Col, Form, Row, Spin } from 'antd';
 import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
-import { useRouter } from 'next/router';
 import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
 import api from '../api/api';
@@ -15,12 +14,9 @@ import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import ApplicationNavBar from '../components/navigation/ApplicationNavBar';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
-import { CREATE_APPLICATION_ROUTE } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
-  const router = useRouter();
-
   const [searchParams, setSearchParams] = useState<ApplicationQueryParams>({
     searchWords: [],
     roleTypeWords: [],
@@ -37,11 +33,6 @@ function Applications() {
 
   const onApplicationStageTypesFilterChange = (stageTypes: ApplicationStageType[]) => {
     setSearchParams({ ...searchParams, stageTypeWords: stageTypes });
-  };
-
-  const onClickAddApplication: React.MouseEventHandler<HTMLElement> = (e) => {
-    e.preventDefault();
-    router.push(CREATE_APPLICATION_ROUTE);
   };
 
   const { data } = useSWR<ApiResponse<ApplicationListData[]>>(
@@ -62,11 +53,6 @@ function Applications() {
           <GoToWorldViewButton />
         </div>
       </div>
-
-      {/* TODO: Move this to bottom navbar */}
-      <Button type="primary" onClick={onClickAddApplication} className="mb-3">
-        Add application
-      </Button>
 
       {/* Search and Filters */}
       <Form>
