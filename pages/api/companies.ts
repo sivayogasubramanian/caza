@@ -55,14 +55,14 @@ async function handler(userId: string, req: NextApiRequest, res: NextApiResponse
 }
 
 async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<CompanyListData[]>>) {
-  const queryParams: CompanyQueryParams = parseGetQueryParams(req);
+  const { companyNames } = parseGetQueryParams(req);
 
-  if (!queryParams.companyNames) {
+  if (companyNames.length === 0) {
     res.status(HttpStatus.OK).json(createJsonResponse([]));
     return;
   }
 
-  const companyNamesFilters = makeCompanyNameFilters(queryParams.companyNames);
+  const companyNamesFilters = makeCompanyNameFilters(companyNames);
 
   const companies: CompanyListData[] = await prisma.company.findMany({
     where: {
