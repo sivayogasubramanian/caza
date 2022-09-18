@@ -15,8 +15,6 @@ interface TaskFormTimePickerProps {
   givenStyle?: CSSProperties;
 }
 
-const { Option } = Select;
-
 function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setTaskFormData }: Props) {
   const [form] = Form.useForm();
 
@@ -31,7 +29,7 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setTaskForm
 
   useEffect(() => {
     if (isSubmitting) {
-      setTaskFormData(form.getFieldsValue());
+      form.validateFields().then(() => setTaskFormData(form.getFieldsValue()));
     }
   }, [isSubmitting]);
 
@@ -74,11 +72,11 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setTaskForm
 
           <Form.Item name="notificationDateTimeType" className="flex-grow">
             <Select onSelect={onSelectNotificationDateTimeType}>
-              <Option value={NotificationDateTimeType.NONE}>None</Option>
-              <Option value={NotificationDateTimeType.DAY_OF_EVENT}>On day of event</Option>
-              <Option value={NotificationDateTimeType.DAYS_BEFORE}>Day(s) before</Option>
-              <Option value={NotificationDateTimeType.DAYS_AFTER}>Day(s) after</Option>
-              <Option value={NotificationDateTimeType.ON_SELECTED_DATE}>On selected date</Option>
+              <Select.Option value={NotificationDateTimeType.NONE}>None</Select.Option>
+              <Select.Option value={NotificationDateTimeType.DAY_OF_EVENT}>On day of event</Select.Option>
+              <Select.Option value={NotificationDateTimeType.DAYS_BEFORE}>Day(s) before</Select.Option>
+              <Select.Option value={NotificationDateTimeType.DAYS_AFTER}>Day(s) after</Select.Option>
+              <Select.Option value={NotificationDateTimeType.ON_SELECTED_DATE}>On selected date</Select.Option>
             </Select>
           </Form.Item>
         </div>
