@@ -18,26 +18,36 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   applications         Application[]
-  contributedCompanies Company[]
-  contributedRoles     Role[]
+  contributedCompanies CompanyContribution[]
+  contributedRoles     RoleContribution[]
 
   @@map("users")
 }
 
 model Company {
-  id            Int     @id @default(autoincrement())
-  name          String
-  companyUrl    String  @map("company_url")
-  isVerified    Boolean @default(false) @map("is_verified")
-  contributor   User?   @relation(fields: [contributorId], references: [uid], onUpdate: Cascade)
-  contributorId String? @map("contributor_id")
+  id         Int     @id @default(autoincrement())
+  name       String
+  companyUrl String  @map("company_url")
+  isVerified Boolean @default(false) @map("is_verified")
 
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  roles Role[]
+  roles         Role[]
+  contributions CompanyContribution[]
 
   @@unique([name, companyUrl])
   @@map("companies")
+}
+
+model CompanyContribution {
+  company   Company @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  companyId Int     @map("company_id")
+
+  contributor   User   @relation(fields: [contributorId], references: [uid], onUpdate: Cascade, onDelete: Cascade)
+  contributorId String @map("contributor_id")
+
+  @@id([companyId, contributorId])
+  @@map("companies_contributions")
 }
 
 enum RoleType {
@@ -49,21 +59,32 @@ enum RoleType {
 }
 
 model Role {
-  id            Int      @id @default(autoincrement())
-  company       Company  @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  companyId     Int      @map("company_id")
-  title         String
-  type          RoleType
-  year          Int
-  isVerified    Boolean  @default(false) @map("is_verified")
-  contributor   User?    @relation(fields: [contributorId], references: [uid], onUpdate: Cascade)
-  contributorId String?  @map("contributor_id")
+  id         Int      @id @default(autoincrement())
+  company    Company  @relation(fields: [companyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  companyId  Int      @map("company_id")
+  title      String
+  type       RoleType
+  year       Int
+  isVerified Boolean  @default(false) @map("is_verified")
 
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  applications Application[]
+  applications  Application[]
+  contributions RoleContribution[]
 
+  @@unique([companyId, title, type, year])
   @@map("roles")
+}
+
+model RoleContribution {
+  role   Role @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roleId Int  @map("role_id")
+
+  contributor   User   @relation(fields: [contributorId], references: [uid], onUpdate: Cascade, onDelete: Cascade)
+  contributorId String @map("contributor_id")
+
+  @@id([roleId, contributorId])
+  @@map("roles_contributions")
 }
 
 model Application {
