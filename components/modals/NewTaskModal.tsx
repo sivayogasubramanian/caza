@@ -20,7 +20,6 @@ interface Props {
 }
 
 function NewTaskModal({ applicationId, setIsAddingNewTask, mutateApplicationData }: Props) {
-  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
   const [initialValues] = useState<TaskFormData>({
@@ -59,7 +58,6 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, mutateApplicationData
     <Modal
       open
       title="New Task"
-      okButtonProps={{ disabled: shouldDisableSaveButton }}
       okText="Create"
       onCancel={() => setIsAddingNewTask(false)}
       onOk={() => setIsSubmitting(true)}
@@ -67,10 +65,8 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, mutateApplicationData
     >
       <TaskForm
         initialValues={initialValues}
-        shouldTouchAllCompulsoryFields={true}
         shouldShowMarkDone={false}
         isSubmitting={isSubmitting}
-        setShouldDisableSaveButton={setShouldDisableSaveButton}
         setTaskFormData={setTaskFormData}
       />
     </Modal>

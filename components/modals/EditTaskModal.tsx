@@ -29,7 +29,6 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
   const [initialValues, setInitialValues] = useState<TaskFormData>({
     notificationDaysOffset: DEFAULT_NOTIFICATION_DAYS_OFFSET,
   });
-  const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
 
@@ -116,23 +115,15 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
         <Button key="cancel" onClick={() => setSelectedTask(null)}>
           Cancel
         </Button>,
-        <Button
-          key="save"
-          type="primary"
-          loading={isSubmitting}
-          onClick={() => setIsSubmitting(true)}
-          disabled={shouldDisableSaveButton}
-        >
+        <Button key="save" type="primary" loading={isSubmitting} onClick={() => setIsSubmitting(true)}>
           Save
         </Button>,
       ]}
     >
       <TaskForm
         initialValues={initialValues}
-        shouldTouchAllCompulsoryFields={false}
         shouldShowMarkDone={true}
         isSubmitting={isSubmitting}
-        setShouldDisableSaveButton={setShouldDisableSaveButton}
         setTaskFormData={setTaskFormData}
       />
     </Modal>
