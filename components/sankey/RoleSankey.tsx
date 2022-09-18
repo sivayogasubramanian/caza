@@ -3,6 +3,9 @@ import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleCh
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
 import CompanyLogo from '../company/CompanyLogo';
+import { renderToString } from 'react-dom/server';
+import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
+import { ApplicationStageType } from '@prisma/client';
 
 export type RoleSankeyProps = { data: WorldRoleStatsData };
 
@@ -81,10 +84,18 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
 function createTooltip(data: WorldRoleStatsData, edgeIndex: number): string {
   const targetEdge = data.edges[edgeIndex];
   const { source, dest, totalNumHours, userCount } = targetEdge;
-  return `<div class="text-lg rotate-0 md:rotate-270">
-      ${source} to ${dest}:<br /> ${userCount} user${userCount > 1 ? 's' : ''}
-      took ~${Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
-    </div>`;
+  const sourceUserFacing = stageTypeToDisplayStringMap.get(source.split(':')[0] as ApplicationStageType);
+  const destUserFacing = stageTypeToDisplayStringMap.get(dest.split(':')[0] as ApplicationStageType);
+
+  const element = (
+    <div className="w-0 h-0 relative">
+      <div className="origin-bottom-left rotate-90 absolute left-0 right-0 top-0 bottom-0">
+        {sourceUserFacing} to {destUserFacing}:<br /> {userCount} user{userCount > 1 ? 's ' : ' '}
+        took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+      </div>
+    </div>
+  );
+  return renderToString(element);
 }
 
 type SankeyMouseEvent = { row: number; name?: string };
