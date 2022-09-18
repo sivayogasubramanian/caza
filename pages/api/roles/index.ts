@@ -153,20 +153,25 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return;
   }
 
+  const roleData: RoleData = {
+    id: duplicateRole.id,
+    title: duplicateRole.title,
+    type: duplicateRole.type,
+    year: duplicateRole.year,
+  };
+
   const isAlreadyContributedByUser = duplicateRole.contributions.some(
     (contribution) => contribution.contributorId === userId,
   );
 
   if (duplicateRole.isVerified || isAlreadyContributedByUser) {
-    res.status(HttpStatus.OK).json(createJsonResponse(duplicateRole, messages[MessageType.ROLE_ALREADY_EXISTS]));
+    res.status(HttpStatus.OK).json(createJsonResponse(roleData, messages[MessageType.ROLE_ALREADY_EXISTS]));
     return;
   }
 
   await addRoleContribution(userId, duplicateRole.id);
 
-  res
-    .status(HttpStatus.CREATED)
-    .json(createJsonResponse(duplicateRole, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
+  res.status(HttpStatus.CREATED).json(createJsonResponse(roleData, messages[MessageType.ROLE_CREATED_SUCCESSFULLY]));
 
   return;
 }

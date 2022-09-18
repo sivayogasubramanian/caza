@@ -114,12 +114,18 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     return;
   }
 
+  const companyData: CompanyData = {
+    id: duplicateCompany.id,
+    name: duplicateCompany.name,
+    companyUrl: duplicateCompany.companyUrl,
+  };
+
   const isAlreadyContributedByUser = duplicateCompany.contributions.some(
     (contribution) => contribution.contributorId === userId,
   );
 
   if (duplicateCompany.isVerified || isAlreadyContributedByUser) {
-    res.status(HttpStatus.OK).json(createJsonResponse(duplicateCompany, messages[MessageType.COMPANY_ALREADY_EXISTS]));
+    res.status(HttpStatus.OK).json(createJsonResponse(companyData, messages[MessageType.COMPANY_ALREADY_EXISTS]));
     return;
   }
 
@@ -127,7 +133,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 
   res
     .status(HttpStatus.CREATED)
-    .json(createJsonResponse(duplicateCompany, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
+    .json(createJsonResponse(companyData, messages[MessageType.COMPANY_CREATED_SUCCESSFULLY]));
   return;
 }
 
