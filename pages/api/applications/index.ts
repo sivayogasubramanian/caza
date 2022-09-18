@@ -23,6 +23,7 @@ import { combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../util
 import { splitByCommaRemovingWhitespacesAround, splitByWhitespaces } from '../../../utils/strings/formatters';
 import { convertApplicationStageToPayload } from '../../../utils/applicationStage/converter';
 import { isValidDate } from '../../../utils/date/validations';
+import { canBecomeInteger } from '../../../utils/numbers/validations';
 
 enum MessageType {
   APPLICATION_CREATED_SUCCESSFULLY,
@@ -208,7 +209,7 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
     return MessageType.MISSING_ROLE_ID;
   }
 
-  if (roleId === null || !Number.isInteger(roleId)) {
+  if (!canBecomeInteger(roleId)) {
     return MessageType.INVALID_ROLE_ID;
   }
 
