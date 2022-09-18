@@ -6,7 +6,7 @@ import { Nullable } from '../../types/utils';
 interface Props {
   initialValues: TaskFormData;
   shouldTouchAllCompulsoryFields: boolean;
-  shouldAllowMarkDone: boolean;
+  shouldShowMarkDone: boolean;
   isSubmitting: boolean;
   setShouldDisableSaveButton: React.Dispatch<React.SetStateAction<boolean>>;
   setTaskFormData: React.Dispatch<React.SetStateAction<Nullable<TaskFormData>>>;
@@ -17,16 +17,16 @@ const { Option } = Select;
 function TaskForm({
   initialValues,
   shouldTouchAllCompulsoryFields,
-  shouldAllowMarkDone,
+  shouldShowMarkDone,
   isSubmitting,
   setShouldDisableSaveButton,
   setTaskFormData,
 }: Props) {
   const [form] = Form.useForm();
 
+  const [shouldShowNotificationDaysOffsetInput, setShouldShowNotificationDaysOffsetInput] = useState(false);
+  const [shouldShowNotificationDateTimePicker, setShouldShowNotificationDateTimePicker] = useState(false);
   const [shouldShowNotificationTimePicker, setShouldShowNotificationTimePicker] = useState(false);
-  const [shouldShowNotificationDaysInput, setShouldShowNotificationDaysInput] = useState(false);
-  const [shouldShowNotificationDatePicker, setShouldShowNotificationDatePicker] = useState(false);
 
   useEffect(() => {
     form.resetFields();
@@ -45,10 +45,10 @@ function TaskForm({
         value === NotificationDateTimeType.DAYS_BEFORE ||
         value === NotificationDateTimeType.DAYS_AFTER,
     );
-    setShouldShowNotificationDaysInput(
+    setShouldShowNotificationDaysOffsetInput(
       value === NotificationDateTimeType.DAYS_BEFORE || value === NotificationDateTimeType.DAYS_AFTER,
     );
-    setShouldShowNotificationDatePicker(value === NotificationDateTimeType.ON_SELECTED_DATE);
+    setShouldShowNotificationDateTimePicker(value === NotificationDateTimeType.ON_SELECTED_DATE);
   };
 
   const getTimePickerComponent = (givenStyle?: React.CSSProperties) => (
@@ -90,7 +90,7 @@ function TaskForm({
 
       <Form.Item label="Notification date">
         <div className="flex items-stretch">
-          {shouldShowNotificationDaysInput && (
+          {shouldShowNotificationDaysOffsetInput && (
             <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>
               <InputNumber precision={0} />
             </Form.Item>
@@ -107,7 +107,7 @@ function TaskForm({
           </Form.Item>
         </div>
 
-        {shouldShowNotificationDatePicker && (
+        {shouldShowNotificationDateTimePicker && (
           <div className="flex justify-between">
             <Form.Item
               name="notificationDate"
@@ -124,7 +124,7 @@ function TaskForm({
         {shouldShowNotificationTimePicker && getTimePickerComponent()}
       </Form.Item>
 
-      {shouldAllowMarkDone && (
+      {shouldShowMarkDone && (
         <Form.Item name="isDone" valuePropName="checked">
           <Checkbox>Done</Checkbox>
         </Form.Item>

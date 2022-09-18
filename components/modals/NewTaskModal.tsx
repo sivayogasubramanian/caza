@@ -18,7 +18,7 @@ interface Props {
 
 function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }: Props) {
   const [shouldDisableSaveButton, setShouldDisableSaveButton] = useState(true);
-  const [shouldSubmit, setShouldSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [taskFormData, setTaskFormData] = useState<Nullable<TaskFormData>>(null);
   const [initialValues] = useState<TaskFormData>({
     notificationTime: DEFAULT_NOTIFICATION_TIME,
@@ -38,7 +38,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
   };
 
   const onSubmit = () => {
-    setShouldSubmit(true);
+    setIsSubmitting(true);
   };
 
   const submit = (values: TaskFormData) => {
@@ -57,7 +57,7 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
         setShouldFetchData(true);
         setIsAddingNewTask(false);
       })
-      .finally(() => setShouldSubmit(false));
+      .finally(() => setIsSubmitting(false));
   };
 
   return (
@@ -73,8 +73,8 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, setShouldFetchData }:
       <TaskForm
         initialValues={initialValues}
         shouldTouchAllCompulsoryFields={true}
-        shouldAllowMarkDone={false}
-        isSubmitting={shouldSubmit}
+        shouldShowMarkDone={false}
+        isSubmitting={isSubmitting}
         setShouldDisableSaveButton={setShouldDisableSaveButton}
         setTaskFormData={setTaskFormData}
       />
