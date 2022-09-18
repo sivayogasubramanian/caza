@@ -18,6 +18,7 @@ import { canBecomeInteger } from '../../utils/numbers/validations';
 import EditTaskModal from '../../components/modals/EditTaskModal';
 import { Nullable } from '../../types/utils';
 import NewTaskModal from '../../components/modals/NewTaskModal';
+import EditStageModal from '../../components/modals/EditStageModal';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -65,6 +66,7 @@ function Application() {
       firstItem.date.getTime() - secondItem.date.getTime() || (firstItem.type === TimelineType.TASK ? -1 : 1),
   );
 
+  const [selectedStage, setSelectedStage] = useState<Nullable<ApplicationStageApplicationData>>(null);
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
   const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
 
@@ -75,6 +77,8 @@ function Application() {
           This application seems very empty. Add your first stage or task now!
         </div>
       )}
+
+      {selectedStage && <EditStageModal setSelectedStage={setSelectedStage} />}
 
       {isAddingNewTask && (
         <NewTaskModal
@@ -98,7 +102,10 @@ function Application() {
           {timelineItems.map((item, index) => (
             <Timeline.Item key={index} dot={getTimelineIcon(item)}>
               {item.type === TimelineType.STAGE ? (
-                <ApplicationStageTimelineCard applicationStage={item.data as ApplicationStageApplicationData} />
+                <ApplicationStageTimelineCard
+                  applicationStage={item.data as ApplicationStageApplicationData}
+                  onClick={() => setSelectedStage(item.data as ApplicationStageApplicationData)}
+                />
               ) : (
                 <ApplicationTaskTimelineCard
                   applicationId={applicationId}
