@@ -22,17 +22,17 @@ import { splitByWhitespaces, splitByCommaRemovingWhitespacesAround } from '../..
 
 const prisma = new PrismaClient();
 
-async function handler(userId: string, req: NextApiRequest, res: NextApiResponse) {
+async function handler(_: string, req: NextApiRequest, res: NextApiResponse) {
   const method = req.method;
   switch (method) {
     case HttpMethod.GET:
-      return handleGet(userId, req, res);
+      return handleGet(req, res);
     default:
       return rejectHttpMethod(res, method);
   }
 }
 
-async function handleGet(userId: string, req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleListData[]>>) {
+async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleListData[]>>) {
   const { searchWords, roleTypeWords } = parseGetQueryParams(req);
 
   const companyNameFilters = makeCompanyNameFilters(searchWords);
