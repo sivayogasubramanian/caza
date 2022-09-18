@@ -22,7 +22,7 @@ function WorldRoleListCard({ role }: Props) {
   return (
     <div className="flex flex-col gap-2 shadow-md rounded-lg p-3">
       <div className="flex items-center xs-12 md-4 p-4">
-        <CompanyLogo companyUrl={role.company.companyUrl} className="rounded-full max-w-[3rem]" />
+        <CompanyLogo company={role.company} className="rounded-full max-w-[3rem]" />
 
         <div className="ml-5 w-[100%] flex flex-col gap-0.5">
           <div className="font-bold">{role.title}</div>
