@@ -55,7 +55,7 @@ function WorldRoleListCard({ role }: Props) {
       <div className="flex items-center xs-12 md-4 p-4">
         <CompanyLogo companyUrl={role.company.companyUrl} className="rounded-full max-w-[3rem]" />
 
-        <div className="ml-5 w-[100%] flex flex-col gap-0.5 ">
+        <div className="ml-5 w-[100%] flex flex-col gap-0.5">
           <div className="font-bold">{role.title}</div>
 
           <div className="text-gray-500 text-xs">{`${role.company.name}, ${roleTypeToDisplayStringMap.get(
@@ -77,7 +77,7 @@ function WorldRoleListCard({ role }: Props) {
             return (
               <Tooltip title={`${stageTypeToDisplayStringMap.get(stage)}: ${stageCount}`} key={stage}>
                 <div
-                  className="overflow-hidden text-center"
+                  className={`overflow-hidden text-center ${percentage < 0.05 ? 'text-transparent md:text-black' : ''}`}
                   style={{ width: `${percentage * 100}%`, backgroundColor: color }}
                 >
                   {stageCount}
@@ -91,16 +91,16 @@ function WorldRoleListCard({ role }: Props) {
       </div>
 
       {/* Stage Color Legend */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {stageColors
           .filter(({ stage }) => role.applicationStages.some(({ type }) => stage === type))
           .map(({ stage, color }) => (
-            <>
+            <div className="flex gap-2">
               <div className="w-4 h-4 rounded-md" style={{ backgroundColor: color }}>
                 &nbsp;
               </div>
               <div>{stageTypeToDisplayStringMap.get(stage)}</div>
-            </>
+            </div>
           ))}
       </div>
 
