@@ -1,25 +1,26 @@
 import { Button, Timeline } from 'antd';
+import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../api/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
 import TaskIcon from '../../components/icons/timeline/TaskIcon';
+import EditStageModal from '../../components/modals/EditStageModal';
+import EditTaskModal from '../../components/modals/EditTaskModal';
+import NewStageModal from '../../components/modals/NewStageModal';
+import NewTaskModal from '../../components/modals/NewTaskModal';
 import NotFound from '../../components/notFound/NotFound';
 import Spinner from '../../components/spinner/Spinner';
 import { ApplicationData } from '../../types/application';
 import { ApplicationStageApplicationData } from '../../types/applicationStage';
 import { TaskData } from '../../types/task';
 import { TimelineData, TimelineType } from '../../types/timeline';
+import { Nullable } from '../../types/utils';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
-import React, { useState } from 'react';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
-import EditTaskModal from '../../components/modals/EditTaskModal';
-import { Nullable } from '../../types/utils';
-import NewTaskModal from '../../components/modals/NewTaskModal';
-import EditStageModal from '../../components/modals/EditStageModal';
-import NewStageModal from '../../components/modals/NewStageModal';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -74,77 +75,86 @@ function Application() {
 
   return (
     <Spinner isLoading={isLoading}>
-      {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
-        <div className="mr-5 ml-5 flex justify-center text-center text-gray-300">
-          This application seems very empty. Add your first stage or task now!
-        </div>
-      )}
+      <div className="p-5">
+        {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
+          <div className="flex justify-center text-center text-gray-300">
+            This application seems very empty. Add your first stage or task now!
+          </div>
+        )}
 
-      {isAddingNewStage && (
-        <NewStageModal
-          applicationId={applicationId}
-          setIsAddingNewStage={setIsAddingNewStage}
-          mutateApplicationData={mutateApplicationData}
-        />
-      )}
+        {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
+          <div className="flex items-center justify-between">
+            <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
+            {/* TODO: ADD NAVIGATION BUTTONS */}
+          </div>
+        )}
 
-      {selectedStage && (
-        <EditStageModal
-          applicationId={applicationId}
-          initialStage={selectedStage}
-          setSelectedStage={setSelectedStage}
-          mutateApplicationData={mutateApplicationData}
-        />
-      )}
+        {isAddingNewStage && (
+          <NewStageModal
+            applicationId={applicationId}
+            setIsAddingNewStage={setIsAddingNewStage}
+            mutateApplicationData={mutateApplicationData}
+          />
+        )}
 
-      {isAddingNewTask && (
-        <NewTaskModal
-          applicationId={applicationId}
-          setIsAddingNewTask={setIsAddingNewTask}
-          mutateApplicationData={mutateApplicationData}
-        />
-      )}
+        {selectedStage && (
+          <EditStageModal
+            applicationId={applicationId}
+            initialStage={selectedStage}
+            setSelectedStage={setSelectedStage}
+            mutateApplicationData={mutateApplicationData}
+          />
+        )}
 
-      {selectedTask && (
-        <EditTaskModal
-          applicationId={applicationId}
-          initialTask={selectedTask}
-          setSelectedTask={setSelectedTask}
-          mutateApplicationData={mutateApplicationData}
-        />
-      )}
+        {isAddingNewTask && (
+          <NewTaskModal
+            applicationId={applicationId}
+            setIsAddingNewTask={setIsAddingNewTask}
+            mutateApplicationData={mutateApplicationData}
+          />
+        )}
 
-      {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
-        <Timeline className="m-4" reverse={true}>
-          {timelineItems.map((item, index) => (
-            <Timeline.Item key={index} dot={getTimelineIcon(item)}>
-              {item.type === TimelineType.STAGE ? (
-                <ApplicationStageTimelineCard
-                  applicationStage={item.data as ApplicationStageApplicationData}
-                  onClick={() => setSelectedStage(item.data as ApplicationStageApplicationData)}
-                />
-              ) : (
-                <ApplicationTaskTimelineCard
-                  applicationId={applicationId}
-                  task={item.data as TaskData}
-                  mutateApplicationData={mutateApplicationData}
-                  onClick={() => setSelectedTask(item.data as TaskData)}
-                />
-              )}
-            </Timeline.Item>
-          ))}
-        </Timeline>
-      )}
+        {selectedTask && (
+          <EditTaskModal
+            applicationId={applicationId}
+            initialTask={selectedTask}
+            setSelectedTask={setSelectedTask}
+            mutateApplicationData={mutateApplicationData}
+          />
+        )}
 
-      {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
+        {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
+          <Timeline className="m-4" reverse={true}>
+            {timelineItems.map((item, index) => (
+              <Timeline.Item key={index} dot={getTimelineIcon(item)}>
+                {item.type === TimelineType.STAGE ? (
+                  <ApplicationStageTimelineCard
+                    applicationStage={item.data as ApplicationStageApplicationData}
+                    onClick={() => setSelectedStage(item.data as ApplicationStageApplicationData)}
+                  />
+                ) : (
+                  <ApplicationTaskTimelineCard
+                    applicationId={applicationId}
+                    task={item.data as TaskData}
+                    mutateApplicationData={mutateApplicationData}
+                    onClick={() => setSelectedTask(item.data as TaskData)}
+                  />
+                )}
+              </Timeline.Item>
+            ))}
+          </Timeline>
+        )}
 
-      <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewStage(true)}>
-        Create new stage
-      </Button>
+        {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
 
-      <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
-        Create new task
-      </Button>
+        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewStage(true)}>
+          Create new stage
+        </Button>
+
+        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
+          Create new task
+        </Button>
+      </div>
     </Spinner>
   );
 }
