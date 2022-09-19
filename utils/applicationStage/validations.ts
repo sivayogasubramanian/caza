@@ -19,15 +19,17 @@ const FINAL_STAGES: string[] = [
 export const chronologicalErrorMessages = Object.freeze({
   [ChronologicalValidationError.MORE_THAN_ONE_FINAL_STAGE]: {
     type: StatusMessageType.ERROR,
-    message: `There can only be at most one final stage out of these: ${FINAL_STAGES.toString()}. Please delete the other final stage first.`,
+    message: `There can only be at most one final stage out of these: ${FINAL_STAGES.join(
+      ', ',
+    )}. Please delete the other final stage first.`,
   },
   [ChronologicalValidationError.FINAL_STAGE_OUT_OF_ORDER]: {
     type: StatusMessageType.ERROR,
-    message: 'The date of this stage must be the latest in the timeline.',
+    message: `The final stages ${FINAL_STAGES.join(', ')} must be the latest in the timeline.`,
   },
   [ChronologicalValidationError.FIRST_STAGE_OUT_OF_ORDER]: {
     type: StatusMessageType.ERROR,
-    message: 'The date of this stage must be the earliest in the timeline.',
+    message: `The stage ${ApplicationStageType.APPLIED} must be the earliest in the timeline.`,
   },
   [ChronologicalValidationError.MORE_THAN_ONE_FIRST_STAGE]: {
     type: StatusMessageType.ERROR,
