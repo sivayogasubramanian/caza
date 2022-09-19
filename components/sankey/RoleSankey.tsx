@@ -47,17 +47,10 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
     },
   };
 
-  const chartEvents: ReactGoogleChartEvent[] = [
-    {
-      eventName: 'ready' as GoogleVizEventName,
-      callback: ({ chartWrapper, google }) => addMouseListeners(chartWrapper, google, [], []),
-    },
-  ];
-
   return (
     <div className="w-full h-40 p-8">
       <RoleCard role={data.role} />
-      <Chart chartType="Sankey" data={sankeyData} options={option} chartEvents={chartEvents} />
+      <Chart chartType="Sankey" data={sankeyData} options={option} />
     </div>
   );
 };
@@ -86,37 +79,12 @@ function createTooltip(data: WorldRoleStatsData, edgeIndex: number): string {
   const destUserFacing = stageTypeToDisplayStringMap.get(dest.split(':')[0] as ApplicationStageType);
 
   const element = (
-    <div className="w-0 h-0 relative">
-      <div className="origin-bottom-left rotate-90 md:rotate-0 absolute left-0 right-0 top-0 bottom-0">
-        {sourceUserFacing} to {destUserFacing}:<br /> {userCount} user{userCount > 1 ? 's ' : ' '}
-        took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
-      </div>
+    <div>
+      {sourceUserFacing} to {destUserFacing}:<br /> {userCount} user{userCount > 1 ? 's ' : ' '}
+      took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
     </div>
   );
   return renderToString(element);
 }
-
-type SankeyMouseEvent = { row: number; name?: string };
-
-// Typing for Google Chart is very suspect.
-/* eslint-disable */
-function addMouseListeners(
-  chartWrapper: GoogleChartWrapper,
-  google: GoogleViz,
-  mouseOverListeners: ((e: SankeyMouseEvent) => void)[],
-  mouseOutListeners: ((e: SankeyMouseEvent) => void)[],
-) {
-  google.visualization.events.addListener(
-    chartWrapper.getChart() as any,
-    'onmouseover' as GoogleVizEventName,
-    (e: any) => {
-      mouseOverListeners.forEach((fn) => fn(e as SankeyMouseEvent));
-    },
-  );
-  google.visualization.events.addListener(chartWrapper.getChart() as any, 'onmouseout' as any, (e: any) => {
-    mouseOutListeners.forEach((fn) => fn(e as SankeyMouseEvent));
-  });
-}
-/* eslint-enable */
 
 export default RoleSankey;
