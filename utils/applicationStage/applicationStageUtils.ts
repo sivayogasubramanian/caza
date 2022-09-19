@@ -19,7 +19,7 @@ import RejectedIcon from '../../components/icons/timeline/RejectedIcon';
 import TechnicalIcon from '../../components/icons/timeline/TechnicalIcon';
 import WithdrawnIcon from '../../components/icons/timeline/WithdrawnIcon';
 
-export const stageTypeToDisplayStringMap = Immutable.Map<ApplicationStageType, string>({
+export const stageTypeToDisplayStringMap = Immutable.OrderedMap({
   APPLIED: 'Applied',
   ONLINE_ASSESSMENT: 'Online Assessment',
   TECHNICAL: 'Technical Round',
