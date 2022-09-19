@@ -18,11 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
             fetcher: (url) => api.get(url),
           }}
         >
-          <Header>
-            <ApplicationNavBar>
-              <Component {...pageProps} />
-            </ApplicationNavBar>
-          </Header>
+          <Header />
+          <Component {...pageProps} />
+          <ApplicationNavBar />
         </SWRConfig>
       </AxiosInterceptor>
     </AuthContext.Provider>
