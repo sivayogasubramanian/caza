@@ -15,7 +15,7 @@ export default function ApplicationNavBar() {
   const worldClass = router.pathname.startsWith(WORLD_ROUTE) ? activatedClass : inactivatedClass;
 
   return (
-    <section className="block md:hidden fixed bottom-0 inset-x-0 z-50 bg-slate-100 pt-1 pb-1 cursor-pointer">
+    <section className="block md:hidden sticky bottom-0 inset-x-0 z-50 bg-slate-100 pt-1 pb-1 cursor-pointer">
       <div className="flex items-center">
         <Link href="/">
           <div className={yourListClass}>
