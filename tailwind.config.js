@@ -11,7 +11,7 @@ module.exports = {
       addUtilities({
         '.role-sankey-label': {
           transformBox: 'fill-box',
-          transform: 'rotate(90deg) translate(-60%, -180%)',
+          transform: 'rotate(90deg)',
         },
       });
     }),
