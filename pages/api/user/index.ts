@@ -28,7 +28,7 @@ enum MessageType {
 const messages = Object.freeze({
   // POST messages (without oldToken)
   [MessageType.USER_CREATED]: { type: StatusMessageType.SUCCESS, message: 'New user added.' },
-  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.ERROR, message: 'User already exists.' },
+  [MessageType.USER_ALREADY_EXISTS]: { type: StatusMessageType.SUCCESS, message: 'User already exists.' },
   // POST messages (with oldToken)
   [MessageType.NEW_USER_LINKED]: { type: StatusMessageType.SUCCESS, message: 'Account was linked successfully.' },
   [MessageType.NEW_USER_UNVERIFIED]: { type: StatusMessageType.ERROR, message: 'Account could not be linked.' },
@@ -72,7 +72,7 @@ function handlePost(currentUid: string, req: NextApiRequest, res: NextApiRespons
 async function handlePostWithoutOldToken(currentUid: string, res: NextApiResponse<ApiResponse<UserData>>) {
   const isExisting = (await getUserIfExists(currentUid)) !== null;
   if (isExisting) {
-    return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.USER_ALREADY_EXISTS]));
+    return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.USER_ALREADY_EXISTS]));
   }
 
   await prisma.user.create({ data: { uid: currentUid } });
