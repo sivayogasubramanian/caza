@@ -50,7 +50,7 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmit
   };
 
   return (
-    <Form form={form} initialValues={initialValues}>
+    <Form form={form} initialValues={initialValues} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
       <Form.Item
         label="Task"
         name="title"
