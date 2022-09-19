@@ -3,13 +3,18 @@ import { ApplicationStageType, PrismaClient } from '@prisma/client';
 import { ApiResponse, StatusMessageType } from '../../../../../types/apiResponse';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpers';
-import { ApplicationStageData, ApplicationStagePostData } from '../../../../../types/applicationStage';
+import {
+  ApplicationStageChronologicalData,
+  ApplicationStageData,
+  ApplicationStagePostData,
+} from '../../../../../types/applicationStage';
 import { isValidDate } from '../../../../../utils/date/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { Nullable } from '../../../../../types/utils';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 import { convertApplicationStageToPayload } from '../../../../../utils/applicationStage/converter';
+import { chronologicalErrorMessages, validateStageChronology } from '../../../../../utils/applicationStage/validations';
 
 const prisma = new PrismaClient();
 
@@ -72,9 +77,23 @@ async function handlePost(uid: string, req: NextApiRequest, res: NextApiResponse
     return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_NOT_FOUND]));
   }
 
-  const { type, date, emojiUnicodeHex, remark } = req.body as ApplicationStagePostData;
-  const parameters = { type, date: new Date(date), emojiUnicodeHex, remark };
+  const applicationStagePostData = req.body as ApplicationStagePostData;
+  const { type, date, emojiUnicodeHex, remark } = applicationStagePostData;
 
+  const applicationStagesOfApplication = await findApplicationStagesOfApplication(applicationId, uid);
+
+  const chronologicalErrorMessageType = validatePostStageChronology(
+    applicationStagesOfApplication,
+    applicationStagePostData,
+  );
+  if (chronologicalErrorMessageType !== null) {
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json(createJsonResponse({}, chronologicalErrorMessages[chronologicalErrorMessageType]));
+    return;
+  }
+
+  const parameters = { type, date: new Date(date), emojiUnicodeHex, remark };
   const newStage = await prisma.applicationStage.create({
     data: { ...parameters, applicationId: application.id },
   });
@@ -118,6 +137,33 @@ function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
   }
 
   return null;
+}
+
+function validatePostStageChronology(
+  otherApplicationStagesOfApplication: ApplicationStageChronologicalData[],
+  applicationStagePostData: ApplicationStagePostData,
+) {
+  const applicationStagesToValidate = [
+    ...otherApplicationStagesOfApplication,
+    {
+      type: applicationStagePostData.type,
+      date: new Date(applicationStagePostData.date),
+    },
+  ];
+
+  return validateStageChronology(...applicationStagesToValidate);
+}
+
+async function findApplicationStagesOfApplication(applicationId: number, userId: string) {
+  return await prisma.applicationStage.findMany({
+    where: {
+      application: {
+        id: applicationId,
+        userId: userId,
+      },
+    },
+    select: { type: true, date: true },
+  });
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));

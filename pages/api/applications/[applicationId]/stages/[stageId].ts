@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApplicationStageType, PrismaClient } from '@prisma/client';
-import { ApplicationStageData, ApplicationStagePatchData } from '../../../../../types/applicationStage';
+import {
+  ApplicationStageChronologicalData,
+  ApplicationStageData,
+  ApplicationStagePatchData,
+} from '../../../../../types/applicationStage';
 import { isValidHex } from '../../../../../utils/strings/validations';
 import { withAuthUser } from '../../../../../utils/auth/jwtHelpers';
 import { isValidDate } from '../../../../../utils/date/validations';
@@ -9,6 +13,7 @@ import { withPrismaErrorHandling } from '../../../../../utils/prisma/prismaHelpe
 import { ApiResponse, EmptyPayload, StatusMessageType } from '../../../../../types/apiResponse';
 import { canBecomeInteger } from '../../../../../utils/numbers/validations';
 import { convertApplicationStageToPayload } from '../../../../../utils/applicationStage/converter';
+import { chronologicalErrorMessages, validateStageChronology } from '../../../../../utils/applicationStage/validations';
 
 enum MessageType {
   APPLICATION_STAGE_DELETE_UNAUTHORIZED,
@@ -103,6 +108,30 @@ async function handlePatch(
     remark: req.body.remark,
   };
 
+  const applicationStageToEdit = await findApplicationStage(applicationId, applicationStageId, userId);
+  if (!applicationStageToEdit) {
+    res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.APPLICATION_STAGE_NOT_FOUND]));
+    return;
+  }
+
+  const otherApplicationStagesOfApplication = await findOtherApplicationStagesOfApplication(
+    applicationId,
+    applicationStageId,
+    userId,
+  );
+
+  const chronologicalErrorMessageType = validatePatchStageChronology(
+    otherApplicationStagesOfApplication,
+    applicationStageToEdit,
+    applicationStagePatchData,
+  );
+  if (chronologicalErrorMessageType !== null) {
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json(createJsonResponse({}, chronologicalErrorMessages[chronologicalErrorMessageType]));
+    return;
+  }
+
   // Note: updateMany is used to allow filter on non-unique columns.
   // This allows a check to ensure users are only updating their own application stages.
   const { count } = await prisma.applicationStage.updateMany({
@@ -159,6 +188,20 @@ async function handleDelete(userId: string, req: NextApiRequest, res: NextApiRes
   const applicationStageId = Number(req.query.stageId);
   const applicationId = Number(req.query.applicationId);
 
+  const otherApplicationStagesOfApplication = await findOtherApplicationStagesOfApplication(
+    applicationId,
+    applicationStageId,
+    userId,
+  );
+
+  const chronologicalErrorMessageType = validateStageChronology(...otherApplicationStagesOfApplication);
+  if (chronologicalErrorMessageType !== null) {
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json(createJsonResponse({}, chronologicalErrorMessages[chronologicalErrorMessageType]));
+    return;
+  }
+
   // Note: deleteMany is used to allow filter on non-unique columns.
   // This allows a check to ensure users are only deleting their own application stages.
   const { count } = await prisma.applicationStage.deleteMany({
@@ -213,6 +256,22 @@ function validatePatchRequest(req: NextApiRequest) {
   return null;
 }
 
+function validatePatchStageChronology(
+  otherApplicationStagesOfApplication: ApplicationStageChronologicalData[],
+  applicationStageToEdit: ApplicationStageChronologicalData,
+  applicationStagePatchData: ApplicationStagePatchData,
+) {
+  const applicationStagesToValidate = [
+    ...otherApplicationStagesOfApplication,
+    {
+      type: applicationStagePatchData.type ? applicationStagePatchData.type : applicationStageToEdit.type,
+      date: applicationStagePatchData.date ? new Date(applicationStagePatchData.date) : applicationStageToEdit.date,
+    },
+  ];
+
+  return validateStageChronology(...applicationStagesToValidate);
+}
+
 function validateDeleteRequest(req: NextApiRequest) {
   if (!canBecomeInteger(req.query.stageId)) {
     return MessageType.INVALID_APPLICATION_STAGE_ID;
@@ -223,6 +282,36 @@ function validateDeleteRequest(req: NextApiRequest) {
   }
 
   return null;
+}
+
+async function findApplicationStage(applicationId: number, applicationStageId: number, userId: string) {
+  return await prisma.applicationStage.findFirst({
+    where: {
+      id: applicationStageId,
+      application: {
+        id: applicationId,
+        userId: userId,
+      },
+    },
+    select: { type: true, date: true },
+  });
+}
+
+async function findOtherApplicationStagesOfApplication(
+  applicationId: number,
+  applicationStageId: number,
+  userId: string,
+) {
+  return await prisma.applicationStage.findMany({
+    where: {
+      id: { not: applicationStageId },
+      application: {
+        id: applicationId,
+        userId: userId,
+      },
+    },
+    select: { type: true, date: true },
+  });
 }
 
 export default withPrismaErrorHandling(withAuthUser(handler));

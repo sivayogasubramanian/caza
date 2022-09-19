@@ -39,3 +39,8 @@ export type ApplicationStageFormData = {
   emojiUnicodeHex?: Nullable<string>;
   remark?: Nullable<string>;
 };
+
+export type ApplicationStageChronologicalData = {
+  type: ApplicationStageType;
+  date: Date;
+};

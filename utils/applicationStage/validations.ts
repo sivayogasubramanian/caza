@@ -1,5 +1,6 @@
 import { ApplicationStageType } from '@prisma/client';
 import { Nullable } from '../../types/utils';
+import { StatusMessageType } from '../../types/apiResponse';
 
 export enum ChronologicalValidationError {
   MORE_THAN_ONE_FINAL_STAGE,
@@ -15,6 +16,29 @@ const FINAL_STAGES: string[] = [
   ApplicationStageType.WITHDRAWN,
 ];
 
+export const chronologicalErrorMessages = Object.freeze({
+  [ChronologicalValidationError.MORE_THAN_ONE_FINAL_STAGE]: {
+    type: StatusMessageType.ERROR,
+    message: `There can only be at most one final stage out of these: ${FINAL_STAGES.toString()}. Please delete the other final stage first.`,
+  },
+  [ChronologicalValidationError.FINAL_STAGE_OUT_OF_ORDER]: {
+    type: StatusMessageType.ERROR,
+    message: 'The date of this stage must be the latest in the timeline.',
+  },
+  [ChronologicalValidationError.FIRST_STAGE_OUT_OF_ORDER]: {
+    type: StatusMessageType.ERROR,
+    message: 'The date of this stage must be the earliest in the timeline.',
+  },
+  [ChronologicalValidationError.MORE_THAN_ONE_FIRST_STAGE]: {
+    type: StatusMessageType.ERROR,
+    message: `The stage ${ApplicationStageType.APPLIED} already exists.`,
+  },
+  [ChronologicalValidationError.MISSING_FIRST_STAGE]: {
+    type: StatusMessageType.ERROR,
+    message: `The stage ${ApplicationStageType.APPLIED} must be present.`,
+  },
+});
+
 /**
  * Takes in a list of stages and if any of the following conditions are out of order, returns a message.
  * - final stage (withdrawn / accepted / rejected) occurs before another stage
@@ -29,7 +53,7 @@ export function validateStageChronology(
   ...stages: { type: ApplicationStageType; date: Date }[]
 ): Nullable<ChronologicalValidationError> {
   return (
-    hasOnlyOneAppliedStage(...stages) ??
+    hasOneAndOnlyOneAppliedStage(...stages) ??
     hasCorrectOrderForFirstStage(...stages) ??
     hasOnlyOneFinalStage(...stages) ??
     hasCorrectOrderForFinalStage(...stages)
@@ -59,7 +83,7 @@ function hasCorrectOrderForFinalStage(
   return null;
 }
 
-function hasOnlyOneAppliedStage(
+function hasOneAndOnlyOneAppliedStage(
   ...stages: { type: ApplicationStageType; date: Date }[]
 ): Nullable<ChronologicalValidationError> {
   const firstStages = stages.filter((stage) => stage.type === ApplicationStageType.APPLIED);
