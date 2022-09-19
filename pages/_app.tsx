@@ -6,6 +6,7 @@ import api from '../frontendApis/api';
 import { AxiosInterceptor } from '../frontendApis/interceptor';
 import Header from '../components/header/Header';
 import ApplicationNavBar from '../components/navigation/ApplicationNavBar';
+import Reminder from '../components/notification/Reminder';
 import AuthContext from '../context/AuthContext';
 import useFirebaseLogin from '../hooks/useFirebaseLogin';
 import '../styles/globals.css';
@@ -33,7 +34,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         >
           <Header />
-          <Component {...pageProps} />
+          <Reminder>
+            <Component {...pageProps} />
+          </Reminder>
           <ApplicationNavBar />
         </SWRConfig>
       </AxiosInterceptor>
