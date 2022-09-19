@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         >
           <Header />
-          <Component className="flex-grow" {...pageProps} />
+          <Component {...pageProps} />
           <ApplicationNavBar />
         </SWRConfig>
       </AxiosInterceptor>
