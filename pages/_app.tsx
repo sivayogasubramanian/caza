@@ -4,6 +4,7 @@ import api from '../api/api';
 import { AxiosInterceptor } from '../api/interceptor';
 import Header from '../components/header/Header';
 import ApplicationNavBar from '../components/navigation/ApplicationNavBar';
+import Reminder from '../components/notification/Reminder';
 import AuthContext from '../context/AuthContext';
 import useAnonymousLoginIfNeeded from '../hooks/useAnonymousLoginIfNeeded';
 import '../styles/globals.css';
@@ -19,7 +20,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         >
           <Header />
-          <Component {...pageProps} />
+          <Reminder>
+            <Component {...pageProps} />
+          </Reminder>
           <ApplicationNavBar />
         </SWRConfig>
       </AxiosInterceptor>
