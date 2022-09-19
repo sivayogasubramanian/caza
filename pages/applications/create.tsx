@@ -47,10 +47,10 @@ function ApplicationCreate() {
   const [isCreateCompanyFormOpen, setIsCreateCompanyFormOpen] = useState<boolean>(false);
   const [isCreateRoleFormOpen, setIsCreateRoleFormOpen] = useState<boolean>(false);
 
-  const [companySearchParams, setCompanySearchParams] = useState<CompanyQueryParams>({ companyNames: [] });
+  const [companySearchParams, setCompanySearchParams] = useState<CompanyQueryParams>({ companyNames: [''] });
   const [selectedCompany, setSelectedCompany] = useState<Nullable<CompanyListData>>(null);
 
-  const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [] });
+  const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [''] });
   const [selectedRole, setSelectedRole] = useState<Nullable<RoleData>>(null);
   const [applicationDate, setApplicationDate] = useState<Nullable<moment.Moment>>(moment(new Date()));
 
