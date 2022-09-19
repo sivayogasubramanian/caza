@@ -10,11 +10,7 @@ function Spinner({ isLoading, children }: Props) {
   return (
     <Spin
       spinning={isLoading}
-      wrapperClassName={
-        isLoading
-          ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2 h-full [&>div]:h-full'
-          : 'h-full [&>div]:h-full'
-      }
+      wrapperClassName={isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}
     >
       {children}
     </Spin>
