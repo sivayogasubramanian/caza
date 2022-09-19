@@ -45,7 +45,7 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
   }, [isSubmitting]);
 
   return (
-    <Form form={form} initialValues={initialValues}>
+    <Form form={form} initialValues={initialValues} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
       <Form.Item name="type" label="Stage" rules={[{ required: true, message: 'Please choose a stage.' }]}>
         <Select placeholder="Select stage">
           {stageTypeToDisplayStringMap.map((value, key) => (
