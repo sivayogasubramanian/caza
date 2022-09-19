@@ -76,16 +76,16 @@ function Application() {
   return (
     <Spinner isLoading={isLoading}>
       <div className="p-5">
-        {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
-          <div className="flex justify-center text-center text-gray-300">
-            This application seems very empty. Add your first stage or task now!
-          </div>
-        )}
-
-        {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
+        {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">
             <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
             {/* TODO: ADD NAVIGATION BUTTONS */}
+          </div>
+        )}
+
+        {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
+          <div className="flex justify-center text-center text-gray-300">
+            This application seems very empty. Add your first stage or task now!
           </div>
         )}
 
