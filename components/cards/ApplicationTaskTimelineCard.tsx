@@ -1,13 +1,13 @@
+import { Checkbox } from 'antd';
+import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import { KeyedMutator } from 'swr';
+import tasksApi from '../../api/tasksApi';
+import { ApiResponse } from '../../types/apiResponse';
+import { ApplicationData } from '../../types/application';
 import { TaskData } from '../../types/task';
 import { makeDisplayDate, makeDisplayNotificationDatetime } from '../../utils/date/formatters';
-import NotificationBell from '../icons/NotificationBellIcon';
-import { Checkbox } from 'antd';
 import { isValidDate } from '../../utils/date/validations';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import tasksApi from '../../api/tasksApi';
-import { KeyedMutator } from 'swr';
-import { ApplicationData } from '../../types/application';
-import { ApiResponse } from '../../types/apiResponse';
+import NotificationBell from '../icons/NotificationBellIcon';
 
 interface Props {
   applicationId: number;
@@ -29,7 +29,7 @@ function ApplicationTaskTimelineCard({ applicationId, task, mutateApplicationDat
   };
 
   return (
-    <div className="shadow-md rounded-lg cursor-pointer hover:backdrop-brightness-95" onClick={onClick}>
+    <div className="shadow-md rounded-lg cursor-pointer hover:shadow-lg" onClick={onClick}>
       <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex items-center gap-2 col-span-3">
