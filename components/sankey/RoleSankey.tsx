@@ -34,32 +34,39 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   );
 
   const option = {
-    tooltip: { isHtml: true },
+    tooltip: { isHtml: true, trigger: 'selection' },
     sankey: {
       node: {
-        label: {
-          color: 'transparent',
-          bold: true,
-        },
+        label: { bold: true },
+        interactivity: true,
       },
       link: {
         colorMode: 'gradient',
       },
+      allowHtml: 'true',
+      tooltip: { isHtml: true, trigger: 'selection' },
     },
   };
 
   const chartEvents: ReactGoogleChartEvent[] = [
     {
       eventName: 'ready' as GoogleVizEventName,
-      callback: ({ chartWrapper, google }) =>
-        addMouseListeners(chartWrapper, google, [({ row }) => setEdgeIndex(row)], [() => setEdgeIndex(-1)]),
+      callback: ({ chartWrapper, google }) => setAllSelectedAlways(data, chartWrapper, google),
     },
   ];
 
   return (
     <div className="w-full h-40 p-8">
       <RoleCard role={data.role} />
-      <Chart chartType="Sankey" data={sankeyData} options={option} chartEvents={chartEvents} />
+      <Chart
+        // className="[&>div>div>div>svg>g>text]:[font-style=italic]"
+        className="[&>div]:[font-style=italic]"
+        // className="[&>div>div>div>svg>g>text]:[transform-box=fill-box] [&>div>div>div>svg>g>text]:[transform=rotate(90deg)]"
+        chartType="Sankey"
+        data={sankeyData}
+        options={option}
+        chartEvents={chartEvents}
+      />
     </div>
   );
 };
@@ -98,25 +105,30 @@ function createTooltip(data: WorldRoleStatsData, edgeIndex: number): string {
   return renderToString(element);
 }
 
-type SankeyMouseEvent = { row: number; name?: string };
-
 // Typing for Google Chart is very suspect.
 /* eslint-disable */
-function addMouseListeners(
-  chartWrapper: GoogleChartWrapper,
-  google: GoogleViz,
-  mouseOverListeners: ((e: SankeyMouseEvent) => void)[],
-  mouseOutListeners: ((e: SankeyMouseEvent) => void)[],
-) {
+function setAllSelectedAlways(data: WorldRoleStatsData, chartWrapper: GoogleChartWrapper, google: GoogleViz) {
+  const { nodes } = data;
+  const dataTable = chartWrapper.getDataTable();
+  (chartWrapper.getChart() as any).setSelection(
+    nodes.map((name, row) => {
+      const edgeIndex = data.edges.map((e) => e.dest).indexOf(name);
+      const div = edgeIndex >= 0 ? createTooltip(data, edgeIndex) : '<div>Foo Fah</div>';
+      dataTable?.setValue(row, 3, div);
+      return { row, name, column: null };
+    }),
+  );
+  console.log(dataTable);
   google.visualization.events.addListener(
     chartWrapper.getChart() as any,
     'onmouseover' as GoogleVizEventName,
     (e: any) => {
-      mouseOverListeners.forEach((fn) => fn(e as SankeyMouseEvent));
+      console.log(nodes.indexOf(e.name));
+      console.log(e);
     },
   );
   google.visualization.events.addListener(chartWrapper.getChart() as any, 'onmouseout' as any, (e: any) => {
-    mouseOutListeners.forEach((fn) => fn(e as SankeyMouseEvent));
+    console.log(chartWrapper.getChart().getSelection());
   });
 }
 /* eslint-enable */
