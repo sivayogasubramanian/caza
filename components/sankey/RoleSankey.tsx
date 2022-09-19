@@ -3,11 +3,13 @@ import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleCh
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
 import CompanyLogo from '../company/CompanyLogo';
+import { renderToString } from 'react-dom/server';
+import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
+import { ApplicationStageType } from '@prisma/client';
 
 export type RoleSankeyProps = { data: WorldRoleStatsData };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
-  const [edgeIndex, setEdgeIndex] = useState<number>(-1);
   if (!data) {
     // This should be hidden with a antd Spinner element.
     return <div></div>;
@@ -31,24 +33,24 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   );
 
   const option = {
+    tooltip: { isHtml: true },
     sankey: {
       node: {
-        label: {
-          color: 'transparent',
-          bold: true,
-        },
+        label: { color: 'transparent', bold: true },
+        interactivity: true,
       },
       link: {
         colorMode: 'gradient',
       },
+      allowHtml: 'true',
+      tooltip: { isHtml: true },
     },
   };
 
   const chartEvents: ReactGoogleChartEvent[] = [
     {
       eventName: 'ready' as GoogleVizEventName,
-      callback: ({ chartWrapper, google }) =>
-        addMouseListeners(chartWrapper, google, [({ row }) => setEdgeIndex(row)], [() => setEdgeIndex(-1)]),
+      callback: ({ chartWrapper, google }) => addMouseListeners(chartWrapper, google, [], []),
     },
   ];
 
@@ -77,15 +79,21 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
   );
 };
 
-function createTooltip(data: WorldRoleStatsData, edgeIndex: number): JSX.Element {
+function createTooltip(data: WorldRoleStatsData, edgeIndex: number): string {
   const targetEdge = data.edges[edgeIndex];
   const { source, dest, totalNumHours, userCount } = targetEdge;
-  return (
-    <div className="text-lg rotate-0 md:rotate-270">
-      {source} to {dest}:<br /> {userCount} user{userCount > 1 ? 's' : ''}
-      took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+  const sourceUserFacing = stageTypeToDisplayStringMap.get(source.split(':')[0] as ApplicationStageType);
+  const destUserFacing = stageTypeToDisplayStringMap.get(dest.split(':')[0] as ApplicationStageType);
+
+  const element = (
+    <div className="w-0 h-0 relative">
+      <div className="origin-bottom-left rotate-90 md:rotate-0 absolute left-0 right-0 top-0 bottom-0">
+        {sourceUserFacing} to {destUserFacing}:<br /> {userCount} user{userCount > 1 ? 's ' : ' '}
+        took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+      </div>
     </div>
   );
+  return renderToString(element);
 }
 
 type SankeyMouseEvent = { row: number; name?: string };
