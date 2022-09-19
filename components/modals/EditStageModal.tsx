@@ -73,7 +73,7 @@ function EditStageModal({ applicationId, initialStage, setSelectedStage, mutateA
     Modal.confirm({
       title: 'Are you sure about deleting this stage?',
       icon: <ExclamationCircleOutlined />,
-      content: 'This action is irreversible',
+      content: 'This action is irreversible!',
       onOk: handleDelete,
     });
   };

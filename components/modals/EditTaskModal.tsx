@@ -77,7 +77,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
     Modal.confirm({
       title: 'Are you sure about deleting this task?',
       icon: <ExclamationCircleOutlined />,
-      content: 'This action is irreversible',
+      content: 'This action is irreversible!',
       onOk: handleDelete,
     });
   };
