@@ -59,9 +59,7 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
     <div className="w-full h-40 p-8">
       <RoleCard role={data.role} />
       <Chart
-        // className="[&>div>div>div>svg>g>text]:[font-style=italic]"
-        className="[&>div]:[font-style=italic]"
-        // className="[&>div>div>div>svg>g>text]:[transform-box=fill-box] [&>div>div>div>svg>g>text]:[transform=rotate(90deg)]"
+        className="[&>div>div>div>svg>g>text]:role-sankey-label"
         chartType="Sankey"
         data={sankeyData}
         options={option}
