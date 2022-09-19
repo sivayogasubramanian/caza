@@ -44,6 +44,8 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
     }
   }, [isSubmitting]);
 
+  const openEmojiPicker = () => setShouldShowEmojiPicker(!shouldShowEmojiPicker);
+
   return (
     <Form form={form} initialValues={initialValues} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
       <Form.Item name="type" label="Stage" rules={[{ required: true, message: 'Please choose a stage.' }]}>
@@ -62,13 +64,16 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
 
       <Form.Item label="Reaction">
         <div>
-          {!shouldShowEmojiPicker && !selectedEmojiUnicode && (
-            <AddEmojiIcon onClick={() => setShouldShowEmojiPicker(!shouldShowEmojiPicker)} />
-          )}
+          {!shouldShowEmojiPicker && !selectedEmojiUnicode && <AddEmojiIcon onClick={openEmojiPicker} />}
 
           {!shouldShowEmojiPicker && selectedEmojiUnicode && (
             <div className="flex items-center">
-              <span role="img" aria-label="emoji" className="text-xl">
+              <span
+                role="img"
+                aria-label="emoji"
+                className="text-xl cursor-pointer hover:backdrop-brightness-95"
+                onClick={openEmojiPicker}
+              >
                 {String.fromCodePoint(parseInt(selectedEmojiUnicode, 16))}
               </span>
 
