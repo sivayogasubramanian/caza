@@ -158,6 +158,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
     title: duplicateRole.title,
     type: duplicateRole.type,
     year: duplicateRole.year,
+    isVerified: duplicateRole.isVerified,
   };
 
   const isAlreadyContributedByUser = duplicateRole.contributions.some(
@@ -204,7 +205,7 @@ async function createRole(userId: string, rolePostData: RolePostData): Promise<R
         },
       },
     },
-    select: { id: true, title: true, type: true, year: true },
+    select: { id: true, title: true, type: true, year: true, isVerified: true },
   });
 }
 
