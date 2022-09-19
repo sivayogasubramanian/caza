@@ -80,7 +80,7 @@ function Application() {
     <Spinner isLoading={isLoading}>
       <div className="p-5">
         {hasSuccessfullyFetchedApplication && (
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between">
             <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
           </div>
         )}
