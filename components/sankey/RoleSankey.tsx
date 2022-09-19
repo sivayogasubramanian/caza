@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
-import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
+import { FC } from 'react';
+import Chart from 'react-google-charts';
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
 import CompanyLogo from '../company/CompanyLogo';
