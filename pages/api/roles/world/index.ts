@@ -54,6 +54,7 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
       title: true,
       type: true,
       year: true,
+      isVerified: true,
       company: {
         select: {
           id: true,
@@ -77,15 +78,17 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
     },
   });
 
-  const rolesWithStageCounts: WorldRoleListData[] = roles.map(({ id, title, type, year, company, applications }) => {
-    const latestStages = applications.flatMap((application) =>
-      application.applicationStages.flatMap((stage) => stage.type),
-    );
-    const stageCountMap = buildFrequencyMap(latestStages);
-    const applicationStages = Array.from(stageCountMap.entries()).map(([type, count]) => ({ type, count }));
+  const rolesWithStageCounts: WorldRoleListData[] = roles.map(
+    ({ id, title, type, year, isVerified, company, applications }) => {
+      const latestStages = applications.flatMap((application) =>
+        application.applicationStages.flatMap((stage) => stage.type),
+      );
+      const stageCountMap = buildFrequencyMap(latestStages);
+      const applicationStages = Array.from(stageCountMap.entries()).map(([type, count]) => ({ type, count }));
 
-    return { id, title, type, year, company, applicationStages };
-  });
+      return { id, title, type, year, isVerified, company, applicationStages };
+    },
+  );
 
   res.status(HttpStatus.OK).json(createJsonResponse(rolesWithStageCounts));
 }

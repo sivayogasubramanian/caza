@@ -173,6 +173,7 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
           title: true,
           type: true,
           year: true,
+          isVerified: true,
           company: { select: { id: true, name: true, companyUrl: true } },
         },
       },
@@ -231,7 +232,7 @@ function convertApplicationListDataToPayload({
   latestStage: ApplicationStage | undefined;
   taskNotificationCount: number;
 }): ApplicationListData {
-  const { company, title, type, year } = role;
+  const { company, title, type, year, isVerified } = role;
   return {
     id,
     taskNotificationCount,
@@ -239,6 +240,7 @@ function convertApplicationListDataToPayload({
       type,
       title,
       year,
+      isVerified,
       id: role.id,
       company: { id: company.id, name: company.name, companyUrl: company.companyUrl },
     },

@@ -14,11 +14,12 @@ export type RoleData = {
   title: string;
   type: RoleType;
   year: number;
+  isVerified: boolean;
 };
 
 export type RoleApplicationListData = RoleData & { company: CompanyData };
 
-export type RoleListData = RoleData & { company: CompanyData; isVerified: boolean };
+export type RoleListData = RoleData & { company: CompanyData };
 
 export type RoleQueryParams = {
   companyId?: number;

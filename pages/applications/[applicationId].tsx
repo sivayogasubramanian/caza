@@ -21,6 +21,9 @@ import { Nullable } from '../../types/utils';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
+import GlobeIcon from '../../components/icons/GlobeIcon';
+import Link from 'next/link';
+import { PlusOutlined } from '@ant-design/icons';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -79,7 +82,6 @@ function Application() {
         {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">
             <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
-            {/* TODO: ADD NAVIGATION BUTTONS */}
           </div>
         )}
 
@@ -146,15 +148,27 @@ function Application() {
         )}
 
         {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
-
-        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewStage(true)}>
-          Create new stage
-        </Button>
-
-        <Button type="primary" className="bg-blue-400" onClick={() => setIsAddingNewTask(true)}>
-          Create new task
-        </Button>
       </div>
+
+      {hasSuccessfullyFetchedApplication && (
+        <div className="fixed w-full bottom-14 flex items-center justify-around">
+          <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={() => setIsAddingNewStage(true)}>
+            New stage
+          </Button>
+
+          <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={() => setIsAddingNewTask(true)}>
+            New task
+          </Button>
+
+          {application.role.isVerified && (
+            <Link href={`/world/${application.role.id}`}>
+              <Button shape="round" className="flex items-center gap-2" type="primary" icon={<GlobeIcon size={15} />}>
+                Role stats
+              </Button>
+            </Link>
+          )}
+        </div>
+      )}
     </Spinner>
   );
 }
