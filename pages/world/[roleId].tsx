@@ -3,7 +3,6 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import useSWR from 'swr';
-import { ROLES_API_ENDPOINT } from '../../api/rolesApi';
 import { WORLD_API_ENDPOINT } from '../../api/worldApi';
 import RoleSankey from '../../components/sankey/RoleSankey';
 import AuthContext from '../../context/AuthContext';

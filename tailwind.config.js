@@ -1,3 +1,4 @@
+/* eslint-disable-next-line */
 const plugin = require('tailwindcss/plugin');
 
 /** @type {import('tailwindcss').Config} */

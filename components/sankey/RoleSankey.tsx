@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
@@ -10,7 +10,6 @@ import { ApplicationStageType } from '@prisma/client';
 export type RoleSankeyProps = { data: WorldRoleStatsData };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
-  const [edgeIndex, setEdgeIndex] = useState<number>(-1);
   if (!data) {
     // This should be hidden with a antd Spinner element.
     return <div></div>;
