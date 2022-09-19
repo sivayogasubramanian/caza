@@ -20,7 +20,7 @@ function WorldRoleListCard({ role }: Props) {
   const sumOfStageCounts = role.applicationStages.reduce((acc, stage) => acc + stage.count, 0);
 
   return (
-    <div className="flex flex-col gap-2 shadow-md rounded-lg p-3">
+    <div className="flex flex-col gap-2 shadow-md rounded-lg p-3 last:mb-10 md:last:mb-0">
       <div className="flex items-center xs-12 md-4 p-4">
         <CompanyLogo company={role.company} className="rounded-full max-w-[3rem]" />
 

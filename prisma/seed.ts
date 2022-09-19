@@ -12,6 +12,7 @@ const users: Prisma.UserCreateInput[] = [
   { uid: 'devUserWithoutData' },
   { uid: 'devUserVerifiedWithData' },
   { uid: 'devUserVerifiedWithoutData' },
+  { uid: 'BrlE1KRjGpeq8rO15jrETWnSafL2' },
 ];
 
 const companies: Prisma.CompanyCreateInput[] = [
