@@ -18,11 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
             fetcher: (url) => api.get(url),
           }}
         >
-          <div className="flex flex-col h-screen">
-            <Header />
-            <Component className="flex-grow" {...pageProps} />
-            <ApplicationNavBar />
-          </div>
+          <Header />
+          <Component className="flex-grow" {...pageProps} />
+          <ApplicationNavBar />
         </SWRConfig>
       </AxiosInterceptor>
     </AuthContext.Provider>

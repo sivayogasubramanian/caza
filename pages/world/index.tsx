@@ -40,7 +40,7 @@ function RolesWorld() {
   const worldRoles = Array.isArray(data?.payload) ? data?.payload : [];
 
   return (
-    <div className="p-5 h-full">
+    <div className="p-5">
       <Title>World Overview</Title>
 
       {/* Search and Filters */}

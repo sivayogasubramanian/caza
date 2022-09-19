@@ -151,7 +151,7 @@ function Application() {
       </div>
 
       {hasSuccessfullyFetchedApplication && (
-        <div className="absolute w-full p-2 bottom-2 flex items-center justify-between">
+        <div className="fixed w-full p-2 bottom-12 flex items-center justify-between">
           <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={() => setIsAddingNewStage(true)}>
             New stage
           </Button>
