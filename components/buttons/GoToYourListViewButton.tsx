@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import Link from 'next/link';
-import UserIcon from '../icons/GlobeIcon';
+import UserIcon from '../icons/UserIcon';
 
 function GoToYourListViewButton() {
   return (
