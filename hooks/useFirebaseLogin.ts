@@ -3,6 +3,8 @@ import { Auth, getAuth, getRedirectResult, onAuthStateChanged, signInAnonymously
 import { useCallback, useEffect, useState } from 'react';
 import usersApi from '../api/usersApi';
 import { openNotification } from '../components/notification/Notifier';
+import { ApiResponse } from '../types/apiResponse';
+import { UserData } from '../types/user';
 import { Nullable } from '../types/utils';
 import { getPreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
 
@@ -27,7 +29,9 @@ export default function useFirebaseLogin() {
         if (result) {
           const oldUserToken = getPreviousUserToken() ?? undefined;
           const newUserToken = await user.getIdToken();
-          usersApi.createAccount(newUserToken, oldUserToken).catch(openNotification);
+          usersApi
+            .createAccount(newUserToken, oldUserToken)
+            .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)));
         }
       } else {
         const auth = getAuth();
