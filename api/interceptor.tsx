@@ -36,7 +36,7 @@ const AxiosInterceptor = ({ children }: Props) => {
         return config;
       }
 
-      config.headers.Authorization = `Bearer ${jwtToken}`;
+      config.headers.Authorization = config.headers.Authorization || `Bearer ${jwtToken}`;
       config.paramsSerializer = toQueryString;
 
       return config;
