@@ -1,9 +1,5 @@
 import { ApplicationStageType } from '@prisma/client';
-<<<<<<< HEAD
 import { Tooltip } from 'antd';
-=======
-import { Button, Tooltip } from 'antd';
->>>>>>> Add Google Analytics events
 import { useRouter } from 'next/router';
 import { WorldRoleListData } from '../../types/role';
 import { log } from '../../utils/analytics';
