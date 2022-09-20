@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Chart from 'react-google-charts';
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
@@ -10,6 +10,9 @@ import { ApplicationStageType } from '@prisma/client';
 export type RoleSankeyProps = { data: WorldRoleStatsData };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
+  const [width, setWidth] = useState(2000);
+  const [height, setHeight] = useState(900);
+
   if (!data) {
     // This should be hidden with a antd Spinner element.
     return <div></div>;
@@ -35,6 +38,7 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const option = {
     tooltip: { isHtml: true },
     sankey: {
+      height: width,
       node: {
         label: { color: 'transparent', bold: true },
         interactivity: true,
@@ -50,7 +54,9 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   return (
     <div className="w-full h-40 p-8">
       <RoleCard role={data.role} />
-      <Chart chartType="Sankey" data={sankeyData} options={option} />
+      <div className="rotate-90">
+        <Chart chartType="Sankey" data={sankeyData} options={option} />
+      </div>
     </div>
   );
 };
