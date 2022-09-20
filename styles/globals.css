@@ -4,6 +4,16 @@
 @import '~antd/dist/antd.css';
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background;
+  }
+}
+
 html,
 body {
   padding: 0;

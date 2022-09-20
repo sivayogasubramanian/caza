@@ -29,7 +29,7 @@ function ApplicationListCard({ application }: Props) {
 
   return (
     <div
-      className="shadow-md rounded-lg mt-2 cursor-pointer transition-shadow duration-500 hover:shadow-lg last:mb-10 md:last:mb-0"
+      className="bg-white/[.9] shadow-around rounded-lg mt-2 cursor-pointer transition-shadow duration-500 hover:shadow-bigAround last:mb-10 md:last:mb-0"
       onClick={() => router.push(`${APPLICATIONS_ROUTE}/${application.id}`)}
     >
       <div className="p-4 flex items-center">
