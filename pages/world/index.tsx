@@ -84,15 +84,15 @@ function RolesWorld() {
 
       {/* World List */}
       <Spinner isLoading={!currentUser.isAnonymous && !data}>
-        {worldRoles?.map((role, index) => (
-          <WorldRoleListCard key={index} role={role} shouldBlur={currentUser.isAnonymous} />
-        ))}
-
         {currentUser.isAnonymous && (
           <div className="flex justify-center mt-5 text-base text-gray-500">
             Please log in with Github to see the world view.
           </div>
         )}
+
+        {worldRoles?.map((role, index) => (
+          <WorldRoleListCard key={index} role={role} shouldBlur={currentUser.isAnonymous} />
+        ))}
       </Spinner>
     </div>
   );
