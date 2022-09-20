@@ -41,7 +41,10 @@ class BaseApi {
   }
 }
 
-function processRequest<D extends Payload>(endpoint: string, promise: AxiosPromise<ApiResponse<D>>): ApiPromise<D> {
+export function processRequest<D extends Payload>(
+  endpoint: string,
+  promise: AxiosPromise<ApiResponse<D>>,
+): ApiPromise<D> {
   return promise
     .then((response: AxiosResponse<ApiResponse<D>>) => {
       const apiResponse = response.data;

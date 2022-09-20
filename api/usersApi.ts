@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { ApiPromise, ApiResponse } from '../types/apiResponse';
-import { UserData, UserPostData } from '../types/user';
-import api from './api';
+import { ApiPromise } from '../types/apiResponse';
+import { UserData } from '../types/user';
+import { processRequest } from './api';
 
 const USER_API_ENDPOINT = '/api/user';
 
@@ -9,10 +9,9 @@ const USER_API_ENDPOINT = '/api/user';
 // in the interceptor yet.
 class UsersApi {
   // Idempotent create account function. Successfully returns with no change if user exists.
-  public createAccount(newUserToken: string): ApiPromise<UserData> {
-    return axios.post(USER_API_ENDPOINT, {
-      headers: { Authorization: `Bearer ${newUserToken}` },
-    });
+  public createAccount(newToken: string, oldToken?: string): ApiPromise<UserData> {
+    const apiResult = axios.post(USER_API_ENDPOINT, { oldToken }, { headers: { Authorization: `Bearer ${newToken}` } });
+    return processRequest(USER_API_ENDPOINT, apiResult);
   }
 }
 
