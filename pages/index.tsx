@@ -2,10 +2,12 @@ import { ApplicationStageType, RoleType } from '@prisma/client';
 import { Col, Form, Row, Spin } from 'antd';
 import Search from 'antd/lib/input/Search';
 import Title from 'antd/lib/typography/Title';
+import Lottie from 'lottie-react';
 import { ChangeEventHandler, useState } from 'react';
 import useSWR from 'swr';
 import api from '../api/api';
 import { APPLICATIONS_API_ENDPOINT } from '../api/applicationsApi';
+import splash from '../assets/splash.json';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
 import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
@@ -42,6 +44,10 @@ function Applications() {
   const applications: ApplicationListData[] = Array.isArray(data?.payload)
     ? (data?.payload as ApplicationListData[])
     : [];
+
+  if (!data) {
+    return <Lottie className="h-[90vh] w-60 m-auto" autoPlay loop animationData={splash} />;
+  }
 
   return (
     <div className="p-5">
