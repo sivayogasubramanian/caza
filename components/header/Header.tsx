@@ -37,12 +37,9 @@ function Header() {
       return;
     }
 
-    signOut(auth).then(() =>
-      openNotification({
-        type: StatusMessageType.SUCCESS,
-        message: currentUser?.displayName ? `See you again soon, ${currentUser.displayName}!` : 'See you again soon!',
-      }),
-    );
+    signOut(auth).finally(() => {
+      window.location.reload();
+    });
   };
 
   return (
