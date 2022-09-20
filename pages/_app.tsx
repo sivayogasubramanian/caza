@@ -1,4 +1,6 @@
+import { initializeApp } from 'firebase/app';
 import type { AppProps } from 'next/app';
+import { useCallback } from 'react';
 import { SWRConfig } from 'swr';
 import api from '../api/api';
 import { AxiosInterceptor } from '../api/interceptor';
@@ -9,6 +11,18 @@ import useAnonymousLoginIfNeeded from '../hooks/useAnonymousLoginIfNeeded';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const initFirebase = useCallback(() => {
+    initializeApp({
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    });
+  }, [initializeApp]);
+
+  initFirebase();
   const authContextValue = useAnonymousLoginIfNeeded();
   return (
     <AuthContext.Provider value={authContextValue}>
