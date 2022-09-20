@@ -21,7 +21,7 @@ const AxiosInterceptor = ({ children }: Props) => {
       const newExpiryDate = new Date(result.expirationTime);
 
       setJwtToken(result.token);
-      setJwtExpiry(new Date(result.expirationTime));
+      setJwtExpiry(newExpiryDate);
     });
   };
 
