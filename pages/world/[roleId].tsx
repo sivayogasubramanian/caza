@@ -4,15 +4,16 @@ import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import useSWR from 'swr';
 import { WORLD_API_ENDPOINT } from '../../api/worldApi';
-import RoleSankey from '../../components/sankey/RoleSankey';
 import AuthContext from '../../context/AuthContext';
 import { canBecomeInteger } from '../../utils/numbers/validations';
+import dynamic from 'next/dynamic';
+import NotFound from '../../components/notFound/NotFound';
+const RoleSankey = dynamic(() => import('../../components/sankey/RoleSankey'), { ssr: false });
 
 const RoleWorldPage: NextPage = () => {
   const { currentUser } = useContext(AuthContext);
   if (!currentUser || currentUser.isAnonymous) {
-    // TODO: Make a consistent component (shared between world/index.tsx and world/[roleId].tsx)
-    return <div>Insert Log In or Go Back component here.</div>;
+    return <NotFound message="The role page you are looking for cannot be found." />;
   }
 
   const { query } = useRouter();
