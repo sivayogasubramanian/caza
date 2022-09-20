@@ -13,11 +13,21 @@ type Props = {
 const AxiosInterceptor = ({ children }: Props) => {
   const { currentUser } = useContext(AuthContext);
   const [jwtToken, setJwtToken] = useState<string>();
+  const [jwtExpiry, setJwtExpiry] = useState<Date>();
   const [isIntercepted, setIsIntercepted] = useState<boolean>(false);
 
-  useEffect(() => {
-    currentUser?.getIdToken().then(setJwtToken);
-  }, [currentUser, setJwtToken]);
+  const refreshToken = () => {
+    currentUser?.getIdTokenResult().then((result) => {
+      const newExpiryDate = new Date(result.expirationTime);
+
+      setJwtToken(result.token);
+      setJwtExpiry(newExpiryDate);
+    });
+  };
+
+  const millisecondsToExpiry = jwtExpiry?.getTime() ?? 0 - new Date().getTime();
+  const hasExpired = millisecondsToExpiry <= 0;
+  useEffect(refreshToken, [currentUser, setJwtToken, hasExpired]);
 
   useEffect(() => {
     // Set the interceptor only when the token is available
