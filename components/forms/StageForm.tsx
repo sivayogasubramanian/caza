@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { IEmojiData } from 'emoji-picker-react';
 import { Nullable } from '../../types/utils';
 import { ApplicationStageFormData } from '../../types/applicationStage';
+import { log } from '../../utils/analytics';
 
 interface Props {
   initialValues: ApplicationStageFormData;
@@ -39,8 +40,14 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
     if (isSubmitting) {
       form
         .validateFields()
-        .then(() => setStageFormData({ ...form.getFieldsValue(), emojiUnicodeHex: selectedEmojiUnicode }))
-        .catch(() => setIsSubmitting(false));
+        .then(() => {
+          log('stage_form_valid');
+          setStageFormData({ ...form.getFieldsValue(), emojiUnicodeHex: selectedEmojiUnicode });
+        })
+        .catch((errorInfo) => {
+          log('stage_form_invalid', { errorInfo });
+          setIsSubmitting(false);
+        });
     }
   }, [isSubmitting]);
 

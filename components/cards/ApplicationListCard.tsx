@@ -3,6 +3,7 @@ import { Badge } from 'antd';
 import { useRouter } from 'next/router';
 import { ReactNode } from 'react';
 import { ApplicationListData } from '../../types/application';
+import { log } from '../../utils/analytics';
 import { stageTypeToBadgeMap } from '../../utils/applicationStage/applicationStageUtils';
 import { APPLICATIONS_ROUTE } from '../../utils/constants';
 import { getCountOfDaysTillTodayFrom } from '../../utils/date/formatters';
@@ -27,10 +28,15 @@ function ApplicationListCard({ application }: Props) {
       ? new Date(application.latestStage.date)
       : undefined;
 
+  const onCardClick = () => {
+    log('click_application_list_card');
+    router.push(`${APPLICATIONS_ROUTE}/${application.id}`);
+  };
+
   return (
     <div
       className="bg-white/[.9] shadow-around rounded-lg mt-2 cursor-pointer transition-shadow duration-500 hover:shadow-bigAround"
-      onClick={() => router.push(`${APPLICATIONS_ROUTE}/${application.id}`)}
+      onClick={onCardClick}
     >
       <div className="p-4 flex items-center">
         <CompanyLogo company={application.role.company} className="rounded-full max-w-[3rem]" />

@@ -1,10 +1,16 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useRouter } from 'next/router';
+import { log } from '../../utils/analytics';
 import { CREATE_APPLICATION_ROUTE } from '../../utils/constants';
 
 function CreateApplicationButton() {
   const router = useRouter();
+
+  const onClick = () => {
+    log('click_create_application_button');
+    router.push(CREATE_APPLICATION_ROUTE);
+  };
 
   return (
     <Button
@@ -13,7 +19,7 @@ function CreateApplicationButton() {
       type="primary"
       shape="circle"
       icon={<PlusOutlined />}
-      onClick={() => router.push(CREATE_APPLICATION_ROUTE)}
+      onClick={onClick}
     />
   );
 }

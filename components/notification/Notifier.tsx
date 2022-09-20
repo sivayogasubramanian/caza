@@ -1,5 +1,6 @@
 import { notification } from 'antd';
 import { StatusMessage, StatusMessageType } from '../../types/apiResponse';
+import { log } from '../../utils/analytics';
 
 export function openNotification(statusMessage: StatusMessage) {
   switch (statusMessage.type) {
@@ -14,16 +15,18 @@ export function openNotification(statusMessage: StatusMessage) {
   }
 }
 
-function openSuccessNotification(statusMessage: StatusMessage) {
+function openSuccessNotification({ message }: StatusMessage) {
+  log('success_notification', { message });
   notification.success({
-    message: statusMessage.message,
+    message,
     placement: 'top',
   });
 }
 
-function openErrorNotification(statusMessage: StatusMessage) {
+function openErrorNotification({ message }: StatusMessage) {
+  log('error_notification', { message });
   notification.error({
-    message: statusMessage.message,
+    message,
     placement: 'top',
   });
 }

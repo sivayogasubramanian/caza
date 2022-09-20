@@ -17,6 +17,7 @@ import { splitByWhitespaces } from '../../utils/strings/formatters';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import GoToYourListViewButton from '../../components/buttons/GoToYourListViewButton';
 import { motion } from 'framer-motion';
+import { log } from '../../utils/analytics';
 
 function RolesWorld() {
   const { currentUser } = useContext(AuthContext);
@@ -57,7 +58,9 @@ function RolesWorld() {
   };
 
   const onApplicationFilterCheckboxChange = (e: CheckboxChangeEvent) => {
-    setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: e.target.checked });
+    const newValue = e.target.checked;
+    log('toggle_world_view_my_applications_checkbox', { newValue });
+    setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: newValue });
   };
 
   const { data } = !currentUser.isAnonymous

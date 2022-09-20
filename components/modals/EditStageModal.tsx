@@ -13,6 +13,7 @@ import applicationStagesApi from '../../frontendApis/applicationStagesApi';
 import { KeyedMutator } from 'swr';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationData } from '../../types/application';
+import { log } from '../../utils/analytics';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 interface Props {
@@ -35,6 +36,7 @@ function EditStageModal({ applicationId, initialStage, setSelectedStage, mutateA
   }, [stageFormData]);
 
   const handleSubmit = (values: ApplicationStageFormData) => {
+    log('submit_edit_stage_modal');
     const stagePatchData: ApplicationStagePatchData = {
       type: values.type,
       date: values.date?.toISOString(),
@@ -67,9 +69,13 @@ function EditStageModal({ applicationId, initialStage, setSelectedStage, mutateA
     });
   }, [stage]);
 
-  const onCancel = () => setSelectedStage(null);
+  const onCancel = () => {
+    log('cancel_edit_stage_modal');
+    setSelectedStage(null);
+  };
 
   const onDelete = () => {
+    log('click_delete_stage_button');
     Modal.confirm({
       title: 'Are you sure about deleting this stage?',
       icon: <ExclamationCircleOutlined />,

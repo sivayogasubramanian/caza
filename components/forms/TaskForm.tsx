@@ -2,6 +2,7 @@ import { Checkbox, DatePicker, Form, Input, InputNumber, Select, TimePicker } fr
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { NotificationDateTimeType, TaskFormData } from '../../types/task';
 import { Nullable } from '../../types/utils';
+import { log } from '../../utils/analytics';
 
 interface Props {
   initialValues: TaskFormData;
@@ -31,8 +32,14 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmit
     if (isSubmitting) {
       form
         .validateFields()
-        .then(() => setTaskFormData(form.getFieldsValue()))
-        .catch(() => setIsSubmitting(false));
+        .then(() => {
+          log('task_form_valid');
+          setTaskFormData(form.getFieldsValue());
+        })
+        .catch((errorInfo) => {
+          log('task_form_invalid', { errorInfo });
+          setIsSubmitting(false);
+        });
     }
   }, [isSubmitting]);
 
