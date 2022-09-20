@@ -8,8 +8,6 @@ import { StatusMessageType } from '../../types/apiResponse';
 import { removePreviousUserToken, storePreviousUserToken } from '../../utils/localStorage/temporaryUserKeyStorage';
 import { openNotification } from '../notification/Notifier';
 
-type MenuItem = Required<MenuProps>['items'][number];
-
 function Header() {
   const { auth, currentUser } = useContext(AuthContext);
   const githubProviderData = currentUser?.providerData.length != 0 ? currentUser?.providerData[0] : null;
@@ -57,21 +55,9 @@ function Header() {
     );
   };
 
-  function getItem(label: ReactNode, key: Key, icon?: ReactNode, children?: MenuItem[], type?: 'group'): MenuItem {
-    return {
-      key,
-      icon,
-      children,
-      label,
-      type,
-    } as MenuItem;
-  }
-
-  const items: MenuProps['items'] = [getItem('Log out', '1', <LogoutOutlined />)];
-
   return (
-    <div className="w-full fixed top-0 p-2 flex justify-between items-center z-50">
-      <img src={logo.src} width="175px" />
+    <div className="bg-background w-full fixed top-0 p-2 flex justify-between items-center z-50">
+      <img src={logo.src} width="150px" />
 
       {currentUser?.isAnonymous && (
         <Button
@@ -86,19 +72,10 @@ function Header() {
 
       {!currentUser?.isAnonymous && (
         <div className="relative">
-          {/*<Button*/}
-          {/*  type="primary"*/}
-          {/*  icon={<LogoutOutlined />}*/}
-          {/*  className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black border-none hover:border-none"*/}
-          {/*  onClick={handleLogout}*/}
-          {/*>*/}
-          {/*  Log out*/}
-          {/*</Button>*/}
-
           {githubProviderData?.photoURL && (
             <img
               src={githubProviderData?.photoURL}
-              width="35px"
+              width="30px"
               className="rounded-full"
               onClick={() => setShouldShowProfileMenu(!shouldShowProfileMenu)}
             />
@@ -111,7 +88,6 @@ function Header() {
           )}
         </div>
       )}
-      {/*{shouldShowProfileMenu && <Menu items={items} className="absolute right-2 top-10 shadow-md" />}*/}
     </div>
   );
 }
