@@ -8,9 +8,10 @@ function CreateApplicationButton() {
 
   return (
     <Button
-      className="text-black hover:text-black bg-blue-400 hover:bg-blue-500 border-none hover:border-none"
+      className="bg-button-primary focus:bg-button-primary border-none hover:border-none shadow-primary w-10"
+      size="large"
       type="primary"
-      shape="round"
+      shape="circle"
       icon={<PlusOutlined />}
       onClick={() => router.push(CREATE_APPLICATION_ROUTE)}
     />

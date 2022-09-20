@@ -1,7 +1,7 @@
 import { GithubOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Button, MenuProps } from 'antd';
+import { Button } from 'antd';
 import { GithubAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { useContext, useState, ReactNode, Key } from 'react';
+import { useContext, useState } from 'react';
 import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
 import { StatusMessageType } from '../../types/apiResponse';

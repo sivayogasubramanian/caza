@@ -7,7 +7,7 @@ function GoToWorldViewButton() {
     <Link href="/world">
       <Button
         type="primary"
-        icon={<GlobeIcon size={15} />}
+        icon={<GlobeIcon isActive={false} />}
         className="items-center flex gap-1 bg-blue-400 text-black hover:text-black rounded-md hover:bg-blue-500 border-none hover:border-none"
       >
         Go To World View

@@ -3,13 +3,13 @@ import { useRouter } from 'next/router';
 import { WORLD_ROUTE } from '../../utils/constants';
 import CreateApplicationButton from '../buttons/CreateApplicationButton';
 import GlobeIcon from '../icons/GlobeIcon';
-import UserIcon from '../icons/UserIcon';
+import HomeIcon from '../icons/HomeIcon';
 
 export default function ApplicationNavBar() {
   const router = useRouter();
 
   const inactivatedClass = 'w-full text-center';
-  const activatedClass = inactivatedClass + ' text-blue-500';
+  const activatedClass = inactivatedClass + ' text-bold';
 
   const yourListClass = !router.pathname.startsWith(WORLD_ROUTE) ? activatedClass : inactivatedClass;
   const worldClass = router.pathname.startsWith(WORLD_ROUTE) ? activatedClass : inactivatedClass;
@@ -19,7 +19,7 @@ export default function ApplicationNavBar() {
       <div className="flex items-center">
         <Link href="/">
           <div className={yourListClass}>
-            <UserIcon size={15} />
+            <HomeIcon isActive={!router.pathname.startsWith(WORLD_ROUTE)} />
             <span className="block text-xs">Your List</span>
           </div>
         </Link>
@@ -28,7 +28,7 @@ export default function ApplicationNavBar() {
 
         <Link href="/world">
           <div className={worldClass}>
-            <GlobeIcon size={15} />
+            <GlobeIcon isActive={router.pathname.startsWith(WORLD_ROUTE)} />
             <span className="block text-xs">World View</span>
           </div>
         </Link>
