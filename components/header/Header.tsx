@@ -1,16 +1,20 @@
 import { GithubOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, MenuProps } from 'antd';
 import { GithubAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { useContext } from 'react';
+import { useContext, useState, ReactNode, Key } from 'react';
 import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
 import { StatusMessageType } from '../../types/apiResponse';
 import { removePreviousUserToken, storePreviousUserToken } from '../../utils/localStorage/temporaryUserKeyStorage';
 import { openNotification } from '../notification/Notifier';
 
+type MenuItem = Required<MenuProps>['items'][number];
+
 function Header() {
   const { auth, currentUser } = useContext(AuthContext);
   const githubProviderData = currentUser?.providerData.length != 0 ? currentUser?.providerData[0] : null;
+
+  const [shouldShowProfileMenu, setShouldShowProfileMenu] = useState<boolean>(false);
 
   const handleLogin = () => {
     if (!auth) {
@@ -53,8 +57,20 @@ function Header() {
     );
   };
 
+  function getItem(label: ReactNode, key: Key, icon?: ReactNode, children?: MenuItem[], type?: 'group'): MenuItem {
+    return {
+      key,
+      icon,
+      children,
+      label,
+      type,
+    } as MenuItem;
+  }
+
+  const items: MenuProps['items'] = [getItem('Log out', '1', <LogoutOutlined />)];
+
   return (
-    <div className="z-50 pl-5 pr-5 pt-3 pb-3 flex justify-between items-center sticky top-0 bg-slate-100">
+    <div className="w-full fixed top-0 p-2 flex justify-between items-center z-50">
       <img src={logo.src} width="175px" />
 
       {currentUser?.isAnonymous && (
@@ -69,21 +85,33 @@ function Header() {
       )}
 
       {!currentUser?.isAnonymous && (
-        <div className="flex items-center space-x-4">
-          <Button
-            type="primary"
-            icon={<LogoutOutlined />}
-            className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black border-none hover:border-none"
-            onClick={handleLogout}
-          >
-            Log out
-          </Button>
+        <div className="relative">
+          {/*<Button*/}
+          {/*  type="primary"*/}
+          {/*  icon={<LogoutOutlined />}*/}
+          {/*  className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black border-none hover:border-none"*/}
+          {/*  onClick={handleLogout}*/}
+          {/*>*/}
+          {/*  Log out*/}
+          {/*</Button>*/}
 
           {githubProviderData?.photoURL && (
-            <img src={githubProviderData?.photoURL} width="35px" className="rounded-full" />
+            <img
+              src={githubProviderData?.photoURL}
+              width="35px"
+              className="rounded-full"
+              onClick={() => setShouldShowProfileMenu(!shouldShowProfileMenu)}
+            />
+          )}
+
+          {shouldShowProfileMenu && (
+            <Button className="absolute right-2 top-10 shadow-md" icon={<LogoutOutlined />} onClick={handleLogout}>
+              Log out
+            </Button>
           )}
         </div>
       )}
+      {/*{shouldShowProfileMenu && <Menu items={items} className="absolute right-2 top-10 shadow-md" />}*/}
     </div>
   );
 }
