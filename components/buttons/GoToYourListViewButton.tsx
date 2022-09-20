@@ -4,7 +4,7 @@ import UserIcon from '../icons/UserIcon';
 
 function GoToYourListViewButton() {
   return (
-    <Link href="/world">
+    <Link href="/">
       <Button
         type="primary"
         icon={<UserIcon size={15} />}

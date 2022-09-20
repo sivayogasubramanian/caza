@@ -29,7 +29,7 @@ export default function ApplicationNavBar() {
         <Link href="/world">
           <div className={worldClass}>
             <GlobeIcon size={15} />
-            <span className="block text-xs">Explore</span>
+            <span className="block text-xs">World View</span>
           </div>
         </Link>
       </div>
