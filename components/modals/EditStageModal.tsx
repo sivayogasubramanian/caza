@@ -9,7 +9,7 @@ import {
 } from '../../types/applicationStage';
 import { isValidDate } from '../../utils/date/validations';
 import moment from 'moment';
-import applicationStagesApi from '../../api/applicationStagesApi';
+import applicationStagesApi from '../../frontendApis/applicationStagesApi';
 import { KeyedMutator } from 'swr';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationData } from '../../types/application';

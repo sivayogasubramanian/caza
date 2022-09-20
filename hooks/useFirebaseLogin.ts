@@ -1,7 +1,7 @@
 import { getApps } from 'firebase/app';
 import { Auth, getAuth, getRedirectResult, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { useCallback, useEffect, useState } from 'react';
-import usersApi from '../api/usersApi';
+import usersApi from '../frontendApis/usersApi';
 import { openNotification } from '../components/notification/Notifier';
 import { ApiResponse } from '../types/apiResponse';
 import { UserData } from '../types/user';

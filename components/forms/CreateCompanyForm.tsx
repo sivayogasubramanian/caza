@@ -1,5 +1,5 @@
 import { Form, Input, Modal } from 'antd';
-import companiesApi from '../../api/companiesApi';
+import companiesApi from '../../frontendApis/companiesApi';
 import { CompanyData } from '../../types/company';
 
 type Props = {

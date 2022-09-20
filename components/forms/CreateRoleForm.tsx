@@ -1,5 +1,5 @@
 import { Form, InputNumber, Input, Modal } from 'antd';
-import rolesApi from '../../api/rolesApi';
+import rolesApi from '../../frontendApis/rolesApi';
 import { CompanyListData } from '../../types/company';
 import { RoleData } from '../../types/role';
 import { Nullable } from '../../types/utils';

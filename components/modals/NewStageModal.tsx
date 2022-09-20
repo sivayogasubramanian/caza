@@ -8,7 +8,7 @@ import StageForm from '../forms/StageForm';
 import { Nullable } from '../../types/utils';
 import { ApplicationStageType } from '@prisma/client';
 import { isValidHex } from '../../utils/strings/validations';
-import applicationStagesApi from '../../api/applicationStagesApi';
+import applicationStagesApi from '../../frontendApis/applicationStagesApi';
 
 interface Props {
   applicationId: number;

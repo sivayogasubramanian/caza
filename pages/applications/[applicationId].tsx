@@ -3,7 +3,7 @@ import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
-import applicationsApi from '../../api/applicationsApi';
+import applicationsApi from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
 import TaskIcon from '../../components/icons/timeline/TaskIcon';

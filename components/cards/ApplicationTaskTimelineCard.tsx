@@ -1,7 +1,7 @@
 import { Checkbox } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { KeyedMutator } from 'swr';
-import tasksApi from '../../api/tasksApi';
+import tasksApi from '../../frontendApis/tasksApi';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationData } from '../../types/application';
 import { TaskData } from '../../types/task';

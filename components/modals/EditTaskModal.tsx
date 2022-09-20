@@ -5,7 +5,7 @@ import { isValidDate } from '../../utils/date/validations';
 import { calculateDaysOffset } from '../../utils/date/formatters';
 import { Nullable } from '../../types/utils';
 import TaskForm from '../forms/TaskForm';
-import tasksApi from '../../api/tasksApi';
+import tasksApi from '../../frontendApis/tasksApi';
 import {
   DEFAULT_NOTIFICATION_DAYS_OFFSET,
   DEFAULT_NOTIFICATION_TIME,

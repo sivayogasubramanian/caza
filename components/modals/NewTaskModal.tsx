@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import TaskForm from '../forms/TaskForm';
 import { NotificationDateTimeType, TaskFormData, TaskPostData } from '../../types/task';
-import tasksApi from '../../api/tasksApi';
+import tasksApi from '../../frontendApis/tasksApi';
 import {
   DEFAULT_NOTIFICATION_DAYS_OFFSET,
   DEFAULT_NOTIFICATION_TIME,
