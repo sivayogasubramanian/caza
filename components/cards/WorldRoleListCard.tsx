@@ -1,6 +1,5 @@
-import { RightCircleOutlined } from '@ant-design/icons';
 import { ApplicationStageType } from '@prisma/client';
-import { Button, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { useRouter } from 'next/router';
 import { WorldRoleListData } from '../../types/role';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
@@ -25,7 +24,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
 
   return (
     <div
-      className={`flex flex-col gap-2 shadow-md rounded-lg p-3 last:mb-10 md:last:mb-0 ${
+      className={`flex flex-col gap-2 shadow-md rounded-lg p-3 last:mb-10 md:last:mb-0 cursor-pointer transition-shadow duration-500 hover:shadow-lg ${
         shouldBlur ? 'blur-sm pointer-events-none' : ''
       }`}
       onClick={() => router.push(`${WORLD_ROUTE}/${role.id}`)}
