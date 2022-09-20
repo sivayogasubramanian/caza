@@ -1,6 +1,6 @@
 import { GithubOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { GithubAuthProvider, signInWithRedirect, signOut } from 'firebase/auth';
+import { GithubAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { useContext } from 'react';
 import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
@@ -30,7 +30,7 @@ function Header() {
       ? currentUser.getIdToken(true).then(storePreviousUserToken)
       : Promise.resolve();
 
-    storeIfAnonymous.then(() => signInWithRedirect(auth, provider));
+    storeIfAnonymous.then(() => signInWithPopup(auth, provider).finally(() => window.location.reload()));
   };
 
   const handleLogout = () => {
