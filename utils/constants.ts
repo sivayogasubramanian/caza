@@ -19,3 +19,5 @@ export const HOMEPAGE_ROUTE = '/';
 export const APPLICATIONS_ROUTE = '/applications';
 export const CREATE_APPLICATION_ROUTE = APPLICATIONS_ROUTE + '/create';
 export const WORLD_ROUTE = '/world';
+
+export const TAILWIND_MD_BREAKPOINT_PIXELS = 768;
