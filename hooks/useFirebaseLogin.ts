@@ -1,6 +1,7 @@
 import { getApps } from 'firebase/app';
 import { Auth, getAuth, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { useCallback, useEffect, useState } from 'react';
+import usersApi from '../api/usersApi';
 import { Nullable } from '../types/utils';
 
 /**
@@ -16,13 +17,16 @@ export default function useFirebaseLogin() {
 
   const handleAuthStateChanged = useCallback(
     async (user: Nullable<User>) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
+      if (!user) {
         const auth = getAuth();
-        await signInAnonymously(auth);
+        const newUser = await signInAnonymously(auth);
+        user = newUser.user;
       }
+
+      setCurrentUser(user);
+      user.getIdToken().then(usersApi.createAccount);
     },
+
     [getAuth, signInAnonymously],
   );
 
