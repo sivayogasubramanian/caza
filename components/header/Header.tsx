@@ -5,6 +5,7 @@ import { useContext } from 'react';
 import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
 import { StatusMessageType } from '../../types/apiResponse';
+import { removePreviousUserToken, storePreviousUserToken } from '../../utils/localStorage/temporaryUserKeyStorage';
 import { openNotification } from '../notification/Notifier';
 
 function Header() {
@@ -25,7 +26,11 @@ function Header() {
       allow_signup: 'false',
     });
 
-    signInWithRedirect(auth, provider);
+    const storeIfAnonymous = currentUser?.isAnonymous
+      ? currentUser.getIdToken(true).then(storePreviousUserToken)
+      : Promise.resolve();
+
+    storeIfAnonymous.then(() => signInWithRedirect(auth, provider));
   };
 
   const handleLogout = () => {
@@ -36,6 +41,8 @@ function Header() {
       });
       return;
     }
+
+    removePreviousUserToken();
 
     signOut(auth).finally(() => {
       window.location.reload();
