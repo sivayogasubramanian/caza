@@ -17,11 +17,9 @@ const AxiosInterceptor = ({ children }: Props) => {
   const [isIntercepted, setIsIntercepted] = useState<boolean>(false);
 
   const refreshToken = () => {
-    currentUser?.getIdTokenResult().then((result) => {
-      const newExpiryDate = new Date(result.expirationTime);
-
+    currentUser?.getIdTokenResult(true).then((result) => {
       setJwtToken(result.token);
-      setJwtExpiry(newExpiryDate);
+      setJwtExpiry(new Date(result.expirationTime));
     });
   };
 
