@@ -7,7 +7,7 @@ import { AxiosInterceptor } from '../api/interceptor';
 import Header from '../components/header/Header';
 import ApplicationNavBar from '../components/navigation/ApplicationNavBar';
 import AuthContext from '../context/AuthContext';
-import useAnonymousLoginIfNeeded from '../hooks/useAnonymousLoginIfNeeded';
+import useFirebaseLogin from '../hooks/useFirebaseLogin';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -21,9 +21,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     });
   }, [initializeApp]);
-
   initFirebase();
-  const authContextValue = useAnonymousLoginIfNeeded();
+
+  const authContextValue = useFirebaseLogin();
   return (
     <AuthContext.Provider value={authContextValue}>
       <AxiosInterceptor>
