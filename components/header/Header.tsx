@@ -5,6 +5,7 @@ import { useContext, useState } from 'react';
 import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
 import { StatusMessageType } from '../../types/apiResponse';
+import { log, logException } from '../../utils/analytics';
 import { removePreviousUserToken, storePreviousUserToken } from '../../utils/localStorage/temporaryUserKeyStorage';
 import { openNotification } from '../notification/Notifier';
 
@@ -15,7 +16,10 @@ function Header() {
   const [shouldShowProfileMenu, setShouldShowProfileMenu] = useState<boolean>(false);
 
   const handleLogin = () => {
+    log('click_login_button');
+
     if (!auth) {
+      logException('`auth` object from AuthContext is falsy', false);
       openNotification({
         type: StatusMessageType.ERROR,
         message: 'There was an error when trying to log in. Please try again.',
@@ -40,7 +44,9 @@ function Header() {
   };
 
   const handleLogout = () => {
+    log('click_logout_button');
     if (!auth) {
+      logException('`auth` object from AuthContext is falsy', false);
       openNotification({
         type: StatusMessageType.ERROR,
         message: 'There was an error when trying to log out. Please try again.',

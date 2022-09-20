@@ -19,6 +19,7 @@ import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
 import { HOMEPAGE_ROUTE } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+import { log } from '../../utils/analytics';
 
 const addNewCompanyOption: CompanyAutocompleteOption = {
   company: null,
@@ -81,6 +82,7 @@ function ApplicationCreate() {
     setRoleSearchParams((prevState) => ({ ...prevState, companyId: company?.id ?? undefined }));
 
     if (company === null) {
+      log('click_add_new_company_option');
       setIsCreateCompanyFormOpen(true);
     }
   };
@@ -108,6 +110,7 @@ function ApplicationCreate() {
 
   const onSelectRole = (role: Nullable<RoleData>) => {
     if (role === null && selectedCompany !== null) {
+      log('click_add_new_role_option');
       setIsCreateRoleFormOpen(true);
     }
 
@@ -126,6 +129,7 @@ function ApplicationCreate() {
   };
 
   const onSubmit = () => {
+    log('submit_create_application_form');
     setShouldShowValidationErrors(true);
 
     if (selectedRole === null || applicationDate === null) {

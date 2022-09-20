@@ -12,6 +12,7 @@ import { Modal } from 'antd';
 import { KeyedMutator } from 'swr';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationData } from '../../types/application';
+import { log } from '../../utils/analytics';
 
 interface Props {
   applicationId: number;
@@ -59,8 +60,14 @@ function NewTaskModal({ applicationId, setIsAddingNewTask, mutateApplicationData
       open
       title="New Task"
       okText="Create"
-      onCancel={() => setIsAddingNewTask(false)}
-      onOk={() => setIsSubmitting(true)}
+      onCancel={() => {
+        log('cancel_new_task_modal');
+        setIsAddingNewTask(false);
+      }}
+      onOk={() => {
+        log('submit_new_task_modal');
+        setIsSubmitting(true);
+      }}
       maskClosable={false}
     >
       <TaskForm

@@ -5,6 +5,7 @@ import tasksApi from '../../frontendApis/tasksApi';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationData } from '../../types/application';
 import { TaskData } from '../../types/task';
+import { log } from '../../utils/analytics';
 import { makeDisplayDate, makeDisplayNotificationDatetime } from '../../utils/date/formatters';
 import { isValidDate } from '../../utils/date/validations';
 import NotificationBell from '../icons/NotificationBellIcon';
@@ -25,7 +26,9 @@ function ApplicationTaskTimelineCard({ applicationId, task, mutateApplicationDat
       : undefined;
 
   const onToggleCheckbox = (e: CheckboxChangeEvent) => {
-    tasksApi.editTask(applicationId, task.id, { isDone: e.target.checked }).then(() => mutateApplicationData());
+    const isTaskDone = e.target.checked;
+    log('toggle_task_checkbox', { isTaskDone });
+    tasksApi.editTask(applicationId, task.id, { isDone: isTaskDone }).then(() => mutateApplicationData());
   };
 
   return (
