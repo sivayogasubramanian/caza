@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import type { AppProps } from 'next/app';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { SWRConfig } from 'swr';
 import splash from '../assets/splash.json';
 import Header from '../components/header/Header';
@@ -55,6 +56,13 @@ function MyApp({ Component, pageProps }: AppProps) {
     },
     [authContextValue],
   );
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      const axe = require('@axe-core/react');
+      axe(React, ReactDOM, 1000);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={authContextValue}>
