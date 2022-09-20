@@ -1,8 +1,10 @@
 import { RightCircleOutlined } from '@ant-design/icons';
 import { ApplicationStageType } from '@prisma/client';
 import { Button, Tooltip } from 'antd';
+import { useRouter } from 'next/router';
 import { WorldRoleListData } from '../../types/role';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
+import { WORLD_ROUTE } from '../../utils/constants';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
 import CompanyLogo from '../company/CompanyLogo';
 
@@ -17,6 +19,8 @@ const stageColors = Object.values(ApplicationStageType).map((stage, index) => ({
 }));
 
 function WorldRoleListCard({ role, shouldBlur }: Props) {
+  const router = useRouter();
+
   const sumOfStageCounts = role.applicationStages.reduce((acc, stage) => acc + stage.count, 0);
 
   return (
@@ -24,6 +28,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
       className={`flex flex-col gap-2 shadow-md rounded-lg p-3 last:mb-10 md:last:mb-0 ${
         shouldBlur ? 'blur-sm pointer-events-none' : ''
       }`}
+      onClick={() => router.push(`${WORLD_ROUTE}/${role.id}`)}
     >
       <div className="flex items-center xs-12 md-4 p-4">
         <CompanyLogo company={role.company} className="rounded-full max-w-[3rem]" />
@@ -35,10 +40,6 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
             role.type,
           )}, ${role.year}`}</div>
         </div>
-
-        <Tooltip title="See Detailed View">
-          <Button type="primary" shape="circle" icon={<RightCircleOutlined />} />
-        </Tooltip>
       </div>
 
       {/* Stacked Bar Chart */}
