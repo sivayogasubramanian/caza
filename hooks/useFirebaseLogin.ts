@@ -1,8 +1,10 @@
 import { getApps } from 'firebase/app';
-import { Auth, getAuth, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
+import { Auth, getAuth, getRedirectResult, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { useCallback, useEffect, useState } from 'react';
 import usersApi from '../api/usersApi';
+import { openNotification } from '../components/notification/Notifier';
 import { Nullable } from '../types/utils';
+import { getPreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
 
 /**
  * Hook that handles anonymous log in / register if not already logged in or attaches the verified login.
@@ -17,14 +19,24 @@ export default function useFirebaseLogin() {
 
   const handleAuthStateChanged = useCallback(
     async (user: Nullable<User>) => {
-      if (!user) {
+      if (user) {
+        const result = await getRedirectResult(getAuth());
+
+        // This can happen due to a login flow or re-authentication required by firebase (cannot be predicted).
+        // In event of re-authenticating by Github, previous user token should be set as undefined (no linking).
+        if (result) {
+          const oldUserToken = getPreviousUserToken() ?? undefined;
+          const newUserToken = await user.getIdToken();
+          usersApi.createAccount(newUserToken, oldUserToken).catch(openNotification);
+        }
+      } else {
         const auth = getAuth();
         const newUser = await signInAnonymously(auth);
         user = newUser.user;
+        user.getIdToken().then(usersApi.createAccount);
       }
 
       setCurrentUser(user);
-      user.getIdToken().then(usersApi.createAccount);
     },
 
     [getAuth, signInAnonymously],
