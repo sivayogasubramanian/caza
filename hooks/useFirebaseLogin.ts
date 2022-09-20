@@ -6,7 +6,7 @@ import { openNotification } from '../components/notification/Notifier';
 import { ApiResponse } from '../types/apiResponse';
 import { UserData } from '../types/user';
 import { Nullable } from '../types/utils';
-import { getPreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
+import { getPreviousUserToken, removePreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
 
 /**
  * Hook that handles anonymous log in / register if not already logged in or attaches the verified login.
@@ -31,7 +31,8 @@ export default function useFirebaseLogin() {
           const newUserToken = await user.getIdToken();
           usersApi
             .createAccount(newUserToken, oldUserToken)
-            .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)));
+            .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)))
+            .finally(removePreviousUserToken);
         }
       } else {
         const auth = getAuth();
