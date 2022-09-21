@@ -33,14 +33,14 @@ function CreateCompanyForm({ isOpen, closeForm, onCreate }: Props) {
           label="Company name"
           rules={[{ required: true, message: 'Please input the company name!' }]}
         >
-          <Input />
+          <Input placeholder="Enter the company's name" />
         </Form.Item>
         <Form.Item
           name="companyUrl"
           label="Company website"
           rules={[{ required: true, message: 'Please input the company website!' }]}
         >
-          <Input />
+          <Input placeholder="Enter the company's website" />
         </Form.Item>
       </Form>
     </Modal>

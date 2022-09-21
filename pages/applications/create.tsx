@@ -147,7 +147,7 @@ function ApplicationCreate() {
       initial={{ opacity: 0.2 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.2 }}
-      className="flex flex-col justify-center items-stretch min-h-screen p-8"
+      className="flex flex-col justify-center items-stretch min-h-screen p-4"
     >
       <Title className="text-center">Add Application</Title>
 
@@ -179,6 +179,7 @@ function ApplicationCreate() {
         >
           <Select
             showSearch
+            placeholder="Type to search for a company"
             options={companyOptionsWithAdd}
             onSelect={(value: string, { company }: CompanyAutocompleteOption) => onSelectCompany(company)}
             onSearch={onSearchCompany}
@@ -201,6 +202,7 @@ function ApplicationCreate() {
         >
           <Select
             showSearch
+            placeholder={selectedCompany ? 'Type to search for a role' : ''}
             disabled={!selectedCompany}
             options={roleOptionsWithAdd}
             onSelect={(value: string, { role }: RoleAutocompleteOption) => onSelectRole(role)}
