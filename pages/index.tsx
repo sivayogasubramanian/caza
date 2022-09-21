@@ -52,7 +52,7 @@ function Applications() {
   }, [currentUser]);
 
   return (
-    <div>
+    <div className={`h-full overflow-clip ${isSearchHidden ? '' : 'pb-24'}`}>
       <div className="mt-2 p-2 bg-primary-one rounded-b-3xl">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-2xl font-bold text-white">Applications</div>
@@ -122,7 +122,7 @@ function Applications() {
       </div>
 
       {/* Application List */}
-      <div className="p-4">
+      <div className="p-4 h-5/6 overflow-y-scroll">
         <Spin spinning={!applicationListData}>
           {applications.map((application, index) => (
             <ApplicationListCard key={index} application={application} />

@@ -57,11 +57,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           </AnimatePresence>
 
           {!isSplashScreenPlaying && (
-            <div className="flex-col h-screen justify-between">
+            <div className="flex flex-col h-screen justify-between">
               <Header />
               <div className="p-4" />
-              <Component className="grow" {...pageProps} />
-              <div className="p-4" />
+              <Component {...pageProps} />
               <ApplicationNavBar />
             </div>
           )}
