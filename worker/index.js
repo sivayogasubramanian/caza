@@ -58,7 +58,7 @@ self.addEventListener('message', (event) => {
     return;
   }
 
-  if (event.data.message === 'PRECACHE_USER_APPLICATIONS') {
+  if (event.data.message === 'SW_PRECACHE_USER_DATA') {
     event.waitUntil(precacheAllUserApplications(event.data.token));
   }
 });

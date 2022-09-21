@@ -7,6 +7,7 @@ import { ApiResponse } from '../types/apiResponse';
 import { UserData } from '../types/user';
 import { Nullable } from '../types/utils';
 import { getPreviousUserToken, removePreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
+import { precacheUserData } from '../worker/utils';
 
 /**
  * Hook that handles anonymous log in / register if not already logged in or attaches the verified login.
@@ -24,12 +25,7 @@ export default function useFirebaseLogin() {
       if (user) {
         const newUserToken = await user.getIdToken();
 
-        window.navigator.serviceWorker.ready.then((worker) => {
-          worker.active?.postMessage({
-            message: 'PRECACHE_USER_APPLICATIONS',
-            token: newUserToken,
-          });
-        });
+        precacheUserData(newUserToken);
 
         const result = await getRedirectResult(getAuth());
 
