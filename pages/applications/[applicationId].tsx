@@ -24,6 +24,7 @@ import { canBecomeInteger } from '../../utils/numbers/validations';
 import GlobeIcon from '../../components/icons/GlobeIcon';
 import Link from 'next/link';
 import { PlusOutlined } from '@ant-design/icons';
+import { motion } from 'framer-motion';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -78,7 +79,12 @@ function Application() {
 
   return (
     <Spinner isLoading={isLoading}>
-      <div className="p-5">
+      <motion.div
+        initial={{ opacity: 0.2 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, ease: 'easeInOut' }}
+        className="p-5"
+      >
         {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">
             <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
@@ -148,7 +154,7 @@ function Application() {
         )}
 
         {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
-      </div>
+      </motion.div>
 
       {hasSuccessfullyFetchedApplication && (
         <div className="fixed w-full bottom-14 flex items-center justify-around">

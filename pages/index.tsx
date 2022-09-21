@@ -14,6 +14,7 @@ import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function Applications() {
   const { currentUser } = useContext(AuthContext);
@@ -140,13 +141,19 @@ function Applications() {
       </div>
 
       {/* Application List */}
-      <div className="p-4 h-5/6 overflow-y-scroll" onScroll={handleScroll}>
+      <motion.div
+        initial={{ opacity: 0.2 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, ease: 'easeInOut' }}
+        className="p-4 h-5/6 overflow-y-scroll"
+        onScroll={handleScroll}
+      >
         <Spin spinning={!applicationListData}>
           {applications.map((application, index) => (
             <ApplicationListCard key={index} application={application} />
           ))}
         </Spin>
-      </div>
+      </motion.div>
     </div>
   );
 }
