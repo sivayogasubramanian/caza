@@ -81,12 +81,7 @@ function Application() {
       spinning={isLoading}
       wrapperClassName={`h-full ${isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}`}
     >
-      <motion.div
-        initial={{ opacity: 0.2 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, ease: 'easeInOut' }}
-        className="p-2 mt-2 h-full pb-32 overflow-y-scroll"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-2 mt-2 h-full pb-32 overflow-y-scroll">
         {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">
             <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>

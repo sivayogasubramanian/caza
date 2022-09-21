@@ -144,9 +144,8 @@ function ApplicationCreate() {
 
   return (
     <motion.div
-      initial={{ opacity: 0.2 }}
+      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 0.2 }}
       className="flex flex-col justify-center items-stretch min-h-screen p-4"
     >
       <Title className="text-center">Add Application</Title>
