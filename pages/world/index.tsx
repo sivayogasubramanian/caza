@@ -60,14 +60,13 @@ function RolesWorld() {
     setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: e.target.checked });
   };
 
-  const { data } = !currentUser.isAnonymous
-    ? useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, searchParams], (url, searchParams) =>
-        api.get(url, { params: searchParams }),
-      )
-    : { data: undefined };
-  const isLoading = !currentUser.isAnonymous && !data;
+  const { data } = useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, searchParams], (url, searchParams) =>
+    api.get(url, { params: searchParams }),
+  );
 
-  const worldRoles = !currentUser.isAnonymous && Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
+  const isLoading = !data;
+  const worldRoles =
+    !currentUser.isAnonymous && isLoading ? [] : Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
 
   return (
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
