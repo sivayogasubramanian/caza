@@ -22,13 +22,21 @@ export default function useFirebaseLogin() {
   const handleAuthStateChanged = useCallback(
     async (user: Nullable<User>) => {
       if (user) {
+        const newUserToken = await user.getIdToken();
+
+        window.navigator.serviceWorker.ready.then((worker) => {
+          worker.active?.postMessage({
+            message: 'PRECACHE_USER_APPLICATIONS',
+            token: newUserToken,
+          });
+        });
+
         const result = await getRedirectResult(getAuth());
 
         // This can happen due to a login flow or re-authentication required by firebase (cannot be predicted).
         // In event of re-authenticating by Github, previous user token should be set as undefined (no linking).
         if (result) {
           const oldUserToken = getPreviousUserToken() ?? undefined;
-          const newUserToken = await user.getIdToken();
           usersApi
             .createAccount(newUserToken, oldUserToken)
             .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)))
@@ -42,6 +50,7 @@ export default function useFirebaseLogin() {
       }
 
       setCurrentUser(user);
+      console.log('SET CURRENT USER');
     },
 
     [getAuth, signInAnonymously],
