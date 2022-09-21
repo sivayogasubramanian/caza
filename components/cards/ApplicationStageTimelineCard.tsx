@@ -12,7 +12,7 @@ function ApplicationStageTimelineCard({ applicationStage, onClick }: Props) {
   const date = isValidDate(applicationStage.date) ? new Date(applicationStage.date) : undefined;
 
   return (
-    <div className="bg-white shadow-around rounded-lg cursor-pointer hover:shadow-lg" onClick={onClick}>
+    <div className="bg-white shadow-around rounded-lg cursor-pointer hover:shadow-bigAround" onClick={onClick}>
       <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
           <div className="font-bold flex items-start col-span-3 gap-1">

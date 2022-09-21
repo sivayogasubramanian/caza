@@ -29,7 +29,7 @@ function ApplicationTaskTimelineCard({ applicationId, task, mutateApplicationDat
   };
 
   return (
-    <div className="bg-white shadow-around rounded-lg cursor-pointer hover:shadow-lg" onClick={onClick}>
+    <div className="bg-white shadow-around rounded-lg cursor-pointer hover:shadow-bigAround" onClick={onClick}>
       <div className="p-2">
         <div className="grid grid-cols-4 gap-2">
           <div className="flex items-center gap-2 col-span-3">
