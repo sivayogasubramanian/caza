@@ -3,12 +3,30 @@ import { precacheAllUserApplications } from './applications';
 
 declare let self: ServiceWorkerGlobalScope;
 
-self.addEventListener('message', (event?: ExtendableMessageEvent) => {
+self.addEventListener('install', (event?: ExtendableEvent) => {
   if (!event) {
     return;
   }
 
-  if (event.origin !== window.location.origin) {
+  event.waitUntil(
+    caches.open('pages').then(function (cache) {
+      return cache.addAll([
+        '/',
+        '/applications/[applicationId].tsx',
+        // ...
+      ]);
+    }),
+  );
+});
+
+self.addEventListener('message', (event?: ExtendableMessageEvent) => {
+  console.log('Service worker received a message:', event);
+  if (!event) {
+    return;
+  }
+
+  // FIXME: Hardcoded route
+  if (event.origin !== 'http://localhost:3000') {
     // Ignore if the event is not from the same origin
     return;
   }
