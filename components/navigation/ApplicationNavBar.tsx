@@ -15,7 +15,7 @@ export default function ApplicationNavBar() {
   const worldClass = router.pathname.startsWith(WORLD_ROUTE) ? activatedClass : inactivatedClass;
 
   return (
-    <section className="bg-white shadow-top block fixed p-2 bottom-0 w-full md:hidden cursor-pointer">
+    <div className="bg-white shadow-top block fixed p-2 bottom-0 w-full md:hidden cursor-pointer">
       <div className="flex items-center">
         <Link href="/">
           <div className={yourListClass}>
@@ -33,6 +33,6 @@ export default function ApplicationNavBar() {
           </div>
         </Link>
       </div>
-    </section>
+    </div>
   );
 }
