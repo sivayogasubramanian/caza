@@ -24,7 +24,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
 
   return (
     <div
-      className={`bg-white flex flex-col gap-2 shadow-around rounded-lg p-3 last:mb-10 md:last:mb-0 cursor-pointer transition-shadow duration-500 hover:shadow-lg ${
+      className={`bg-white flex flex-col gap-2 shadow-around mt-2 rounded-lg p-3 last:mb-10 md:last:mb-0 cursor-pointer transition-shadow duration-500 hover:shadow-lg ${
         shouldBlur ? 'bg-white blur-sm pointer-events-none' : ''
       }`}
       onClick={() => router.push(`${WORLD_ROUTE}/${role.id}`)}
