@@ -53,6 +53,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<W
       title: true,
       type: true,
       year: true,
+      isVerified: true,
       company: { select: { id: true, name: true, companyUrl: true } },
     },
   });
