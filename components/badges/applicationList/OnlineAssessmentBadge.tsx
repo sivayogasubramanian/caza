@@ -6,7 +6,7 @@ import { stageTypeToDisplayStringMap } from '../../../utils/applicationStage/app
 function OnlineAssessmentBadge() {
   return (
     <Badge
-      style={{ backgroundColor: '#ACF8FF', color: '#000000' }}
+      style={{ backgroundColor: '#D0ACFF', color: '#9E3CCC' }}
       count={stageTypeToDisplayStringMap.get(ApplicationStageType.ONLINE_ASSESSMENT)}
     />
   );
