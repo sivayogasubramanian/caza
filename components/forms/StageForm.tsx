@@ -59,7 +59,7 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
       </Form.Item>
 
       <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please select a date.' }]}>
-        <DatePicker />
+        <DatePicker className="w-full" />
       </Form.Item>
 
       <Form.Item label="Reaction">
