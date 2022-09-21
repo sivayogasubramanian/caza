@@ -6,7 +6,6 @@ import CompanyLogo from '../company/CompanyLogo';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import { ApplicationStageType } from '@prisma/client';
 import { TAILWIND_MD_BREAKPOINT_PIXELS } from '../../utils/constants';
-import { renderToString } from 'react-dom/server';
 
 const HAIR_SPACE = ' ';
 const ZERO_WIDTH_SPACE = '​';
