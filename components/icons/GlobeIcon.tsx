@@ -3,10 +3,10 @@
 import React from 'react';
 
 interface Props {
-  isActive: boolean;
+  isActive?: boolean;
 }
 
-function GlobeIcon({ isActive }: Props) {
+function GlobeIcon({ isActive = true }: Props) {
   return isActive ? (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none">
       <path

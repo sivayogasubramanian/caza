@@ -162,7 +162,7 @@ function Application() {
 
           {application.role.isVerified && (
             <Link href={`/world/${application.role.id}`}>
-              <Button shape="round" className="flex items-center gap-2" type="primary" icon={<GlobeIcon size={15} />}>
+              <Button shape="round" className="flex items-center gap-2" type="primary" icon={<GlobeIcon />}>
                 Role stats
               </Button>
             </Link>
