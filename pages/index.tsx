@@ -145,7 +145,7 @@ function Applications() {
         initial={{ opacity: 0.2 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, ease: 'easeInOut' }}
-        className="p-4 h-5/6 overflow-y-scroll"
+        className="p-4 h-full pb-32 overflow-y-scroll"
         onScroll={handleScroll}
       >
         <Spin spinning={!applicationListData}>
