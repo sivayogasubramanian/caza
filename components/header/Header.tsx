@@ -82,7 +82,7 @@ function Header() {
           )}
 
           {shouldShowProfileMenu && (
-            <Button className="absolute right-2 top-10 shadow-md" icon={<LogoutOutlined />} onClick={handleLogout}>
+            <Button className="absolute right-0 top-10 shadow-md" icon={<LogoutOutlined />} onClick={handleLogout}>
               Log out
             </Button>
           )}
