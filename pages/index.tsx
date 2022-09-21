@@ -89,6 +89,7 @@ function Applications() {
                     />
                   </Tooltip>
                   <Input
+                    value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
                     placeholder="Search by roles or company..."
                     className="bg-primary-two text-white"
                     bordered={false}
@@ -99,6 +100,7 @@ function Applications() {
               <Col xs={12} md={3}>
                 <Form.Item>
                   <RoleTypesSelect
+                    value={searchParams.roleTypeWords}
                     isBordered={false}
                     isUsedInHeader={true}
                     isMultiselect
@@ -109,6 +111,7 @@ function Applications() {
               <Col xs={12} md={3}>
                 <Form.Item>
                   <ApplicationStagesSelect
+                    value={searchParams.stageTypeWords}
                     isBordered={false}
                     isUsedInHeader={true}
                     isMultiselect
