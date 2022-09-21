@@ -1,17 +1,19 @@
-'use strict';
+import { SW_PRECACHE_USER_DATA_MESSAGE } from '../utils/constants';
 
-const logRequest = (request) => {
+declare let self: ServiceWorkerGlobalScope;
+
+const logRequest = (request: Request) => {
   console.log(`LOG FROM SERVICE WORKER: [Request] ${request.method} ${request.url}`);
 };
 
-const logResponse = async (response) => {
+const logResponse = async (response: Response) => {
   console.log(
     `LOG FROM SERVICE WORKER: [Response] Endpoint ${response.url} returned with ${response.status} ${response.statusText}`,
   );
   console.log(await response.json());
 };
 
-const precacheAllUserApplications = async (token) => {
+const precacheAllUserApplications = async (token: string) => {
   const applicationsResponse = await getApplicationList(token);
   const { payload, messages } = await applicationsResponse.json();
   if (!Array.isArray(payload)) {
@@ -25,7 +27,7 @@ const precacheAllUserApplications = async (token) => {
   });
 };
 
-const getApplicationList = async (token) => {
+const getApplicationList = async (token: string) => {
   const listRequest = new Request('/api/applications', { headers: { Authorization: `Bearer ${token}` } });
   logRequest(listRequest);
 
@@ -39,7 +41,7 @@ const getApplicationList = async (token) => {
   return response;
 };
 
-const getIndividualApplication = async (token, applicationId) => {
+const getIndividualApplication = async (token: string, applicationId: number) => {
   const getRequest = new Request(`/api/applications/${applicationId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -53,12 +55,16 @@ const getIndividualApplication = async (token, applicationId) => {
   });
 };
 
-self.addEventListener('message', (event) => {
+self.addEventListener('message', (event?: ExtendableMessageEvent) => {
+  if (!event) {
+    return;
+  }
+
   if (event.origin !== 'http://localhost:3000') {
     return;
   }
 
-  if (event.data.message === 'SW_PRECACHE_USER_DATA') {
+  if (event.data.message === SW_PRECACHE_USER_DATA_MESSAGE) {
     event.waitUntil(precacheAllUserApplications(event.data.token));
   }
 });
