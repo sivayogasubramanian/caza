@@ -7,7 +7,7 @@ import { ApiResponse } from '../types/apiResponse';
 import { UserData } from '../types/user';
 import { Nullable } from '../types/utils';
 import { getPreviousUserToken, removePreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
-import { precacheUserData } from '../worker/utils';
+import { precacheUserData } from '../worker/client';
 
 /**
  * Hook that handles anonymous log in / register if not already logged in or attaches the verified login.
