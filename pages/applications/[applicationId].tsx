@@ -1,7 +1,7 @@
 import { Button, Spin, Timeline } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
@@ -150,7 +150,7 @@ function Application() {
           </Timeline>
         )}
 
-        {!hasSuccessfullyFetchedApplication && <NotFound message="The application was not found." />}
+        {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
       </motion.div>
 
       {hasSuccessfullyFetchedApplication && (
