@@ -8,6 +8,7 @@ type Props = {
   isMultiselect?: boolean;
   isBordered?: boolean;
   isUsedInHeader?: boolean;
+  value?: ApplicationStageType[];
   onChange?: (newValue: ApplicationStageType[]) => void;
 };
 
@@ -15,6 +16,7 @@ function ApplicationStagesSelect({
   isMultiselect = false,
   isBordered = true,
   isUsedInHeader = false,
+  value,
   onChange,
 }: Props) {
   const mode = isMultiselect ? 'multiple' : undefined;
@@ -27,6 +29,7 @@ function ApplicationStagesSelect({
 
   return (
     <Select
+      value={value}
       placeholder="Application Stage"
       bordered={isBordered}
       className={selectClass}

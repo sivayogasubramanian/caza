@@ -8,10 +8,11 @@ type Props = {
   isMultiselect?: boolean;
   isBordered?: boolean;
   isUsedInHeader?: boolean;
+  value?: RoleType[];
   onChange?: (newValue: RoleType[]) => void;
 };
 
-function RoleTypesSelect({ isMultiselect = false, isBordered = true, isUsedInHeader = false, onChange }: Props) {
+function RoleTypesSelect({ isMultiselect = false, isBordered = true, isUsedInHeader = false, value, onChange }: Props) {
   const mode = isMultiselect ? 'multiple' : undefined;
   const options = roleTypeToDisplayStringMap.map((label, role) => (
     <Option key={role} value={role}>
@@ -22,6 +23,7 @@ function RoleTypesSelect({ isMultiselect = false, isBordered = true, isUsedInHea
 
   return (
     <Select
+      value={value}
       placeholder="Role Type"
       bordered={isBordered}
       className={selectClass}
