@@ -13,7 +13,6 @@ interface Props {
 
 interface TaskFormTimePickerProps {
   isOpen: boolean;
-  givenStyle?: CSSProperties;
 }
 
 function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmitting, setTaskFormData }: Props) {
@@ -63,43 +62,39 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmit
       </Form.Item>
 
       <Form.Item label="Due date" name="dueDate" rules={[{ required: true, message: 'Please select a date.' }]}>
-        <DatePicker style={{ width: '100%' }} />
+        <DatePicker className="w-full" />
       </Form.Item>
 
       <Form.Item label="Notification date">
-        <div className="flex items-stretch">
+        <Form.Item name="notificationDateTimeType" className="flex-grow">
+          <Select onSelect={onSelectNotificationDateTimeType}>
+            <Select.Option value={NotificationDateTimeType.NONE}>None</Select.Option>
+            <Select.Option value={NotificationDateTimeType.DAY_OF_EVENT}>On day of event</Select.Option>
+            <Select.Option value={NotificationDateTimeType.DAYS_BEFORE}>Day(s) before</Select.Option>
+            <Select.Option value={NotificationDateTimeType.DAYS_AFTER}>Day(s) after</Select.Option>
+            <Select.Option value={NotificationDateTimeType.ON_SELECTED_DATE}>On selected date</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <div className="flex">
           {shouldShowNotificationDaysOffsetInput && (
             <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>
               <InputNumber precision={0} />
             </Form.Item>
           )}
 
-          <Form.Item name="notificationDateTimeType" className="flex-grow">
-            <Select onSelect={onSelectNotificationDateTimeType}>
-              <Select.Option value={NotificationDateTimeType.NONE}>None</Select.Option>
-              <Select.Option value={NotificationDateTimeType.DAY_OF_EVENT}>On day of event</Select.Option>
-              <Select.Option value={NotificationDateTimeType.DAYS_BEFORE}>Day(s) before</Select.Option>
-              <Select.Option value={NotificationDateTimeType.DAYS_AFTER}>Day(s) after</Select.Option>
-              <Select.Option value={NotificationDateTimeType.ON_SELECTED_DATE}>On selected date</Select.Option>
-            </Select>
-          </Form.Item>
+          {shouldShowNotificationDateTimePicker && (
+            <div className="flex justify-evenly w-full">
+              <Form.Item name="notificationDate" rules={[{ required: true, message: 'Please select a date.' }]}>
+                <DatePicker className="w-full" />
+              </Form.Item>
+
+              <TaskFormTimePicker isOpen />
+            </div>
+          )}
+
+          <TaskFormTimePicker isOpen={shouldShowNotificationTimePicker} />
         </div>
-
-        {shouldShowNotificationDateTimePicker && (
-          <div className="flex justify-between">
-            <Form.Item
-              name="notificationDate"
-              style={{ width: '50%' }}
-              rules={[{ required: true, message: 'Please select a date.' }]}
-            >
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
-
-            <TaskFormTimePicker isOpen givenStyle={{ width: '50%' }} />
-          </div>
-        )}
-
-        <TaskFormTimePicker isOpen={shouldShowNotificationTimePicker} />
       </Form.Item>
 
       {shouldShowMarkDone && (
@@ -111,11 +106,10 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmit
   );
 }
 
-function TaskFormTimePicker({ isOpen, givenStyle }: TaskFormTimePickerProps) {
+function TaskFormTimePicker({ isOpen }: TaskFormTimePickerProps) {
   return isOpen ? (
     <Form.Item
       name="notificationTime"
-      style={givenStyle && givenStyle}
       rules={[{ required: true, message: 'Please select a time.' }]}
       className="flex-grow"
     >
