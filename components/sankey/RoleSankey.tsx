@@ -1,19 +1,22 @@
-import { FC } from 'react';
-import Chart from 'react-google-charts';
+import { FC, useState } from 'react';
+import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
 import CompanyLogo from '../company/CompanyLogo';
-import { renderToString } from 'react-dom/server';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import { ApplicationStageType } from '@prisma/client';
 import { TAILWIND_MD_BREAKPOINT_PIXELS } from '../../utils/constants';
+import { renderToString } from 'react-dom/server';
 
 const HAIR_SPACE = ' ';
 const ZERO_WIDTH_SPACE = '​';
+const INVISIBLE_TOOLTIP = `<div style="width: 0; height: 0;"></div>`;
 
 export type RoleSankeyProps = { data: WorldRoleStatsData };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
+  const [edgeIndex, setEdgeIndex] = useState<number>(-1);
+
   if (!data) {
     return <div></div>;
   }
@@ -27,39 +30,56 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
     );
   }
 
-  data.nodes = data.nodes.map(nodeIdToUserFacingNodeId);
-  data.edges = data.edges.map(({ source, dest, userCount, totalNumHours }) => {
-    return { source: nodeIdToUserFacingNodeId(source), dest: nodeIdToUserFacingNodeId(dest), userCount, totalNumHours };
-  });
-  console.log(data);
+  const correctedData: WorldRoleStatsData = {
+    role: data.role,
+    numberOfApplications: data.numberOfApplications,
+    nodes: data.nodes.map(nodeIdToUserFacingNodeId),
+    edges: data.edges.map(({ source, dest, userCount, totalNumHours }) => {
+      return {
+        source: nodeIdToUserFacingNodeId(source),
+        dest: nodeIdToUserFacingNodeId(dest),
+        userCount,
+        totalNumHours,
+      };
+    }),
+  };
 
   const sankeyData = [
     ['FROM', 'TO', 'WEIGHT', { role: 'tooltip', type: 'string', p: { html: true } }] as unknown[],
   ].concat(
-    (data as unknown as WorldRoleStatsData).edges.map((e, index) => {
-      return [e.source, e.dest, e.userCount, createTooltip(data, index)];
+    (correctedData as unknown as WorldRoleStatsData).edges.map((e) => {
+      return [e.source, e.dest, e.userCount, INVISIBLE_TOOLTIP];
     }),
   );
 
+  const chartEvents: ReactGoogleChartEvent[] = [
+    {
+      eventName: 'ready' as GoogleVizEventName,
+      callback: ({ chartWrapper, google }) =>
+        addMouseListeners(chartWrapper, google, [({ row }) => setEdgeIndex(row)], [() => setEdgeIndex(-1)]),
+    },
+  ];
+
   const option = {
-    tooltip: { isHtml: true },
+    tooltip: { isHtml: true, trigger: 'selection' },
     sankey: {
       node: {
         label: { bold: true },
-        interactivity: true,
+        tooltip: { isHtml: true, trigger: 'selection' },
       },
       link: {
         colorMode: 'gradient',
+        tooltip: { trigger: 'none' },
       },
-      allowHtml: 'true',
-      tooltip: { isHtml: true },
+      allowHtml: true,
+      tooltip: { isHtml: true, trigger: 'selection' },
     },
   };
 
   const width = getSankeyWidth();
   const getChart = (width: number) => {
     return (
-      <div className="absolute" style={{ width }}>
+      <div className="absolute h-max pb-20" style={{ width }}>
         <Chart
           chartType="Sankey"
           className="top-0 left-0 rotate-90 md:rotate-0"
@@ -67,14 +87,16 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
           width={width >= TAILWIND_MD_BREAKPOINT_PIXELS ? width : undefined}
           data={sankeyData}
           options={option}
+          chartEvents={chartEvents}
         />
+        <MouseOverOverlay data={correctedData} edgeIndex={edgeIndex} />
       </div>
     );
   };
 
   return (
     <div className="w-full h-40 p-8">
-      <RoleCard role={data.role} />
+      <RoleCard role={correctedData.role} />
       <div className="absolute">{getChart(width)}</div>
     </div>
   );
@@ -96,21 +118,6 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
     </div>
   );
 };
-
-function createTooltip(data: WorldRoleStatsData, edgeIndex: number): string {
-  const targetEdge = data.edges[edgeIndex];
-  const { source, dest, totalNumHours, userCount } = targetEdge;
-
-  const element = (
-    <div className="absolute h-0 w-0">
-      <div className="relative top-[100px] md:top-0 overflow-visible w-[200px] -rotate-90 md:rotate-0">
-        {source} to {dest}:<br /> {userCount} user{userCount > 1 ? 's ' : ' '}
-        took ~{Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
-      </div>
-    </div>
-  );
-  return renderToString(element);
-}
 
 function nodeIdToUserFacingNodeId(raw: string) {
   const stages = raw.split(':');
@@ -139,5 +146,44 @@ const stagesToInvisible: Record<string, number> = Object.freeze({
 function createInvisibleRepresentation(stage: string) {
   return HAIR_SPACE + ZERO_WIDTH_SPACE.repeat(stagesToInvisible[stage]);
 }
+
+type MouseOverOverlayProps = { data: WorldRoleStatsData; edgeIndex: number; nodeTitle?: string };
+
+const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
+  if (edgeIndex < 0) {
+    return <div className="text-lg">Nothing in focus.</div>;
+  }
+  const targetEdge = data.edges[edgeIndex];
+  const { source, dest, totalNumHours, userCount } = targetEdge;
+  return (
+    <div className="text-lg">
+      {source} to {dest}:<br /> based on {userCount} experience{userCount > 1 ? 's' : ''}, on average this stage took{' '}
+      {Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+    </div>
+  );
+};
+
+type SankeyMouseEvent = { row: number; name?: string };
+
+// Typing for Google Chart is very suspect.
+/* eslint-disable */
+function addMouseListeners(
+  chartWrapper: GoogleChartWrapper,
+  google: GoogleViz,
+  mouseOverListeners: ((e: SankeyMouseEvent) => void)[],
+  mouseOutListeners: ((e: SankeyMouseEvent) => void)[],
+) {
+  google.visualization.events.addListener(
+    chartWrapper.getChart() as any,
+    'onmouseover' as GoogleVizEventName,
+    (e: any) => {
+      mouseOverListeners.forEach((fn) => fn(e as SankeyMouseEvent));
+    },
+  );
+  google.visualization.events.addListener(chartWrapper.getChart() as any, 'onmouseout' as any, (e: any) => {
+    mouseOutListeners.forEach((fn) => fn(e as SankeyMouseEvent));
+  });
+}
+/* eslint-enable */
 
 export default RoleSankey;
