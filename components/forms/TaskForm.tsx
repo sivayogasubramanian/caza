@@ -99,7 +99,7 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmit
           </div>
         )}
 
-        <TaskFormTimePicker isOpen={shouldShowNotificationTimePicker} givenStyle={{ width: '50%' }} />
+        <TaskFormTimePicker isOpen={shouldShowNotificationTimePicker} />
       </Form.Item>
 
       {shouldShowMarkDone && (
@@ -119,7 +119,7 @@ function TaskFormTimePicker({ isOpen, givenStyle }: TaskFormTimePickerProps) {
       rules={[{ required: true, message: 'Please select a time.' }]}
       className="flex-grow"
     >
-      <TimePicker />
+      <TimePicker className="w-full" />
     </Form.Item>
   ) : null;
 }
