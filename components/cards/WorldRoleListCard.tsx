@@ -10,7 +10,7 @@ import CompanyLogo from '../company/CompanyLogo';
 type Props = { role: WorldRoleListData; shouldBlur: boolean };
 
 // Colors of the individual stage sections, should match the number of values in the ApplicationStageType enum.
-const colors = ['#fbb4ae', '#b3cde3', '#ccebc5', '#decbe4', '#fed9a6', '#ffffcc', '#e5d8bd', '#fddaec', '#ba7b7b'];
+const colors = ['#C2EBF8', '#D0ACFF', '#FFF6A6', '#FFD0E4', '#FFE39A', '#CEEEC8', '#BFE4DE', '#FFC3BF', '#E5E5EE'];
 
 const stageColors = Object.values(ApplicationStageType).map((stage, index) => ({
   stage,
