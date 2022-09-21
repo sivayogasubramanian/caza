@@ -35,7 +35,7 @@ function RolesWorld() {
   const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
   const [isSearchTemporarilyHidden, setIsSearchTemporarilyHidden] = useState<boolean>(false);
   const [scrollY, setScrollY] = useState(window.scrollY);
-  const shouldShowSearch = !isSearchHidden && !isSearchTemporarilyHidden;
+  const isShowingSearch = !isSearchHidden && !isSearchTemporarilyHidden;
 
   const handleScroll = (e: UIEvent<HTMLDivElement>) => {
     const window = e.target as HTMLDivElement;
@@ -70,13 +70,13 @@ function RolesWorld() {
   const worldRoles = !currentUser.isAnonymous && Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
 
   return (
-    <div className={`h-full overflow-clip ${shouldShowSearch ? 'pb-24' : ''}`}>
+    <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-one rounded-b-3xl">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-2xl font-bold text-white">World Overview</div>
 
           <div className="flex items-center justify-end gap-2">
-            {isSearchHidden && (
+            {!isShowingSearch && (
               <Tooltip title="search">
                 <Button
                   className="bg-transparent focus:bg-transparent"
@@ -95,7 +95,7 @@ function RolesWorld() {
         </div>
 
         {/* Search and Filters */}
-        {shouldShowSearch && (
+        {isShowingSearch && (
           <Form>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={18}>
