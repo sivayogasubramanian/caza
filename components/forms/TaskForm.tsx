@@ -1,5 +1,5 @@
 import { Checkbox, DatePicker, Form, Input, InputNumber, Select, TimePicker } from 'antd';
-import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { NotificationDateTimeType, TaskFormData } from '../../types/task';
 import { Nullable } from '../../types/utils';
 
