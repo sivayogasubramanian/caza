@@ -1,6 +1,6 @@
 import { ApplicationStageType, RoleType } from '@prisma/client';
 import { Button, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
-import { ChangeEventHandler, useContext, useEffect, useState } from 'react';
+import { ChangeEventHandler, UIEvent, useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
@@ -25,6 +25,21 @@ function Applications() {
   });
 
   const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
+  const [isSearchTemporarilyHidden, setIsSearchTemporarilyHidden] = useState<boolean>(false);
+  const [scrollY, setScrollY] = useState(window.scrollY);
+  const shouldShowSearch = !isSearchHidden && !isSearchTemporarilyHidden;
+
+  const handleScroll = (e: UIEvent<HTMLDivElement>) => {
+    const window = e.target as HTMLDivElement;
+
+    if (scrollY > window.scrollTop) {
+      setIsSearchTemporarilyHidden(false);
+    }
+    if (scrollY < window.scrollTop) {
+      setIsSearchTemporarilyHidden(true);
+    }
+    setScrollY(window.scrollTop);
+  };
 
   const onSearchBarChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchParams({ ...searchParams, searchWords: splitByWhitespaces(e.target.value) });
@@ -52,7 +67,7 @@ function Applications() {
   }, [currentUser]);
 
   return (
-    <div className={`h-full overflow-clip ${isSearchHidden ? '' : 'pb-24'}`}>
+    <div className={`h-full overflow-clip ${shouldShowSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-one rounded-b-3xl">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-2xl font-bold text-white">Applications</div>
@@ -77,7 +92,7 @@ function Applications() {
         </div>
 
         {/* Search and Filters */}
-        {!isSearchHidden && (
+        {shouldShowSearch && (
           <Form>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={18}>
@@ -125,7 +140,7 @@ function Applications() {
       </div>
 
       {/* Application List */}
-      <div className="p-4 h-5/6 overflow-y-scroll">
+      <div className="p-4 h-5/6 overflow-y-scroll" onScroll={handleScroll}>
         <Spin spinning={!applicationListData}>
           {applications.map((application, index) => (
             <ApplicationListCard key={index} application={application} />
