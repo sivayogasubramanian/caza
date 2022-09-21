@@ -76,7 +76,7 @@ function RolesWorld() {
           <div className="text-2xl font-bold text-white">World Overview</div>
 
           <div className="flex items-center justify-end gap-2">
-            {!isShowingSearch && (
+            {isSearchHidden && (
               <Tooltip title="search">
                 <Button
                   className="bg-transparent focus:bg-transparent"
