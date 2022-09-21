@@ -72,7 +72,7 @@ function Applications() {
         <div className="mb-2 flex items-center justify-between">
           <div className="text-2xl font-bold text-white">Applications</div>
 
-          <div>
+          <div className="flex items-center justify-end gap-2">
             {isSearchHidden && (
               <Tooltip title="search">
                 <Button
@@ -84,7 +84,7 @@ function Applications() {
               </Tooltip>
             )}
 
-            <div className="hidden md:flex">
+            <div className="hidden md:flex items-center gap-2">
               <CreateApplicationButton />
               <GoToWorldViewButton />
             </div>

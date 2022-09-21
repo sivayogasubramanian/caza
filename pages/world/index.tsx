@@ -15,8 +15,8 @@ import { ApiResponse } from '../../types/apiResponse';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../types/role';
 import { worldRolesMockData } from '../../utils/mockData/worldRoles';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
-import GoToWorldViewButton from '../../components/buttons/GoToWorldViewButton';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
+import GoToYourListViewButton from '../../components/buttons/GoToYourListViewButton';
 
 function RolesWorld() {
   const { currentUser } = useContext(AuthContext);
@@ -74,7 +74,7 @@ function RolesWorld() {
         <div className="mb-2 flex items-center justify-between">
           <div className="text-2xl font-bold text-white">World Overview</div>
 
-          <div>
+          <div className="flex items-center justify-end gap-2">
             {isSearchHidden && (
               <Tooltip title="search">
                 <Button
@@ -86,9 +86,9 @@ function RolesWorld() {
               </Tooltip>
             )}
 
-            <div className="hidden md:flex">
+            <div className="hidden md:flex items-center gap-2">
               <CreateApplicationButton />
-              <GoToWorldViewButton />
+              <GoToYourListViewButton />
             </div>
           </div>
         </div>
