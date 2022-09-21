@@ -1,9 +1,8 @@
 import { ApplicationStageType, RoleType } from '@prisma/client';
-import { Col, Form, Row, Spin } from 'antd';
-import Search from 'antd/lib/input/Search';
-import Title from 'antd/lib/typography/Title';
+import { Button, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { ChangeEventHandler, useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
+import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
 import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
@@ -11,10 +10,10 @@ import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import AuthContext from '../context/AuthContext';
 import api from '../frontendApis/api';
-import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { splitByWhitespaces } from '../utils/strings/formatters';
+import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 
 function Applications() {
   const { currentUser } = useContext(AuthContext);
@@ -24,6 +23,8 @@ function Applications() {
     roleTypeWords: [],
     stageTypeWords: [],
   });
+
+  const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
 
   const onSearchBarChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchParams({ ...searchParams, searchWords: splitByWhitespaces(e.target.value) });
@@ -51,41 +52,83 @@ function Applications() {
   }, [currentUser]);
 
   return (
-    <div className="p-5">
-      <div className="flex items-center justify-between">
-        <Title>Applications</Title>
+    <div>
+      <div className="mt-2 p-2 bg-primary-one rounded-b-3xl">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-2xl font-bold text-white">Applications</div>
 
-        <div className="hidden md:flex mb-[0.5em] gap-3">
-          <CreateApplicationButton />
-          <GoToWorldViewButton />
+          <div>
+            {isSearchHidden && (
+              <Tooltip title="search">
+                <Button
+                  className="bg-transparent focus:bg-transparent"
+                  shape="circle"
+                  onClick={() => setIsSearchHidden(false)}
+                  icon={<SearchOutlined style={{ color: '#FFFFFF' }} />}
+                />
+              </Tooltip>
+            )}
+
+            <div className="hidden md:flex">
+              <CreateApplicationButton />
+              <GoToWorldViewButton />
+            </div>
+          </div>
         </div>
+
+        {/* Search and Filters */}
+        {!isSearchHidden && (
+          <Form>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={18}>
+                <Input.Group className="flex items-center justify-items-stretch">
+                  <Tooltip title="Exit search">
+                    <ArrowLeftOutlined
+                      style={{ color: '#FFFFFF', fontSize: '15px', paddingRight: '2%' }}
+                      onClick={() => setIsSearchHidden(true)}
+                    />
+                  </Tooltip>
+                  <Input
+                    placeholder="Search by roles or company..."
+                    className="bg-primary-two text-white"
+                    bordered={false}
+                    onChange={onSearchBarChange}
+                  />
+                </Input.Group>
+              </Col>
+              <Col xs={12} md={3}>
+                <Form.Item>
+                  <RoleTypesSelect
+                    isBordered={false}
+                    isUsedInHeader={true}
+                    isMultiselect
+                    onChange={onRoleTypesFilterChange}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={12} md={3}>
+                <Form.Item>
+                  <ApplicationStagesSelect
+                    isBordered={false}
+                    isUsedInHeader={true}
+                    isMultiselect
+                    onChange={onApplicationStageTypesFilterChange}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        )}
       </div>
 
-      {/* Search and Filters */}
-      <Form>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={18}>
-            <Search placeholder="Search..." onChange={onSearchBarChange} />
-          </Col>
-          <Col xs={12} md={3}>
-            <Form.Item>
-              <RoleTypesSelect isMultiselect onChange={onRoleTypesFilterChange} />
-            </Form.Item>
-          </Col>
-          <Col xs={12} md={3}>
-            <Form.Item>
-              <ApplicationStagesSelect isMultiselect onChange={onApplicationStageTypesFilterChange} />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-
       {/* Application List */}
-      <Spin spinning={!applicationListData}>
-        {applications.map((application, index) => (
-          <ApplicationListCard key={index} application={application} />
-        ))}
-      </Spin>
+      <div className="p-4">
+        <Spin spinning={!applicationListData}>
+          {applications.map((application, index) => (
+            <ApplicationListCard key={index} application={application} />
+          ))}
+        </Spin>
+      </div>
     </div>
   );
 }
