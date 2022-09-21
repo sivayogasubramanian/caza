@@ -6,7 +6,7 @@ import { stageTypeToDisplayStringMap } from '../../../utils/applicationStage/app
 function WithdrawnBadge() {
   return (
     <Badge
-      style={{ backgroundColor: '#CDC3C3', color: '#000000' }}
+      style={{ backgroundColor: '#E5E5EE', color: '#6F6F6F' }}
       count={stageTypeToDisplayStringMap.get(ApplicationStageType.WITHDRAWN)}
     />
   );

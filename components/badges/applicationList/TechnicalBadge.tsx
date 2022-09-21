@@ -6,7 +6,7 @@ import { stageTypeToDisplayStringMap } from '../../../utils/applicationStage/app
 function TechnicalBadge() {
   return (
     <Badge
-      style={{ backgroundColor: '#D8ACFF', color: '#000000' }}
+      style={{ backgroundColor: '#FFF6A6', color: '#9B7A05' }}
       count={stageTypeToDisplayStringMap.get(ApplicationStageType.TECHNICAL)}
     />
   );
