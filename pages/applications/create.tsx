@@ -218,6 +218,7 @@ function ApplicationCreate() {
             onChange={(dateMoment) => {
               setApplicationDate(dateMoment);
             }}
+            className="w-full"
           />
         </Form.Item>
         <Form.Item className="self-center">
