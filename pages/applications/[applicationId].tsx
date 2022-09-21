@@ -83,7 +83,7 @@ function Application() {
         initial={{ opacity: 0.2 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, ease: 'easeInOut' }}
-        className="p-5"
+        className="p-2"
       >
         {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">

@@ -49,10 +49,10 @@ function CreateRoleForm({ company, isOpen, closeForm, onCreate }: Props) {
           <CompanyOption company={company} />
         </Form.Item>
         <Form.Item label="Title" name="title" rules={[{ required: true, message: 'Please input a title!' }]}>
-          <Input />
+          <Input placeholder="Enter the role title" />
         </Form.Item>
         <Form.Item label="Type" name="type" rules={[{ required: true, message: 'Please select a role type!' }]}>
-          <RoleTypesSelect />
+          <RoleTypesSelect placeholder="Select a role type" />
         </Form.Item>
         <Form.Item label="Year" name="year" rules={[{ required: true, message: 'Please input the year!' }]}>
           <InputNumber />
