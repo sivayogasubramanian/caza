@@ -18,6 +18,7 @@ import moment from 'moment';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
 import { HOMEPAGE_ROUTE } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
+import { motion } from 'framer-motion';
 
 const addNewCompanyOption: CompanyAutocompleteOption = {
   company: null,
@@ -142,7 +143,12 @@ function ApplicationCreate() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-stretch min-h-screen p-8">
+    <motion.div
+      initial={{ opacity: 0.2 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.2 }}
+      className="flex flex-col justify-center items-stretch min-h-screen p-8"
+    >
       <Title className="text-center">Add Application</Title>
 
       <CreateCompanyForm
@@ -219,7 +225,7 @@ function ApplicationCreate() {
           </Button>
         </Form.Item>
       </Form>
-    </div>
+    </motion.div>
   );
 }
 

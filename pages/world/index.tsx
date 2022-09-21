@@ -17,6 +17,7 @@ import { worldRolesMockData } from '../../utils/mockData/worldRoles';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import GoToYourListViewButton from '../../components/buttons/GoToYourListViewButton';
+import { motion } from 'framer-motion';
 
 function RolesWorld() {
   const { currentUser } = useContext(AuthContext);
@@ -138,7 +139,13 @@ function RolesWorld() {
       </div>
 
       {/* World List */}
-      <div className="p-4 h-5/6 overflow-y-scroll" onScroll={handleScroll}>
+      <motion.div
+        initial={{ opacity: 0.2 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, ease: 'easeInOut' }}
+        className="p-4 h-5/6 overflow-y-scroll"
+        onScroll={handleScroll}
+      >
         <Spinner isLoading={!currentUser.isAnonymous && !data}>
           {currentUser.isAnonymous && <div>Please log in with Github to see the world view.</div>}
 
@@ -146,7 +153,7 @@ function RolesWorld() {
             <WorldRoleListCard key={index} role={role} shouldBlur={currentUser.isAnonymous} />
           ))}
         </Spinner>
-      </div>
+      </motion.div>
     </div>
   );
 }
