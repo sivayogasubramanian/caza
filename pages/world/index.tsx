@@ -1,5 +1,5 @@
 import { RoleType } from '@prisma/client';
-import { Button, Checkbox, Col, Form, Input, Row, Tooltip } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
 import useSWR from 'swr';
@@ -9,7 +9,6 @@ import CreateApplicationButton from '../../components/buttons/CreateApplicationB
 import WorldRoleListCard from '../../components/cards/WorldRoleListCard';
 import RoleTypesSelect from '../../components/forms/RoleTypesSelect';
 import NotFound from '../../components/notFound/NotFound';
-import Spinner from '../../components/spinner/Spinner';
 import AuthContext from '../../context/AuthContext';
 import { ApiResponse } from '../../types/apiResponse';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../types/role';
@@ -66,6 +65,7 @@ function RolesWorld() {
         api.get(url, { params: searchParams }),
       )
     : { data: undefined };
+  const isLoading = !currentUser.isAnonymous && !data;
 
   const worldRoles = !currentUser.isAnonymous && Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
 
@@ -143,16 +143,19 @@ function RolesWorld() {
         initial={{ opacity: 0.2 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, ease: 'easeInOut' }}
-        className="p-4 h-5/6 overflow-y-scroll"
+        className="p-4 h-full pb-32 overflow-y-scroll"
         onScroll={handleScroll}
       >
-        <Spinner isLoading={!currentUser.isAnonymous && !data}>
+        <Spin
+          spinning={isLoading}
+          wrapperClassName={isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}
+        >
           {currentUser.isAnonymous && <div>Please log in with Github to see the world view.</div>}
 
           {worldRoles?.map((role, index) => (
             <WorldRoleListCard key={index} role={role} shouldBlur={currentUser.isAnonymous} />
           ))}
-        </Spinner>
+        </Spin>
       </motion.div>
     </div>
   );

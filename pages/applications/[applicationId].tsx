@@ -1,4 +1,4 @@
-import { Button, Timeline } from 'antd';
+import { Button, Spin, Timeline } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -12,7 +12,6 @@ import EditTaskModal from '../../components/modals/EditTaskModal';
 import NewStageModal from '../../components/modals/NewStageModal';
 import NewTaskModal from '../../components/modals/NewTaskModal';
 import NotFound from '../../components/notFound/NotFound';
-import Spinner from '../../components/spinner/Spinner';
 import { ApplicationData } from '../../types/application';
 import { ApplicationStageApplicationData } from '../../types/applicationStage';
 import { TaskData } from '../../types/task';
@@ -78,12 +77,15 @@ function Application() {
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
 
   return (
-    <Spinner isLoading={isLoading}>
+    <Spin
+      spinning={isLoading}
+      wrapperClassName={`h-full ${isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}`}
+    >
       <motion.div
         initial={{ opacity: 0.2 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, ease: 'easeInOut' }}
-        className="p-2"
+        className="p-2 mt-2 h-full pb-32 overflow-y-scroll"
       >
         {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">
@@ -175,7 +177,7 @@ function Application() {
           )}
         </div>
       )}
-    </Spinner>
+    </Spin>
   );
 }
 
