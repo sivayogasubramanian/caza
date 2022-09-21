@@ -23,4 +23,4 @@ export const WORLD_ROUTE = '/world';
 export const TAILWIND_MD_BREAKPOINT_PIXELS = 768;
 
 // Service worker message types
-export const SW_PRECACHE_USER_DATA = 'SW_PRECACHE_USER_DATA';
+export const SW_PRECACHE_USER_DATA_MESSAGE = 'SW_PRECACHE_USER_DATA';
