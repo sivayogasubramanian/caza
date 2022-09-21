@@ -8,7 +8,7 @@ function CreateApplicationButton() {
 
   return (
     <Button
-      className="bg-button-primary focus:bg-button-primary border-none hover:border-none shadow-primary w-10"
+      className="bg-primary-one focus:bg-primary-one border-none hover:border-none shadow-primary w-10"
       size="large"
       type="primary"
       shape="circle"

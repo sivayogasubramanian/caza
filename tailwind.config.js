@@ -5,8 +5,9 @@ module.exports = {
     extend: {
       colors: {
         background: '#FFFFFF',
-        button: {
-          primary: '#1A79E4',
+        primary: {
+          one: '#1A79E4',
+          two: '#1A49A6',
         },
       },
       boxShadow: {
