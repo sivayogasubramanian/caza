@@ -12,13 +12,9 @@ const RoleSankey = dynamic(() => import('../../components/sankey/RoleSankey'), {
 
 const RoleWorldPage: NextPage = () => {
   const { currentUser } = useContext(AuthContext);
-  if (!currentUser || currentUser.isAnonymous) {
-    return <NotFound message="The role page you are looking for cannot be found." />;
-  }
-
   const { query } = useRouter();
-  if (!canBecomeInteger(query.roleId)) {
-    return <p>Bad role id.</p>;
+  if (!currentUser || currentUser.isAnonymous || !canBecomeInteger(query.roleId)) {
+    return <NotFound message="The role page you are looking for cannot be found." />;
   }
 
   const roleId = Number(query.roleId);

@@ -18,7 +18,7 @@ enum MessageType {
   SUCCESS,
 }
 
-const Messages = Object.freeze({
+const messages = Object.freeze({
   [MessageType.INVALID_ROLE_ID]: { type: StatusMessageType.ERROR, message: 'Role id is invalid.' },
   [MessageType.ROLE_NOT_FOUND]: { type: StatusMessageType.ERROR, message: 'Role could not be found.' },
   [MessageType.ROLE_NOT_VERIFIED]: { type: StatusMessageType.ERROR, message: 'Role is not verified.' },
@@ -37,9 +37,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ApiResponse<Wor
 async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<WorldRoleStatsData>>) {
   const validationError = await validateGetRequest(req);
   if (validationError === MessageType.ROLE_NOT_VERIFIED) {
-    return res.status(HttpStatus.TEAPOT).json(createJsonResponse({}, Messages[validationError]));
+    return res.status(HttpStatus.TEAPOT).json(createJsonResponse({}, messages[validationError]));
   } else if (validationError !== null) {
-    return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, Messages[validationError]));
+    return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[validationError]));
   }
 
   const roleId = Number(req.query.roleId);
@@ -67,7 +67,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse<ApiResponse<W
 
   return res
     .status(HttpStatus.OK)
-    .json(createJsonResponse({ role, nodes, edges, numberOfApplications }, Messages[MessageType.SUCCESS]));
+    .json(createJsonResponse({ role, nodes, edges, numberOfApplications }, messages[MessageType.SUCCESS]));
 }
 
 async function validateGetRequest(req: NextApiRequest): Promise<Nullable<MessageType>> {
