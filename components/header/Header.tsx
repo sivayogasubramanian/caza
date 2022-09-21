@@ -30,7 +30,11 @@ function Header() {
       ? currentUser.getIdToken(true).then(storePreviousUserToken)
       : Promise.resolve();
 
-    storeIfAnonymous.then(() => signInWithPopup(auth, provider).finally(() => window.location.reload()));
+    storeIfAnonymous.then(() =>
+      signInWithPopup(auth, provider).finally(() =>
+        openNotification({ type: StatusMessageType.SUCCESS, message: 'Logged in successfully!' }),
+      ),
+    );
   };
 
   const handleLogout = () => {
@@ -44,9 +48,9 @@ function Header() {
 
     removePreviousUserToken();
 
-    signOut(auth).finally(() => {
-      window.location.reload();
-    });
+    signOut(auth).finally(() =>
+      openNotification({ type: StatusMessageType.SUCCESS, message: 'Logged out successfully!' }),
+    );
   };
 
   return (
