@@ -21,9 +21,9 @@ import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStag
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
 import GlobeIcon from '../../components/icons/GlobeIcon';
-import Link from 'next/link';
 import { PlusOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+import { WORLD_ROUTE } from '../../utils/constants';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -81,7 +81,7 @@ function Application() {
       spinning={isLoading}
       wrapperClassName={`h-full ${isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}`}
     >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-2 mt-2 h-full pb-32 overflow-y-scroll">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 mt-2 h-full pb-32 overflow-y-scroll">
         {hasSuccessfullyFetchedApplication && (
           <div className="flex items-center justify-between">
             <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
@@ -154,7 +154,7 @@ function Application() {
       </motion.div>
 
       {hasSuccessfullyFetchedApplication && (
-        <div className="fixed w-full bottom-14 flex items-center justify-around">
+        <div className="mb-2 fixed w-full bottom-14 flex items-center justify-evenly">
           <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={() => setIsAddingNewStage(true)}>
             New stage
           </Button>
@@ -164,11 +164,15 @@ function Application() {
           </Button>
 
           {application.role.isVerified && (
-            <Link href={`/world/${application.role.id}`}>
-              <Button shape="round" className="flex items-center gap-2" type="primary" icon={<GlobeIcon />}>
-                Role stats
-              </Button>
-            </Link>
+            <Button
+              shape="round"
+              className="flex items-center gap-2"
+              type="primary"
+              icon={<GlobeIcon />}
+              onClick={() => router.push(`${WORLD_ROUTE}/${application.role.id}`)}
+            >
+              Role stats
+            </Button>
           )}
         </div>
       )}
