@@ -140,9 +140,8 @@ function RolesWorld() {
 
       {/* World List */}
       <motion.div
-        initial={{ opacity: 0.2 }}
+        initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, ease: 'easeInOut' }}
         className="p-4 h-full pb-32 overflow-y-scroll"
         onScroll={handleScroll}
       >
