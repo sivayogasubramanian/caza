@@ -1,7 +1,7 @@
 import { Button, Spin, Timeline } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
