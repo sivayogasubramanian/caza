@@ -67,6 +67,15 @@ function RolesWorld() {
 
   const { data } = useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, debouncedSearchParams]);
 
+  const exitSearch = () => {
+    setIsSearchHidden(true);
+    setSearchParams({
+      searchWords: [],
+      roleTypeWords: [],
+      shouldFilterForCurrentUserApplications: false,
+    });
+  };
+
   const isLoading = !data;
   const worldRoles = isLoading
     ? []
@@ -108,10 +117,7 @@ function RolesWorld() {
               <Col xs={24} md={18}>
                 <Input.Group className="flex items-center justify-items-stretch">
                   <Tooltip title="Exit search">
-                    <ArrowLeftOutlined
-                      style={{ fontSize: '15px', paddingRight: '2%' }}
-                      onClick={() => setIsSearchHidden(true)}
-                    />
+                    <ArrowLeftOutlined style={{ fontSize: '15px', paddingRight: '2%' }} onClick={exitSearch} />
                   </Tooltip>
                   <Input
                     value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
@@ -135,7 +141,12 @@ function RolesWorld() {
               </Col>
               <Col xs={12} md={3}>
                 <Form.Item>
-                  <Checkbox onChange={onApplicationFilterCheckboxChange}>My applications only</Checkbox>
+                  <Checkbox
+                    checked={searchParams.shouldFilterForCurrentUserApplications}
+                    onChange={onApplicationFilterCheckboxChange}
+                  >
+                    My applications only
+                  </Checkbox>
                 </Form.Item>
               </Col>
             </Row>
