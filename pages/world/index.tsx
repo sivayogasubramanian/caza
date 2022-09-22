@@ -72,8 +72,11 @@ function RolesWorld() {
   );
 
   const isLoading = !data;
-  const worldRoles =
-    !currentUser.isAnonymous && isLoading ? [] : Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
+  const worldRoles = isLoading
+    ? []
+    : !currentUser.isAnonymous && Array.isArray(data?.payload)
+    ? data?.payload
+    : worldRolesMockData;
 
   return (
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
@@ -155,7 +158,7 @@ function RolesWorld() {
           spinning={isLoading}
           wrapperClassName={isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}
         >
-          {currentUser.isAnonymous && <div>Please log in with Github to see the world view.</div>}
+          {currentUser.isAnonymous && !isLoading && <div>Please log in with Github to see the world view.</div>}
 
           {worldRoles?.map((role, index) => (
             <WorldRoleListCard key={index} role={role} shouldBlur={currentUser.isAnonymous} />
