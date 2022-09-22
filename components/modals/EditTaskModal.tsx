@@ -16,6 +16,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { KeyedMutator } from 'swr';
 import { ApiResponse } from '../../types/apiResponse';
 import { ApplicationData } from '../../types/application';
+import { log } from '../../utils/analytics';
 
 interface Props {
   applicationId: number;
@@ -71,9 +72,13 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
     }
   }, [taskFormData]);
 
-  const onCancel = () => setSelectedTask(null);
+  const onCancel = () => {
+    log('cancel_edit_task_modal');
+    setSelectedTask(null);
+  };
 
   const onDelete = () => {
+    log('click_delete_task_button');
     Modal.confirm({
       title: 'Are you sure about deleting this task?',
       icon: <ExclamationCircleOutlined />,
@@ -83,6 +88,7 @@ function EditTaskModal({ applicationId, initialTask, setSelectedTask, mutateAppl
   };
 
   const handleSubmit = (values: TaskFormData) => {
+    log('submit_edit_task_modal');
     const taskPatchData: TaskPatchData = {
       title: values.title,
       dueDate: values.dueDate?.toISOString(),

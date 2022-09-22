@@ -2,6 +2,7 @@ import { ApplicationStageType } from '@prisma/client';
 import { Tooltip } from 'antd';
 import { useRouter } from 'next/router';
 import { WorldRoleListData } from '../../types/role';
+import { log } from '../../utils/analytics';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import { WORLD_ROUTE } from '../../utils/constants';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
@@ -22,12 +23,17 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
 
   const sumOfStageCounts = role.applicationStages.reduce((acc, stage) => acc + stage.count, 0);
 
+  const onClick = () => {
+    log('click_world_role_list_item');
+    router.push(`${WORLD_ROUTE}/${role.id}`);
+  };
+
   return (
     <div
       className={`bg-white flex flex-col gap-2 shadow-around mt-2 rounded-lg p-3 cursor-pointer transition-shadow duration-500 hover:shadow-bigAround ${
         shouldBlur ? 'bg-white blur-sm pointer-events-none' : ''
       }`}
-      onClick={() => router.push(`${WORLD_ROUTE}/${role.id}`)}
+      onClick={onClick}
     >
       <div className="flex items-center xs-12 md-4 p-4">
         <CompanyLogo company={role.company} className="rounded-full max-w-[3rem]" />

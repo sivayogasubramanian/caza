@@ -3,6 +3,7 @@ import rolesApi from '../../frontendApis/rolesApi';
 import { CompanyListData } from '../../types/company';
 import { RoleData } from '../../types/role';
 import { Nullable } from '../../types/utils';
+import { log } from '../../utils/analytics';
 import { DEFAULT_NUM_MONTHS_BEFORE_ROLE_START } from '../../utils/constants';
 import CompanyOption from '../CompanyOption';
 import RoleTypesSelect from './RoleTypesSelect';
@@ -25,17 +26,30 @@ function CreateRoleForm({ company, isOpen, closeForm, onCreate }: Props) {
   const [form] = Form.useForm();
 
   const onSubmit = (companyId: number) => {
-    form.validateFields().then(({ title, type, year }) => {
-      rolesApi.createRole({ companyId, title, type, year }).then((resp) => {
-        if (resp.payload.id === undefined) {
-          return;
-        }
+    log('submit_create_company_form');
+    form
+      .validateFields()
+      .then(({ title, type, year }) => {
+        log('create_role_form_valid');
+        rolesApi.createRole({ companyId, title, type, year }).then((resp) => {
+          if (resp.payload.id === undefined) {
+            return;
+          }
 
-        form.resetFields();
-        closeForm();
-        onCreate(resp.payload as RoleData);
+          form.resetFields();
+          closeForm();
+          onCreate(resp.payload as RoleData);
+        });
+      })
+      .catch((errorInfo) => {
+        log('create_role_form_invalid', { errorInfo });
       });
-    });
+  };
+
+  const onCancel = () => {
+    log('cancel_create_role_form');
+    form.resetFields();
+    closeForm();
   };
 
   if (company === null) {
@@ -43,7 +57,7 @@ function CreateRoleForm({ company, isOpen, closeForm, onCreate }: Props) {
   }
 
   return (
-    <Modal title={'Add new role'} open={isOpen} onOk={() => onSubmit(company.id)} onCancel={closeForm}>
+    <Modal title={'Add new role'} open={isOpen} onOk={() => onSubmit(company.id)} onCancel={onCancel}>
       <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} initialValues={{ year: getDefaultRoleYear() }}>
         <Form.Item label="Company" name="companyName">
           <CompanyOption company={company} />

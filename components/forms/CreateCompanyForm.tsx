@@ -1,6 +1,7 @@
 import { Form, Input, Modal } from 'antd';
 import companiesApi from '../../frontendApis/companiesApi';
 import { CompanyData } from '../../types/company';
+import { log } from '../../utils/analytics';
 
 type Props = {
   isOpen: boolean;
@@ -12,21 +13,34 @@ function CreateCompanyForm({ isOpen, closeForm, onCreate }: Props) {
   const [form] = Form.useForm();
 
   const onSubmit = () => {
-    form.validateFields().then((values) => {
-      companiesApi.createCompany(values).then((resp) => {
-        if (resp.payload.id === undefined) {
-          return;
-        }
+    log('submit_create_company_form');
+    form
+      .validateFields()
+      .then((values) => {
+        log('create_company_form_valid');
+        companiesApi.createCompany(values).then((resp) => {
+          if (resp.payload.id === undefined) {
+            return;
+          }
 
-        form.resetFields();
-        closeForm();
-        onCreate(resp.payload as CompanyData);
+          form.resetFields();
+          closeForm();
+          onCreate(resp.payload as CompanyData);
+        });
+      })
+      .catch((errorInfo) => {
+        log('create_company_form_invalid', { errorInfo });
       });
-    });
+  };
+
+  const onCancel = () => {
+    log('cancel_create_company_form');
+    form.resetFields();
+    closeForm();
   };
 
   return (
-    <Modal title={'Add new company'} open={isOpen} onOk={onSubmit} onCancel={closeForm}>
+    <Modal title={'Add new company'} open={isOpen} onOk={onSubmit} onCancel={onCancel}>
       <Form form={form} labelCol={{ span: 7 }} wrapperCol={{ span: 17 }}>
         <Form.Item
           name="name"
