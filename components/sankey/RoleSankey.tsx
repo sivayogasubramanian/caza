@@ -107,16 +107,6 @@ const RoleCard: FC<RoleCardProps> = ({ role }) => {
     <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
       <div className="text-2xl font-bold text-primary-four">{`${role.title} @ ${role.company.name}`}</div>
     </div>
-    // <div className="p-4 flex items-center">
-    //   <CompanyLogo company={role.company} className="rounded-full max-w-[5rem]" />
-    //
-    //   <div className="ml-5 w-[100%] flex flex-col gap-0.5">
-    //     <div className="text-sm">{role.company.name}</div>
-    //     <div className="flex items-start justify-between">
-    //       <div className="text-2xl">{role.title}</div>
-    //     </div>
-    //   </div>
-    // </div>
   );
 };
 
