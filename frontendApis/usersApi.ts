@@ -9,7 +9,7 @@ const USER_API_ENDPOINT = '/api/user';
 // in the interceptor yet.
 class UsersApi {
   // Idempotent create account function. Successfully returns with no change if user exists.
-  public createAccount(newToken: string, oldToken?: string, isVerified: boolean = false): ApiPromise<UserData> {
+  public createAccount(newToken: string, oldToken?: string, isVerified = false): ApiPromise<UserData> {
     const apiResult = axios.post(
       USER_API_ENDPOINT,
       { oldToken, isVerified },
