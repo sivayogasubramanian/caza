@@ -24,3 +24,6 @@ export const TAILWIND_MD_BREAKPOINT_PIXELS = 768;
 
 // Service worker message types
 export const SW_PRECACHE_USER_DATA_MESSAGE = 'SW_PRECACHE_USER_DATA';
+
+// Default debounce delay of 0.5s
+export const DEBOUNCE_DELAY = 500;

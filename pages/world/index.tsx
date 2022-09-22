@@ -19,6 +19,7 @@ import GoToYourListViewButton from '../../components/buttons/GoToYourListViewBut
 import { motion } from 'framer-motion';
 import { log } from '../../utils/analytics';
 import useDebounce from '../../hooks/useDebounce';
+import { DEBOUNCE_DELAY } from '../../utils/constants';
 
 function RolesWorld() {
   const { currentUser } = useContext(AuthContext);
@@ -32,7 +33,7 @@ function RolesWorld() {
     roleTypeWords: [],
     shouldFilterForCurrentUserApplications: false,
   });
-  const debouncedSearchParams = useDebounce(searchParams, 500);
+  const debouncedSearchParams = useDebounce(searchParams, DEBOUNCE_DELAY);
 
   const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
   const [isSearchTemporarilyHidden, setIsSearchTemporarilyHidden] = useState<boolean>(false);
