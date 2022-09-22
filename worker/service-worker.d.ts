@@ -23,7 +23,7 @@
  * @license: ISC
  */
 interface ExtendableEvent extends Event {
-  waitUntil(fn: Promise<any>): void;
+  waitUntil(fn: Promise<any>): void; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface PushSubscriptionChangeEvent extends ExtendableEvent {
@@ -39,11 +39,11 @@ declare class Client {
   url: string;
   focused: boolean;
   focus(): void;
-  postMessage(message: any): void;
+  postMessage(message: any): void; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface Clients {
-  claim(): Promise<any>;
+  claim(): Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   get(id: string): Promise<Client>;
   matchAll(options?: ClientMatchOptions): Promise<Array<Client>>;
   openWindow(url: string): Promise<void>;
@@ -77,7 +77,7 @@ interface InstallEvent extends ExtendableEvent {
   activeWorker: ServiceWorker;
 }
 
-interface ActivateEvent extends ExtendableEvent {}
+type ActivateEvent = ExtendableEvent;
 
 // Notification API
 
@@ -95,7 +95,7 @@ interface PushEvent extends ExtendableEvent {
 interface PushMessageData {
   arrayBuffer(): ArrayBuffer;
   blob(): Blob;
-  json(): any;
+  json(): any; // eslint-disable-line @typescript-eslint/no-explicit-any
   text(): string;
 }
 
@@ -107,8 +107,8 @@ interface SyncEvent extends ExtendableEvent {
 }
 
 interface ExtendableMessageEvent extends ExtendableEvent {
-  data: any;
-  source: Client | Object;
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  source: Client | Record<string, unknown>;
 }
 
 // ServiceWorkerGlobalScope
@@ -118,6 +118,7 @@ interface ServiceWorkerGlobalScope {
   clients: Clients;
   registration: ServiceWorkerRegistration;
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   addEventListener(event: 'activate', fn: (event?: ExtendableEvent) => any): void;
   addEventListener(event: 'message', fn: (event?: ExtendableMessageEvent) => any): void;
   addEventListener(event: 'fetch', fn: (event?: FetchEvent) => any): void;
@@ -125,6 +126,7 @@ interface ServiceWorkerGlobalScope {
   addEventListener(event: 'push', fn: (event?: PushEvent) => any): void;
   addEventListener(event: 'notificationclick', fn: (event?: NotificationEvent) => any): void;
   addEventListener(event: 'sync', fn: (event?: SyncEvent) => any): void;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   fetch(request: Request | string): Promise<Response>;
   skipWaiting(): Promise<void>;
