@@ -25,12 +25,6 @@ self.addEventListener('message', (event?: ExtendableMessageEvent) => {
     return;
   }
 
-  // FIXME: Hardcoded route
-  if (event.origin !== 'http://localhost:3000') {
-    // Ignore if the event is not from the same origin
-    return;
-  }
-
   if (event.data.message === SW_PRECACHE_USER_DATA_MESSAGE) {
     event.waitUntil(precacheAllUserApplications(event.data.token));
   }
