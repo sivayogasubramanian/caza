@@ -17,12 +17,12 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const [edgeIndex, setEdgeIndex] = useState<number>(-1);
 
   if (!data) {
-    return <div></div>;
+    return null;
   }
 
   if (data.edges.length === 0) {
     return (
-      <div className="w-full h-40 p-8">
+      <div className="w-full h-40">
         <RoleCard role={data.role} />
         <div className="text-2xl">The role you have selected does not have enough data to be displayed.</div>
       </div>
@@ -78,10 +78,10 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const width = getSankeyWidth();
   const getChart = (width: number) => {
     return (
-      <div className="absolute h-max pb-20" style={{ width }}>
+      <div className="flex-col h-full w-full gap-2 p-2 items-center">
         <Chart
           chartType="Sankey"
-          className="top-0 left-0 rotate-90 md:rotate-0"
+          className="h-full w-full rotate-90 md:rotate-0"
           height={width < TAILWIND_MD_BREAKPOINT_PIXELS ? width : undefined}
           width={width >= TAILWIND_MD_BREAKPOINT_PIXELS ? width : undefined}
           data={sankeyData}
@@ -94,9 +94,9 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   };
 
   return (
-    <div className="w-full h-40 p-8">
+    <div className="flex-col items-center w-full h-full">
       <RoleCard role={correctedData.role} />
-      <div className="absolute">{getChart(width)}</div>
+      <div>{getChart(width)}</div>
     </div>
   );
 };
@@ -150,13 +150,13 @@ type MouseOverOverlayProps = { data: WorldRoleStatsData; edgeIndex: number; node
 
 const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
   if (edgeIndex < 0 || edgeIndex >= data.edges.length) {
-    return <div className="text-lg">Nothing in focus.</div>;
+    return null;
   }
   const targetEdge = data.edges[edgeIndex];
   const { source, dest, totalNumHours, userCount } = targetEdge;
   return (
     <div className="text-lg">
-      {source} to {dest}:<br /> based on {userCount} experience{userCount > 1 ? 's' : ''}, on average this stage took{' '}
+      {source} to {dest}:<br /> Based on {userCount} experience{userCount > 1 ? 's' : ''}, on average this stage took{' '}
       {Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
     </div>
   );
