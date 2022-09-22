@@ -155,9 +155,9 @@ const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
   const targetEdge = data.edges[edgeIndex];
   const { source, dest, totalNumHours, userCount } = targetEdge;
   return (
-    <div className="text-lg">
-      {source} to {dest}:<br /> Based on {userCount} experience{userCount > 1 ? 's' : ''}, on average this stage took{' '}
-      {Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
+    <div className="text-lg pt-4">
+      {source} to {dest}:<br /> Based on {userCount} experience{userCount > 1 ? 's' : ''}, progression between these
+      stages took an average of {Math.round(((totalNumHours / userCount) * 10) / 24) / 10} days
     </div>
   );
 };
