@@ -158,7 +158,7 @@ function RolesWorld() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-4 h-full pb-32 overflow-y-scroll"
+        className="p-4 h-full pb-32 overflow-y-auto"
         onScroll={handleScroll}
       >
         <Spin
