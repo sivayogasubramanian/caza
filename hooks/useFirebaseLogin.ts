@@ -46,7 +46,6 @@ export default function useFirebaseLogin() {
       }
 
       setCurrentUser(user);
-      console.log('SET CURRENT USER');
     },
 
     [getAuth, signInAnonymously],
