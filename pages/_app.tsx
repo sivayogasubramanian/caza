@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import type { AppProps } from 'next/app';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 import splash from '../assets/splash.json';
 import Header from '../components/header/Header';
@@ -13,7 +13,6 @@ import api from '../frontendApis/api';
 import { AxiosInterceptor } from '../frontendApis/interceptor';
 import useFirebaseLogin from '../hooks/useFirebaseLogin';
 import '../styles/globals.css';
-import { User } from 'firebase/auth';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const initFirebase = useCallback(async () => {
@@ -45,6 +44,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, []);
 
   const makeSwrFetcher = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (url: string, params?: any) => {
       return authContextValue.currentUser?.getIdToken().then(async (token) => {
         return api.get(url, {
