@@ -14,6 +14,7 @@ import api from '../frontendApis/api';
 import { AxiosInterceptor } from '../frontendApis/interceptor';
 import useFirebaseLogin from '../hooks/useFirebaseLogin';
 import '../styles/globals.css';
+import Head from 'next/head';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const initFirebase = useCallback(async () => {
@@ -74,14 +75,19 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <AnimatePresence>
             {isSplashScreenPlaying && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Lottie className="h-screen w-60 m-auto" autoPlay loop animationData={splash} />
-              </motion.div>
+              <div>
+                <Head>
+                  <title>Caza</title>
+                </Head>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Lottie className="h-screen w-60 m-auto" autoPlay loop animationData={splash} />
+                </motion.div>
+              </div>
             )}
           </AnimatePresence>
 
