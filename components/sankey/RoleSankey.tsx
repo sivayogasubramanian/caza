@@ -149,7 +149,7 @@ function createInvisibleRepresentation(stage: string) {
 type MouseOverOverlayProps = { data: WorldRoleStatsData; edgeIndex: number; nodeTitle?: string };
 
 const MouseOverOverlay: FC<MouseOverOverlayProps> = ({ data, edgeIndex }) => {
-  if (edgeIndex < 0) {
+  if (edgeIndex < 0 || edgeIndex >= data.edges.length) {
     return <div className="text-lg">Nothing in focus.</div>;
   }
   const targetEdge = data.edges[edgeIndex];
