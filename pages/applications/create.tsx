@@ -20,6 +20,7 @@ import { HOMEPAGE_ROUTE } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { log } from '../../utils/analytics';
+import useDebounce from '../../hooks/useDebounce';
 
 const addNewCompanyOption: CompanyAutocompleteOption = {
   company: null,
@@ -50,17 +51,20 @@ function ApplicationCreate() {
   const [isCreateRoleFormOpen, setIsCreateRoleFormOpen] = useState<boolean>(false);
 
   const [companySearchParams, setCompanySearchParams] = useState<CompanyQueryParams>({ companyNames: [''] });
+  const debouncedCompanySearchParams = useDebounce(companySearchParams, 500);
   const [selectedCompany, setSelectedCompany] = useState<Nullable<CompanyListData>>(null);
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [''] });
+  const debouncedRoleSearchParams = useDebounce(roleSearchParams, 500);
   const [selectedRole, setSelectedRole] = useState<Nullable<RoleData>>(null);
   const [applicationDate, setApplicationDate] = useState<Nullable<moment.Moment>>(moment(new Date()));
 
   const [shouldShowValidationErrors, setShouldShowValidationErrors] = useState(false);
 
   const { data: companiesData, mutate: mutateCompaniesData } = useSWR<ApiResponse<CompanyListData[]>>(
-    [COMPANIES_API_ENDPOINT, companySearchParams],
-    (url: string, companySearchParams: CompanyQueryParams) => companiesApi.getCompanies(companySearchParams),
+    [COMPANIES_API_ENDPOINT, debouncedCompanySearchParams],
+    (url: string, debouncedCompanySearchParams: CompanyQueryParams) =>
+      companiesApi.getCompanies(debouncedCompanySearchParams),
   );
   const companies = companiesData?.payload || [];
   const companyOptions: CompanyAutocompleteOption[] = companies.map((company) => ({
@@ -98,8 +102,8 @@ function ApplicationCreate() {
   };
 
   const { data: rolesData, mutate: mutateRolesData } = useSWR<ApiResponse<RoleListData[]>>(
-    [ROLES_API_ENDPOINT, roleSearchParams],
-    (url: string, roleSearchParams: RoleQueryParams) => rolesApi.getRoles(roleSearchParams),
+    [ROLES_API_ENDPOINT, debouncedRoleSearchParams],
+    (url: string, debouncedRoleSearchParams: RoleQueryParams) => rolesApi.getRoles(debouncedRoleSearchParams),
   );
   const roles = rolesData?.payload || [];
   const roleOptions: RoleAutocompleteOption[] = roles.map((role) => ({
