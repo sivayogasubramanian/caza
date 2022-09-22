@@ -63,6 +63,11 @@ async function handleGet(userId: string, req: NextApiRequest, res: NextApiRespon
         },
       },
       applications: {
+        where: {
+          user: {
+            isVerified: true,
+          },
+        },
         select: {
           applicationStages: {
             select: {

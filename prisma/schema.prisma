@@ -13,7 +13,8 @@ datasource db {
 
 // ================ MODELS ================
 model User {
-  uid String @id
+  uid        String  @id
+  isVerified Boolean @default(false) @map("is_verified")
 
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
