@@ -80,7 +80,6 @@ function Application() {
     <Button
       type="primary"
       className="rounded-md"
-      // icon={<PlusOutlined />}
       onClick={() => {
         log('click_new_stage_button');
         setIsAddingNewStage(true);
@@ -94,7 +93,6 @@ function Application() {
     <Button
       type="primary"
       className="rounded-md"
-      // icon={<PlusOutlined />}
       onClick={() => {
         log('click_new_task_button');
         setIsAddingNewTask(true);
@@ -108,7 +106,6 @@ function Application() {
     application.role.isVerified && (
       <Button
         className="flex items-center gap-1 text-primary-four border-primary-four rounded-md bg-transparent"
-        // icon={<GlobeIcon isActive={false} fillColor="#185ADB" />}
         onClick={() => {
           log('click_role_stats_button');
           router.push(`${WORLD_ROUTE}/${application.role.id}`);

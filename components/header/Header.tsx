@@ -80,7 +80,7 @@ function Header() {
         <Button
           type="primary"
           icon={<GithubOutlined />}
-          className="items-center flex bg-blue-400 text-black rounded-md hover:bg-blue-500 hover:text-black focus:text-black border-none hover:border-none"
+          className="items-center flex bg-secondary-one text-black rounded-md hover:bg-secondary-one hover:text-black focus:text-black border-none hover:border-none"
           onClick={handleLogin}
         >
           Log in with Github
