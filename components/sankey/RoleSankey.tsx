@@ -2,7 +2,6 @@ import { FC, useState } from 'react';
 import Chart, { GoogleChartWrapper, GoogleViz, GoogleVizEventName, ReactGoogleChartEvent } from 'react-google-charts';
 import { RoleApplicationListData } from '../../types/role';
 import { WorldRoleStatsData } from '../../types/role';
-import CompanyLogo from '../company/CompanyLogo';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import { ApplicationStageType } from '@prisma/client';
 import { TAILWIND_MD_BREAKPOINT_PIXELS } from '../../utils/constants';
@@ -78,7 +77,7 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const width = getSankeyWidth();
   const getChart = (width: number) => {
     return (
-      <div className="flex-col h-full w-full gap-2 p-2 items-center">
+      <div className="flex-col h-full w-full gap-2 p-4 items-center">
         <Chart
           chartType="Sankey"
           className="h-full w-full rotate-90 md:rotate-0"
@@ -105,16 +104,19 @@ type RoleCardProps = { role: RoleApplicationListData };
 
 const RoleCard: FC<RoleCardProps> = ({ role }) => {
   return (
-    <div className="p-4 flex items-center">
-      <CompanyLogo company={role.company} className="rounded-full max-w-[5rem]" />
-
-      <div className="ml-5 w-[100%] flex flex-col gap-0.5">
-        <div className="text-sm">{role.company.name}</div>
-        <div className="flex items-start justify-between">
-          <div className="text-2xl">{role.title}</div>
-        </div>
-      </div>
+    <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
+      <div className="text-2xl font-bold text-primary-four">{`${role.title} @ ${role.company.name}`}</div>
     </div>
+    // <div className="p-4 flex items-center">
+    //   <CompanyLogo company={role.company} className="rounded-full max-w-[5rem]" />
+    //
+    //   <div className="ml-5 w-[100%] flex flex-col gap-0.5">
+    //     <div className="text-sm">{role.company.name}</div>
+    //     <div className="flex items-start justify-between">
+    //       <div className="text-2xl">{role.title}</div>
+    //     </div>
+    //   </div>
+    // </div>
   );
 };
 
