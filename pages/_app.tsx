@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import type { AppProps } from 'next/app';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SWRConfig } from 'swr';
 import splash from '../assets/splash.json';
 import Header from '../components/header/Header';
@@ -13,6 +13,7 @@ import api from '../frontendApis/api';
 import { AxiosInterceptor } from '../frontendApis/interceptor';
 import useFirebaseLogin from '../hooks/useFirebaseLogin';
 import '../styles/globals.css';
+import { User } from 'firebase/auth';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const initFirebase = useCallback(async () => {
@@ -43,12 +44,24 @@ function MyApp({ Component, pageProps }: AppProps) {
     }, 3000);
   }, []);
 
+  const makeSwrFetcher = useCallback(
+    (url: string, params?: any) => {
+      return authContextValue.currentUser?.getIdToken().then(async (token) => {
+        return api.get(url, {
+          params,
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      });
+    },
+    [authContextValue],
+  );
+
   return (
     <AuthContext.Provider value={authContextValue}>
       <AxiosInterceptor>
         <SWRConfig
           value={{
-            fetcher: (url) => api.get(url),
+            fetcher: (url, params) => makeSwrFetcher(url, params),
           }}
         >
           <AnimatePresence>
