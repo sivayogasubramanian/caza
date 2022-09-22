@@ -1,4 +1,4 @@
-import { Button, Spin, Timeline } from 'antd';
+import { Button, Modal, Spin, Timeline } from 'antd';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -21,7 +21,8 @@ import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
 import { motion } from 'framer-motion';
 import { log, logException } from '../../utils/analytics';
-import { WORLD_ROUTE } from '../../utils/constants';
+import { HOMEPAGE_ROUTE, WORLD_ROUTE } from '../../utils/constants';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -118,10 +119,24 @@ function Application() {
     );
 
   const getDeleteButton = () => (
-    <Button danger shape="round" className="bg-transparent focus:bg-transparent rounded-md">
+    <Button danger shape="round" className="bg-transparent focus:bg-transparent rounded-md" onClick={onDelete}>
       Delete
     </Button>
   );
+
+  const handleDelete = () =>
+    applicationsApi.deleteApplication(applicationId).then(() => {
+      router.replace(HOMEPAGE_ROUTE);
+    });
+
+  const onDelete = () => {
+    Modal.confirm({
+      title: 'Are you sure about deleting this application?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'This action is irreversible!',
+      onOk: handleDelete,
+    });
+  };
 
   return (
     <Spin
