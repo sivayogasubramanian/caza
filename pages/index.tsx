@@ -10,7 +10,6 @@ import ApplicationListCard from '../components/cards/ApplicationListCard';
 import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect';
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import AuthContext from '../context/AuthContext';
-import api from '../frontendApis/api';
 import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
 import useDebounce from '../hooks/useDebounce';
 import { ApiResponse } from '../types/apiResponse';
@@ -57,10 +56,10 @@ function Applications() {
     setSearchParams({ ...searchParams, stageTypeWords: stageTypes });
   };
 
-  const { data: applicationListData, mutate: mutateApplicationListData } = useSWR<ApiResponse<ApplicationListData[]>>(
-    [APPLICATIONS_API_ENDPOINT, debouncedSearchParams],
-    // (url, debouncedSearchParams) => api.get(url, { params: debouncedSearchParams }),
-  );
+  const { data: applicationListData, mutate: mutateApplicationListData } = useSWR<ApiResponse<ApplicationListData[]>>([
+    APPLICATIONS_API_ENDPOINT,
+    debouncedSearchParams,
+  ]);
 
   const applications: ApplicationListData[] = Array.isArray(applicationListData?.payload)
     ? (applicationListData?.payload as ApplicationListData[])

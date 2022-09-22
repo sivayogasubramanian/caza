@@ -3,7 +3,6 @@ import { Button, Checkbox, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
 import useSWR from 'swr';
-import api from '../../frontendApis/api';
 import { WORLD_API_ENDPOINT } from '../../frontendApis/worldApi';
 import CreateApplicationButton from '../../components/buttons/CreateApplicationButton';
 import WorldRoleListCard from '../../components/cards/WorldRoleListCard';
