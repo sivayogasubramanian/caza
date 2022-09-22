@@ -23,6 +23,7 @@ import { canBecomeInteger } from '../../utils/numbers/validations';
 import GlobeIcon from '../../components/icons/GlobeIcon';
 import { PlusOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+import { log, logException } from '../../utils/analytics';
 import { WORLD_ROUTE } from '../../utils/constants';
 
 function getTimelineIcon(item: TimelineData) {
@@ -42,6 +43,7 @@ function Application() {
   const hasValidApplicationId = applicationId !== undefined;
 
   if (!hasValidApplicationId) {
+    logException('Invalid application ID', false, { applicationId });
     return <NotFound message="The application id is invalid and cannot be found." />;
   }
 
@@ -135,14 +137,20 @@ function Application() {
                 {item.type === TimelineType.STAGE ? (
                   <ApplicationStageTimelineCard
                     applicationStage={item.data as ApplicationStageApplicationData}
-                    onClick={() => setSelectedStage(item.data as ApplicationStageApplicationData)}
+                    onClick={() => {
+                      log('click_application_stage_timeline_card');
+                      setSelectedStage(item.data as ApplicationStageApplicationData);
+                    }}
                   />
                 ) : (
                   <ApplicationTaskTimelineCard
                     applicationId={applicationId}
                     task={item.data as TaskData}
                     mutateApplicationData={mutateApplicationData}
-                    onClick={() => setSelectedTask(item.data as TaskData)}
+                    onClick={() => {
+                      log('click_application_task_timeline_card');
+                      setSelectedTask(item.data as TaskData);
+                    }}
                   />
                 )}
               </Timeline.Item>
@@ -155,11 +163,27 @@ function Application() {
 
       {hasSuccessfullyFetchedApplication && (
         <div className="mb-2 fixed w-full bottom-14 flex items-center justify-evenly">
-          <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={() => setIsAddingNewStage(true)}>
+          <Button
+            type="primary"
+            shape="round"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              log('click_new_stage_button');
+              setIsAddingNewStage(true);
+            }}
+          >
             New stage
           </Button>
 
-          <Button type="primary" shape="round" icon={<PlusOutlined />} onClick={() => setIsAddingNewTask(true)}>
+          <Button
+            type="primary"
+            shape="round"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              log('click_new_task_button');
+              setIsAddingNewTask(true);
+            }}
+          >
             New task
           </Button>
 
@@ -169,7 +193,10 @@ function Application() {
               className="flex items-center gap-2"
               type="primary"
               icon={<GlobeIcon />}
-              onClick={() => router.push(`${WORLD_ROUTE}/${application.role.id}`)}
+              onClick={() => {
+                log('click_role_stats_button');
+                router.push(`${WORLD_ROUTE}/${application.role.id}`);
+              }}
             >
               Role stats
             </Button>

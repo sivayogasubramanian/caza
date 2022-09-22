@@ -1,6 +1,7 @@
 import { Avatar } from 'antd';
 import { useState } from 'react';
 import { CompanyData } from '../../types/company';
+import { logException } from '../../utils/analytics';
 import { COMPANY_LOGO_API_URL, DEFAULT_LOGO_SIZE } from '../../utils/constants';
 
 interface Props {
@@ -14,6 +15,7 @@ function CompanyLogo({ company, className, size = DEFAULT_LOGO_SIZE }: Props) {
   const [isLogoAvailable, setIsLogoAvailable] = useState<boolean>(true);
 
   if (!isLogoAvailable) {
+    logException(`Could not get company logo for URL ${company.companyUrl}`, false);
     return <Avatar className={className}>{company.name.charAt(0)}</Avatar>;
   }
 

@@ -17,6 +17,7 @@ import { splitByWhitespaces } from '../../utils/strings/formatters';
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import GoToYourListViewButton from '../../components/buttons/GoToYourListViewButton';
 import { motion } from 'framer-motion';
+import { log } from '../../utils/analytics';
 
 function RolesWorld() {
   const { currentUser } = useContext(AuthContext);
@@ -57,17 +58,18 @@ function RolesWorld() {
   };
 
   const onApplicationFilterCheckboxChange = (e: CheckboxChangeEvent) => {
-    setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: e.target.checked });
+    const newValue = e.target.checked;
+    log('toggle_world_view_my_applications_checkbox', { newValue });
+    setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: newValue });
   };
 
-  const { data } = !currentUser.isAnonymous
-    ? useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, searchParams], (url, searchParams) =>
-        api.get(url, { params: searchParams }),
-      )
-    : { data: undefined };
-  const isLoading = !currentUser.isAnonymous && !data;
+  const { data } = useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, searchParams], (url, searchParams) =>
+    api.get(url, { params: searchParams }),
+  );
 
-  const worldRoles = !currentUser.isAnonymous && Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
+  const isLoading = !data;
+  const worldRoles =
+    !currentUser.isAnonymous && isLoading ? [] : Array.isArray(data?.payload) ? data?.payload : worldRolesMockData;
 
   return (
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>

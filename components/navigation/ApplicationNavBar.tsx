@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { log } from '../../utils/analytics';
 import { HOMEPAGE_ROUTE, WORLD_ROUTE } from '../../utils/constants';
 import CreateApplicationButton from '../buttons/CreateApplicationButton';
 import GlobeIcon from '../icons/GlobeIcon';
@@ -12,7 +13,10 @@ export default function ApplicationNavBar() {
       <div className="flex items-center">
         <div
           className="w-full text-center flex flex-col text-xs items-center gap-1"
-          onClick={() => router.push(HOMEPAGE_ROUTE)}
+          onClick={() => {
+            log('click_list_view_tab');
+            router.push(HOMEPAGE_ROUTE);
+          }}
         >
           <HomeIcon isActive={!router.pathname.startsWith(WORLD_ROUTE)} />
           Your List
@@ -22,7 +26,10 @@ export default function ApplicationNavBar() {
 
         <div
           className="w-full text-center flex flex-col text-xs items-center gap-1"
-          onClick={() => router.push(WORLD_ROUTE)}
+          onClick={() => {
+            log('click_world_view_tab');
+            router.push(WORLD_ROUTE);
+          }}
         >
           <GlobeIcon isActive={router.pathname.startsWith(WORLD_ROUTE)} />
           World View

@@ -7,6 +7,7 @@ import { ApplicationStageFormData, ApplicationStagePostData } from '../../types/
 import StageForm from '../forms/StageForm';
 import { Nullable } from '../../types/utils';
 import { ApplicationStageType } from '@prisma/client';
+import { log } from '../../utils/analytics';
 import { isValidHex } from '../../utils/strings/validations';
 import applicationStagesApi from '../../frontendApis/applicationStagesApi';
 
@@ -53,8 +54,14 @@ function NewStageModal({ applicationId, setIsAddingNewStage, mutateApplicationDa
       open
       title="New Stage"
       okText="Create"
-      onCancel={() => setIsAddingNewStage(false)}
-      onOk={() => setIsSubmitting(true)}
+      onCancel={() => {
+        log('cancel_new_stage_modal');
+        setIsAddingNewStage(false);
+      }}
+      onOk={() => {
+        log('submit_new_stage_modal');
+        setIsSubmitting(true);
+      }}
       maskClosable={false}
     >
       <StageForm

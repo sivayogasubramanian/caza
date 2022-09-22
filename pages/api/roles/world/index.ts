@@ -1,14 +1,14 @@
-import { PrismaClient, Prisma, RoleType } from '@prisma/client';
+import { Prisma, PrismaClient, RoleType } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResponse } from '../../../../types/apiResponse';
 import { WorldRoleListData, WorldRoleQueryParams } from '../../../../types/role';
-import { getNonEmptyArrayOrUndefined, combineDefinedArrays, buildFrequencyMap } from '../../../../utils/arrays';
-import { withVerifiedUser } from '../../../../utils/auth/jwtHelpers';
+import { buildFrequencyMap, combineDefinedArrays, getNonEmptyArrayOrUndefined } from '../../../../utils/arrays';
+import { withAuthUser } from '../../../../utils/auth/jwtHelpers';
 import {
   makeCompanyNameFilters,
   makeRoleTitleFilters,
-  makeRoleYearFilters,
   makeRoleTypeFilters,
+  makeRoleYearFilters,
 } from '../../../../utils/filters/filterHelpers';
 import {
   convertQueryParamToStringArray,
@@ -18,7 +18,7 @@ import {
   rejectHttpMethod,
 } from '../../../../utils/http/httpHelpers';
 import { withPrismaErrorHandling } from '../../../../utils/prisma/prismaHelpers';
-import { splitByWhitespaces, splitByCommaRemovingWhitespacesAround } from '../../../../utils/strings/formatters';
+import { splitByCommaRemovingWhitespacesAround, splitByWhitespaces } from '../../../../utils/strings/formatters';
 
 const prisma = new PrismaClient();
 
@@ -109,4 +109,4 @@ function parseGetQueryParams(req: NextApiRequest): WorldRoleQueryParams {
   };
 }
 
-export default withPrismaErrorHandling(withVerifiedUser(handler));
+export default withPrismaErrorHandling(withAuthUser(handler));
