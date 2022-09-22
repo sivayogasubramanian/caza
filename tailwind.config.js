@@ -12,6 +12,9 @@ module.exports = {
           four: '#185ADB',
           five: '#67A2E8',
         },
+        secondary: {
+          one: '#FF9900',
+        },
       },
       boxShadow: {
         top: '0 -1px 5px 2px rgba(0,0,0,0.1)',
