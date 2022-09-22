@@ -4,10 +4,16 @@ import { GithubAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { useContext, useState } from 'react';
 import logo from '../../assets/logoPlaceholder.png';
 import AuthContext from '../../context/AuthContext';
-import { StatusMessageType } from '../../types/apiResponse';
+import usersApi from '../../frontendApis/usersApi';
+import { ApiResponse, StatusMessageType } from '../../types/apiResponse';
+import { UserData } from '../../types/user';
 import { log, logException } from '../../utils/analytics';
-import { removePreviousUserToken, storePreviousUserToken } from '../../utils/localStorage/temporaryUserKeyStorage';
 import { openNotification } from '../notification/Notifier';
+
+const UNABLE_TO_AUTHENTICATE_MESSAGE = {
+  type: StatusMessageType.ERROR,
+  message: 'Sorry we were unable to authenticate you with Github. Please try again.',
+};
 
 function Header() {
   const { auth, currentUser } = useContext(AuthContext);
@@ -32,15 +38,19 @@ function Header() {
       allow_signup: 'false',
     });
 
-    const storeIfAnonymous = currentUser?.isAnonymous
-      ? currentUser.getIdToken(true).then(storePreviousUserToken)
-      : Promise.resolve();
+    const oldUserTokenIfAnonymous: Promise<string | undefined> = currentUser?.isAnonymous
+      ? currentUser.getIdToken(true)
+      : Promise.resolve(undefined);
 
-    storeIfAnonymous.then(() =>
-      signInWithPopup(auth, provider).finally(() =>
-        openNotification({ type: StatusMessageType.SUCCESS, message: 'Logged in successfully!' }),
-      ),
-    );
+    const newUserToken = signInWithPopup(auth, provider)
+      .then(({ user: newUser }) => newUser.getIdToken())
+      .catch(() => {
+        throw { messages: [UNABLE_TO_AUTHENTICATE_MESSAGE] };
+      });
+
+    Promise.all([newUserToken, oldUserTokenIfAnonymous])
+      .then(([newUserToken, oldUserToken]) => usersApi.createAccount(newUserToken, oldUserToken))
+      .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)));
   };
 
   const handleLogout = () => {
@@ -53,8 +63,6 @@ function Header() {
       });
       return;
     }
-
-    removePreviousUserToken();
 
     signOut(auth).finally(() =>
       openNotification({ type: StatusMessageType.SUCCESS, message: 'Logged out successfully!' }),
