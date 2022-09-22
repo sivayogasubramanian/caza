@@ -82,7 +82,7 @@ function Applications() {
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
         <div className="flex items-center justify-between">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-start gap-2">
             <div className="text-2xl font-bold text-primary-four">My Applications</div>
             <GoToWorldViewButton />
           </div>
