@@ -9,12 +9,12 @@ import {
   IceCream,
   KawaiiMood,
   KawaiiProps,
-  Mug,
   Planet,
   SpeechBubble,
 } from 'react-kawaii';
 
 interface Props {
+  isHappy: boolean;
   size?: number;
   color?: string;
 }
@@ -27,20 +27,21 @@ const icons: React.ComponentType<KawaiiProps>[] = [
   File,
   Ghost,
   IceCream,
-  Mug,
   Planet,
   SpeechBubble,
 ];
 
-const moods: KawaiiMood[] = ['sad', 'shocked', 'ko'];
+const sadMoods: KawaiiMood[] = ['sad', 'shocked', 'ko'];
+const happyMoods: KawaiiMood[] = ['blissful', 'happy', 'excited'];
 
 function getRandomItem<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function RandomKawaii({ size, color }: Props) {
+function RandomKawaii({ isHappy, size, color }: Props) {
   const Kawaii = getRandomItem(icons);
-  const mood = getRandomItem(moods);
+  const moodChoices = isHappy ? happyMoods : sadMoods;
+  const mood = getRandomItem(moodChoices);
 
   return <Kawaii size={size} mood={mood} color={color} />;
 }

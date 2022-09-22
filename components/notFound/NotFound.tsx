@@ -7,7 +7,7 @@ interface Props {
 function NotFound({ message }: Props) {
   return (
     <div className="flex flex-col justify-center items-center mt-10">
-      <RandomKawaii size={100} />
+      <RandomKawaii isHappy={false} size={100} />
 
       {message && <p className="mt-1 text-gray-400">{message}</p>}
     </div>
