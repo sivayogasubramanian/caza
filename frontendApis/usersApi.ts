@@ -9,8 +9,12 @@ const USER_API_ENDPOINT = '/api/user';
 // in the interceptor yet.
 class UsersApi {
   // Idempotent create account function. Successfully returns with no change if user exists.
-  public createAccount(newToken: string, oldToken?: string): ApiPromise<UserData> {
-    const apiResult = axios.post(USER_API_ENDPOINT, { oldToken }, { headers: { Authorization: `Bearer ${newToken}` } });
+  public createAccount(newToken: string, oldToken?: string, isVerified: boolean = false): ApiPromise<UserData> {
+    const apiResult = axios.post(
+      USER_API_ENDPOINT,
+      { oldToken, isVerified },
+      { headers: { Authorization: `Bearer ${newToken}` } },
+    );
     return processRequest(USER_API_ENDPOINT, apiResult);
   }
 }
