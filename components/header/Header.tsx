@@ -52,7 +52,7 @@ function Header() {
       });
 
     Promise.all([newUserToken, oldUserTokenIfAnonymous])
-      .then(([newUserToken, oldUserToken]) => usersApi.createAccount(newUserToken, oldUserToken))
+      .then(([newUserToken, oldUserToken]) => usersApi.createAccount(newUserToken, oldUserToken, true))
       .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)));
   };
 

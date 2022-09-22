@@ -66,16 +66,22 @@ function handlePost(currentUid: string, req: NextApiRequest, res: NextApiRespons
   const oldUserToken = oldToken && typeof oldToken === 'string' ? oldToken.trim() : oldToken;
   return oldUserToken /* if null, undefined, empty or contains only whitespace */
     ? handlePostWithOldToken(currentUid, oldUserToken, req, res)
-    : handlePostWithoutOldToken(currentUid, res);
+    : handlePostWithoutOldToken(currentUid, req, res);
 }
 
-async function handlePostWithoutOldToken(currentUid: string, res: NextApiResponse<ApiResponse<UserData>>) {
+async function handlePostWithoutOldToken(
+  currentUid: string,
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<UserData>>,
+) {
   const isExisting = (await getUserIfExists(currentUid)) !== null;
   if (isExisting) {
     return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.USER_ALREADY_EXISTS]));
   }
 
-  await prisma.user.create({ data: { uid: currentUid } });
+  const isVerified = req.body.isVerified === true;
+
+  await prisma.user.create({ data: { uid: currentUid, isVerified } });
   return res
     .status(HttpStatus.CREATED)
     .json(createJsonResponse({ uid: currentUid }, messages[MessageType.USER_CREATED]));
@@ -104,7 +110,8 @@ async function handlePostWithOldToken(
     return res.status(HttpStatus.BAD_REQUEST).json(createJsonResponse({}, messages[MessageType.OLD_USER_VERIFIED]));
   }
 
-  const result = await linkAccount(oldUid, currentUid);
+  const isCurrentUserVerified = req.body.isVerified === true;
+  const result = await linkAccount(oldUid, currentUid, isCurrentUserVerified);
 
   switch (result) {
     case MessageType.NEW_USER_EXISTS:
@@ -132,6 +139,7 @@ async function handleDelete(uid: string, res: NextApiResponse<ApiResponse<EmptyP
 async function linkAccount(
   oldUid: string,
   newUid: string,
+  isCurrentUserVerified: boolean,
 ): Promise<MessageType.NEW_USER_EXISTS | MessageType.OLD_USER_NOT_FOUND | MessageType.NEW_USER_LINKED> {
   const newUser = await getUserIfExists(newUid);
   const oldUser = await getUserIfExists(oldUid);
@@ -148,7 +156,7 @@ async function linkAccount(
   // Update UID to new (foreign key references to UID will cascade on update)
   await prisma.user.update({
     where: { uid: oldUid },
-    data: { uid: newUid },
+    data: { uid: newUid, isVerified: isCurrentUserVerified },
   });
 
   return MessageType.NEW_USER_LINKED;
