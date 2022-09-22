@@ -59,7 +59,7 @@ function Applications() {
 
   const { data: applicationListData, mutate: mutateApplicationListData } = useSWR<ApiResponse<ApplicationListData[]>>(
     [APPLICATIONS_API_ENDPOINT, debouncedSearchParams],
-    (url, debouncedSearchParams) => api.get(url, { params: debouncedSearchParams }),
+    // (url, debouncedSearchParams) => api.get(url, { params: debouncedSearchParams }),
   );
 
   const applications: ApplicationListData[] = Array.isArray(applicationListData?.payload)

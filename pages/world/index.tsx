@@ -66,10 +66,7 @@ function RolesWorld() {
     setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: newValue });
   };
 
-  const { data } = useSWR<ApiResponse<WorldRoleListData[]>>(
-    [WORLD_API_ENDPOINT, debouncedSearchParams],
-    (url, debouncedSearchParams) => api.get(url, { params: debouncedSearchParams }),
-  );
+  const { data } = useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, debouncedSearchParams]);
 
   const isLoading = !data;
   const worldRoles = isLoading

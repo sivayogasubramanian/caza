@@ -3,7 +3,7 @@ import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
-import applicationsApi from '../../frontendApis/applicationsApi';
+import applicationsApi, { APPLICATIONS_API_ENDPOINT } from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
 import TaskIcon from '../../components/icons/timeline/TaskIcon';
@@ -47,7 +47,7 @@ function Application() {
     return <NotFound message="The application id is invalid and cannot be found." />;
   }
 
-  const { data, mutate: mutateApplicationData } = useSWR([applicationId], applicationsApi.getApplication, {
+  const { data, mutate: mutateApplicationData } = useSWR(`${APPLICATIONS_API_ENDPOINT}/${applicationId}`, {
     revalidateOnMount: true,
   });
   const isLoading = data === undefined;
