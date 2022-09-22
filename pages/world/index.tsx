@@ -1,5 +1,5 @@
 import { RoleType } from '@prisma/client';
-import { Button, Checkbox, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
 import useSWR from 'swr';
@@ -165,7 +165,15 @@ function RolesWorld() {
           spinning={isLoading}
           wrapperClassName={isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}
         >
-          {currentUser.isAnonymous && !isLoading && <div>Please log in with Github to see the world view.</div>}
+          {currentUser.isAnonymous && !isLoading && (
+            <Alert
+              message="Restricted Content"
+              description={
+                'Log in with Github to view our community-sourced status aggregates to figure out where you stand among other applicants!'
+              }
+              type="warning"
+            />
+          )}
 
           {worldRoles?.map((role, index) => (
             <WorldRoleListCard key={index} role={role} shouldBlur={currentUser.isAnonymous} />
