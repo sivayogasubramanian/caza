@@ -22,7 +22,7 @@ export default function ApplicationNavBar() {
           Your List
         </div>
 
-        <CreateApplicationButton />
+        <CreateApplicationButton size="large" />
 
         <div
           className="w-full text-center flex flex-col text-xs items-center gap-1"

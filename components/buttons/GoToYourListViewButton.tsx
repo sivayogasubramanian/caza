@@ -14,12 +14,11 @@ function GoToYourListViewButton() {
 
   return (
     <Button
-      type="primary"
-      icon={<HomeIcon isActive={false} />}
-      className="items-center flex gap-1 bg-blue-400 text-black hover:text-black rounded-md hover:bg-blue-500 border-none hover:border-none"
+      icon={<HomeIcon fillColor="#185ADB" isActive={false} />}
+      className="hidden md:flex items-center gap-1 text-primary-four border-primary-four rounded-md bg-transparent"
       onClick={onClick}
     >
-      Go To Your List View
+      Go To Your Applications
     </Button>
   );
 }
