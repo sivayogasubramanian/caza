@@ -1,5 +1,4 @@
 import { Button, Spin, Timeline } from 'antd';
-import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -20,8 +19,6 @@ import { Nullable } from '../../types/utils';
 import { stageTypeToIconMap } from '../../utils/applicationStage/applicationStageUtils';
 import { isValidDate } from '../../utils/date/validations';
 import { canBecomeInteger } from '../../utils/numbers/validations';
-import GlobeIcon from '../../components/icons/GlobeIcon';
-import { PlusOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { log, logException } from '../../utils/analytics';
 import { WORLD_ROUTE } from '../../utils/constants';
@@ -78,6 +75,54 @@ function Application() {
   const [isAddingNewTask, setIsAddingNewTask] = useState<boolean>(false);
   const [selectedTask, setSelectedTask] = useState<Nullable<TaskData>>(null);
 
+  const getAddStageButton = () => (
+    <Button
+      type="primary"
+      className="rounded-md"
+      // icon={<PlusOutlined />}
+      onClick={() => {
+        log('click_new_stage_button');
+        setIsAddingNewStage(true);
+      }}
+    >
+      New Stage
+    </Button>
+  );
+
+  const getAddTaskButton = () => (
+    <Button
+      type="primary"
+      className="rounded-md"
+      // icon={<PlusOutlined />}
+      onClick={() => {
+        log('click_new_task_button');
+        setIsAddingNewTask(true);
+      }}
+    >
+      New Task
+    </Button>
+  );
+
+  const getRoleStatsButton = () =>
+    application.role.isVerified && (
+      <Button
+        className="flex items-center gap-1 text-primary-four border-primary-four rounded-md bg-transparent"
+        // icon={<GlobeIcon isActive={false} fillColor="#185ADB" />}
+        onClick={() => {
+          log('click_role_stats_button');
+          router.push(`${WORLD_ROUTE}/${application.role.id}`);
+        }}
+      >
+        Role Stats
+      </Button>
+    );
+
+  const getDeleteButton = () => (
+    <Button danger shape="round" className="bg-transparent focus:bg-transparent rounded-md">
+      Delete
+    </Button>
+  );
+
   return (
     <Spin
       spinning={isLoading}
@@ -88,8 +133,24 @@ function Application() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
         {hasSuccessfullyFetchedApplication && (
           <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
-            <div className="flex items-center justify-between">
-              <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-start gap-2">
+                <div className="text-2xl font-bold text-primary-four">{`${application.role.title} @ ${application.role.company.name}`}</div>
+                <div className="hidden md:flex">{getRoleStatsButton()}</div>
+              </div>
+
+              <div className="hidden md:flex flex items-center justify-end gap-2">
+                {getAddStageButton()}
+                {getAddTaskButton()}
+                {getDeleteButton()}
+              </div>
+            </div>
+
+            <div className="md:hidden pt-2 w-full flex items-center justify-start gap-2">
+              {getRoleStatsButton()}
+              {getAddStageButton()}
+              {getAddTaskButton()}
+              {getDeleteButton()}
             </div>
           </div>
         )}
@@ -166,49 +227,6 @@ function Application() {
 
         {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
       </motion.div>
-
-      {hasSuccessfullyFetchedApplication && (
-        <div className="mb-2 fixed w-full bottom-14 flex items-center justify-evenly">
-          <Button
-            type="primary"
-            shape="round"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              log('click_new_stage_button');
-              setIsAddingNewStage(true);
-            }}
-          >
-            New stage
-          </Button>
-
-          <Button
-            type="primary"
-            shape="round"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              log('click_new_task_button');
-              setIsAddingNewTask(true);
-            }}
-          >
-            New task
-          </Button>
-
-          {application.role.isVerified && (
-            <Button
-              shape="round"
-              className="flex items-center gap-2"
-              type="primary"
-              icon={<GlobeIcon />}
-              onClick={() => {
-                log('click_role_stats_button');
-                router.push(`${WORLD_ROUTE}/${application.role.id}`);
-              }}
-            >
-              Role stats
-            </Button>
-          )}
-        </div>
-      )}
     </Spin>
   );
 }
