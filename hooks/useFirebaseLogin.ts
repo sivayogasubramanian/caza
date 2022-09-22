@@ -1,12 +1,8 @@
 import { getApps } from 'firebase/app';
-import { Auth, getAuth, getRedirectResult, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
+import { Auth, getAuth, onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
 import { useCallback, useEffect, useState } from 'react';
 import usersApi from '../frontendApis/usersApi';
-import { openNotification } from '../components/notification/Notifier';
-import { ApiResponse } from '../types/apiResponse';
-import { UserData } from '../types/user';
 import { Nullable } from '../types/utils';
-import { getPreviousUserToken, removePreviousUserToken } from '../utils/localStorage/temporaryUserKeyStorage';
 import { precacheUserData } from '../worker/client';
 
 /**
@@ -23,21 +19,7 @@ export default function useFirebaseLogin() {
   const handleAuthStateChanged = useCallback(
     async (user: Nullable<User>) => {
       if (user) {
-        const newUserToken = await user.getIdToken();
-
-        precacheUserData(newUserToken);
-
-        const result = await getRedirectResult(getAuth());
-
-        // This can happen due to a login flow or re-authentication required by firebase (cannot be predicted).
-        // In event of re-authenticating by Github, previous user token should be set as undefined (no linking).
-        if (result) {
-          const oldUserToken = getPreviousUserToken() ?? undefined;
-          usersApi
-            .createAccount(newUserToken, oldUserToken)
-            .catch((result: ApiResponse<UserData>) => result.messages.forEach((message) => openNotification(message)))
-            .finally(removePreviousUserToken);
-        }
+        await user.getIdToken().then(precacheUserData);
       } else {
         const auth = getAuth();
         const newUser = await signInAnonymously(auth);
