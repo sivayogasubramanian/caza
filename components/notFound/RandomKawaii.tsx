@@ -22,7 +22,6 @@ interface Props {
 const icons: React.ComponentType<KawaiiProps>[] = [
   Backpack,
   Browser,
-  Cat,
   CreditCard,
   File,
   Ghost,
