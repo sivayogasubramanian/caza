@@ -109,14 +109,14 @@ function RolesWorld() {
                 <Input.Group className="flex items-center justify-items-stretch">
                   <Tooltip title="Exit search">
                     <ArrowLeftOutlined
-                      style={{ color: '#FFFFFF', fontSize: '15px', paddingRight: '2%' }}
+                      style={{ fontSize: '15px', paddingRight: '2%' }}
                       onClick={() => setIsSearchHidden(true)}
                     />
                   </Tooltip>
                   <Input
                     value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
                     placeholder="Search by roles or company..."
-                    className="bg-primary-two text-white"
+                    className="bg-primary-two"
                     bordered={false}
                     onChange={onSearchBarChange}
                   />
@@ -135,9 +135,7 @@ function RolesWorld() {
               </Col>
               <Col xs={12} md={3}>
                 <Form.Item>
-                  <Checkbox className="text-white" onChange={onApplicationFilterCheckboxChange}>
-                    My applications only
-                  </Checkbox>
+                  <Checkbox onChange={onApplicationFilterCheckboxChange}>My applications only</Checkbox>
                 </Form.Item>
               </Col>
             </Row>
