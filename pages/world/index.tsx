@@ -18,6 +18,7 @@ import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import GoToYourListViewButton from '../../components/buttons/GoToYourListViewButton';
 import { motion } from 'framer-motion';
 import { log } from '../../utils/analytics';
+import useDebounce from '../../hooks/useDebounce';
 
 function RolesWorld() {
   const { currentUser } = useContext(AuthContext);
@@ -31,6 +32,7 @@ function RolesWorld() {
     roleTypeWords: [],
     shouldFilterForCurrentUserApplications: false,
   });
+  const debouncedSearchParams = useDebounce(searchParams, 500);
 
   const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
   const [isSearchTemporarilyHidden, setIsSearchTemporarilyHidden] = useState<boolean>(false);
@@ -63,8 +65,9 @@ function RolesWorld() {
     setSearchParams({ ...searchParams, shouldFilterForCurrentUserApplications: newValue });
   };
 
-  const { data } = useSWR<ApiResponse<WorldRoleListData[]>>([WORLD_API_ENDPOINT, searchParams], (url, searchParams) =>
-    api.get(url, { params: searchParams }),
+  const { data } = useSWR<ApiResponse<WorldRoleListData[]>>(
+    [WORLD_API_ENDPOINT, debouncedSearchParams],
+    (url, debouncedSearchParams) => api.get(url, { params: debouncedSearchParams }),
   );
 
   const isLoading = !data;

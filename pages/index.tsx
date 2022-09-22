@@ -1,8 +1,9 @@
+import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { ApplicationStageType, RoleType } from '@prisma/client';
 import { Button, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
+import { motion } from 'framer-motion';
 import { ChangeEventHandler, UIEvent, useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
 import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
@@ -10,11 +11,11 @@ import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
 import AuthContext from '../context/AuthContext';
 import api from '../frontendApis/api';
+import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
+import useDebounce from '../hooks/useDebounce';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
 import { splitByWhitespaces } from '../utils/strings/formatters';
-import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
 
 function Applications() {
   const { currentUser } = useContext(AuthContext);
@@ -24,6 +25,7 @@ function Applications() {
     roleTypeWords: [],
     stageTypeWords: [],
   });
+  const debouncedSearchParams = useDebounce(searchParams, 500);
 
   const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
   const [isSearchTemporarilyHidden, setIsSearchTemporarilyHidden] = useState<boolean>(false);
@@ -55,8 +57,8 @@ function Applications() {
   };
 
   const { data: applicationListData, mutate: mutateApplicationListData } = useSWR<ApiResponse<ApplicationListData[]>>(
-    [APPLICATIONS_API_ENDPOINT, searchParams],
-    (url, searchParams) => api.get(url, { params: searchParams }),
+    [APPLICATIONS_API_ENDPOINT, debouncedSearchParams],
+    (url, debouncedSearchParams) => api.get(url, { params: debouncedSearchParams }),
   );
 
   const applications: ApplicationListData[] = Array.isArray(applicationListData?.payload)
