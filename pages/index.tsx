@@ -15,6 +15,7 @@ import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
 import useDebounce from '../hooks/useDebounce';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
+import { DEBOUNCE_DELAY } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
@@ -25,7 +26,7 @@ function Applications() {
     roleTypeWords: [],
     stageTypeWords: [],
   });
-  const debouncedSearchParams = useDebounce(searchParams, 500);
+  const debouncedSearchParams = useDebounce(searchParams, DEBOUNCE_DELAY);
 
   const [isSearchHidden, setIsSearchHidden] = useState<boolean>(true);
   const [isSearchTemporarilyHidden, setIsSearchTemporarilyHidden] = useState<boolean>(false);

@@ -16,7 +16,7 @@ import { Nullable } from '../../types/utils';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 import moment from 'moment';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
-import { HOMEPAGE_ROUTE } from '../../utils/constants';
+import { DEBOUNCE_DELAY, HOMEPAGE_ROUTE } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { log } from '../../utils/analytics';
@@ -51,11 +51,11 @@ function ApplicationCreate() {
   const [isCreateRoleFormOpen, setIsCreateRoleFormOpen] = useState<boolean>(false);
 
   const [companySearchParams, setCompanySearchParams] = useState<CompanyQueryParams>({ companyNames: [''] });
-  const debouncedCompanySearchParams = useDebounce(companySearchParams, 500);
+  const debouncedCompanySearchParams = useDebounce(companySearchParams, DEBOUNCE_DELAY);
   const [selectedCompany, setSelectedCompany] = useState<Nullable<CompanyListData>>(null);
 
   const [roleSearchParams, setRoleSearchParams] = useState<RoleQueryParams>({ searchWords: [''] });
-  const debouncedRoleSearchParams = useDebounce(roleSearchParams, 500);
+  const debouncedRoleSearchParams = useDebounce(roleSearchParams, DEBOUNCE_DELAY);
   const [selectedRole, setSelectedRole] = useState<Nullable<RoleData>>(null);
   const [applicationDate, setApplicationDate] = useState<Nullable<moment.Moment>>(moment(new Date()));
 
