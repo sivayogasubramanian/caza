@@ -70,7 +70,7 @@ function Header() {
   };
 
   return (
-    <div className="bg-primary-one w-full fixed top-0 p-2 mb-2 flex justify-between items-center z-50">
+    <div className="bg-primary-three w-full fixed top-0 p-2 mb-2 flex justify-between items-center z-50">
       <img src={logo.src} width="150px" />
 
       {currentUser?.isAnonymous && (

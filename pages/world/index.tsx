@@ -76,25 +76,27 @@ function RolesWorld() {
 
   return (
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
-      <div className="mt-2 p-2 bg-primary-one rounded-b-3xl">
+      <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
         <div className="mb-2 flex items-center justify-between">
-          <div className="text-2xl font-bold text-white">World Overview</div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-2xl font-bold text-primary-four">World View</div>
+            <GoToYourListViewButton />
+          </div>
 
           <div className="flex items-center justify-end gap-2">
             {isSearchHidden && (
               <Tooltip title="search">
                 <Button
-                  className="bg-transparent focus:bg-transparent"
+                  className="bg-transparent border-primary-four focus:bg-transparent"
                   shape="circle"
                   onClick={() => setIsSearchHidden(false)}
-                  icon={<SearchOutlined style={{ color: '#FFFFFF' }} />}
+                  icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
                 />
               </Tooltip>
             )}
 
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center justify-between gap-2">
               <CreateApplicationButton />
-              <GoToYourListViewButton />
             </div>
           </div>
         </div>
