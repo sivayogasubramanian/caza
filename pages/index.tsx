@@ -69,6 +69,15 @@ function Applications() {
     mutateApplicationListData();
   }, [currentUser]);
 
+  const exitSearch = () => {
+    setIsSearchHidden(true);
+    setSearchParams({
+      searchWords: [],
+      roleTypeWords: [],
+      stageTypeWords: [],
+    });
+  };
+
   return (
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
@@ -103,10 +112,7 @@ function Applications() {
               <Col xs={24} md={18}>
                 <Input.Group className="flex items-center justify-items-stretch">
                   <Tooltip title="Exit search">
-                    <ArrowLeftOutlined
-                      style={{ fontSize: '15px', paddingRight: '2%' }}
-                      onClick={() => setIsSearchHidden(true)}
-                    />
+                    <ArrowLeftOutlined style={{ fontSize: '15px', paddingRight: '2%' }} onClick={exitSearch} />
                   </Tooltip>
                   <Input
                     value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
