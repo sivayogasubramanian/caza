@@ -1,10 +1,9 @@
-import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { ApplicationStageType, RoleType } from '@prisma/client';
 import { Button, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { User } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
+import { ChangeEventHandler, UIEvent, useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
 import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
@@ -20,6 +19,8 @@ import { ApplicationListData, ApplicationQueryParams } from '../types/applicatio
 import { log } from '../utils/analytics';
 import { CREATE_APPLICATION_ROUTE, DEBOUNCE_DELAY } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
+import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
+import Head from 'next/head';
 
 function Applications() {
   const { currentUser } = useContext(AuthContext);
@@ -81,102 +82,107 @@ function Applications() {
   };
 
   return (
-    <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
-      <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center justify-start gap-2">
-            <div className="text-2xl font-bold text-primary-four">My Applications</div>
-            <GoToWorldViewButton />
-          </div>
+    <div>
+      <Head>
+        <title>Your Applications.</title>
+      </Head>
+      <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
+        <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center justify-start gap-2">
+              <div className="text-2xl font-bold text-primary-four">My Applications</div>
+              <GoToWorldViewButton />
+            </div>
 
-          <div className="flex items-center justify-end gap-2">
-            {isSearchHidden && (
-              <Tooltip title="search">
-                <Button
-                  className="bg-transparent border-primary-four focus:bg-transparent"
-                  shape="circle"
-                  onClick={() => setIsSearchHidden(false)}
-                  icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
-                />
-              </Tooltip>
-            )}
+            <div className="flex items-center justify-end gap-2">
+              {isSearchHidden && (
+                <Tooltip title="search">
+                  <Button
+                    className="bg-transparent border-primary-four focus:bg-transparent"
+                    shape="circle"
+                    onClick={() => setIsSearchHidden(false)}
+                    icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
+                  />
+                </Tooltip>
+              )}
 
-            <div className="hidden md:flex items-center justify-between gap-2">
-              <CreateApplicationButton />
+              <div className="hidden md:flex items-center justify-between gap-2">
+                <CreateApplicationButton />
+              </div>
             </div>
           </div>
+
+          {/* Search and Filters */}
+          {isShowingSearch && (
+            <Form className="pt-4">
+              <Row gutter={[16, 16]}>
+                <Col xs={24} md={18}>
+                  <Input.Group className="flex items-center justify-items-stretch">
+                    <Tooltip title="Exit search">
+                      <ArrowLeftOutlined style={{ fontSize: '15px', paddingRight: '2%' }} onClick={exitSearch} />
+                    </Tooltip>
+                    <Input
+                      value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
+                      placeholder="Search by roles or company..."
+                      className="bg-primary-two"
+                      bordered={false}
+                      onChange={onSearchBarChange}
+                    />
+                  </Input.Group>
+                </Col>
+                <Col xs={12} md={3}>
+                  <Form.Item>
+                    <RoleTypesSelect
+                      value={searchParams.roleTypeWords}
+                      isBordered={false}
+                      isUsedInHeader={true}
+                      isMultiselect
+                      onChange={onRoleTypesFilterChange}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={12} md={3}>
+                  <Form.Item>
+                    <ApplicationStagesSelect
+                      value={searchParams.stageTypeWords}
+                      isBordered={false}
+                      isUsedInHeader={true}
+                      isMultiselect
+                      onChange={onApplicationStageTypesFilterChange}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          )}
         </div>
 
-        {/* Search and Filters */}
-        {isShowingSearch && (
-          <Form className="pt-4">
-            <Row gutter={[16, 16]}>
-              <Col xs={24} md={18}>
-                <Input.Group className="flex items-center justify-items-stretch">
-                  <Tooltip title="Exit search">
-                    <ArrowLeftOutlined style={{ fontSize: '15px', paddingRight: '2%' }} onClick={exitSearch} />
-                  </Tooltip>
-                  <Input
-                    value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
-                    placeholder="Search by roles or company..."
-                    className="bg-primary-two"
-                    bordered={false}
-                    onChange={onSearchBarChange}
-                  />
-                </Input.Group>
-              </Col>
-              <Col xs={12} md={3}>
-                <Form.Item>
-                  <RoleTypesSelect
-                    value={searchParams.roleTypeWords}
-                    isBordered={false}
-                    isUsedInHeader={true}
-                    isMultiselect
-                    onChange={onRoleTypesFilterChange}
-                  />
-                </Form.Item>
-              </Col>
-              <Col xs={12} md={3}>
-                <Form.Item>
-                  <ApplicationStagesSelect
-                    value={searchParams.stageTypeWords}
-                    isBordered={false}
-                    isUsedInHeader={true}
-                    isMultiselect
-                    onChange={onApplicationStageTypesFilterChange}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          </Form>
-        )}
+        {/* Application List */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="p-4 h-full pb-32 overflow-y-auto"
+          onScroll={handleScroll}
+        >
+          <Spin spinning={isLoading}>
+            {isLoading || applications.length > 0 ? (
+              applications.map((application, index) => <ApplicationListCard key={index} application={application} />)
+            ) : (
+              <div className="mt-4 flex flex-col justify-around items-center gap-2">
+                <RandomKawaii isHappy={true} />
+                <Button
+                  onClick={() => {
+                    log('click-create-application-kawaii');
+                    router.push(CREATE_APPLICATION_ROUTE);
+                  }}
+                >
+                  Create an application
+                </Button>
+              </div>
+            )}
+          </Spin>
+        </motion.div>
       </div>
-
-      {/* Application List */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="p-4 h-full pb-32 overflow-y-auto"
-        onScroll={handleScroll}
-      >
-        <Spin spinning={isLoading}>
-          {isLoading || applications.length > 0 ? (
-            applications.map((application, index) => <ApplicationListCard key={index} application={application} />)
-          ) : (
-            <div className="mt-4 flex flex-col justify-around items-center gap-2">
-              <RandomKawaii isHappy={true} />
-              <Button
-                onClick={() => {
-                  log('click-create-application-kawaii');
-                  router.push(CREATE_APPLICATION_ROUTE);
-                }}
-              >
-                Create an application
-              </Button>
-            </div>
-          )}
-        </Spin>
-      </motion.div>
     </div>
   );
 }

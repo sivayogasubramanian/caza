@@ -20,6 +20,7 @@ import { DEBOUNCE_DELAY, HOMEPAGE_ROUTE } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { log } from '../../utils/analytics';
+import Head from 'next/head';
 import useDebounce from '../../hooks/useDebounce';
 
 const addNewCompanyOption: CompanyAutocompleteOption = {
@@ -151,91 +152,96 @@ function ApplicationCreate() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-col justify-center items-stretch min-h-screen p-4"
-    >
-      <Title className="text-center">Add Application</Title>
-
-      <CreateCompanyForm
-        isOpen={isCreateCompanyFormOpen}
-        closeForm={() => setIsCreateCompanyFormOpen(false)}
-        onCreate={onCreateCompany}
-      />
-
-      <CreateRoleForm
-        company={selectedCompany}
-        isOpen={isCreateRoleFormOpen}
-        closeForm={() => setIsCreateRoleFormOpen(false)}
-        onCreate={onCreateRole}
-      />
-
-      <Form
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 12 }}
-        size="large"
-        className="flex flex-col p-8"
-        onFinish={onSubmit}
+    <div>
+      <Head>
+        <title>Add an application.</title>
+      </Head>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col justify-center items-stretch min-h-screen p-4"
       >
-        <Form.Item
-          label={'Company'}
-          required
-          validateStatus={shouldShowValidationErrors && !selectedCompany ? 'error' : 'validating'}
-          help={shouldShowValidationErrors && !selectedCompany ? 'Please select a company!' : ''}
+        <Title className="text-center">Add Application</Title>
+
+        <CreateCompanyForm
+          isOpen={isCreateCompanyFormOpen}
+          closeForm={() => setIsCreateCompanyFormOpen(false)}
+          onCreate={onCreateCompany}
+        />
+
+        <CreateRoleForm
+          company={selectedCompany}
+          isOpen={isCreateRoleFormOpen}
+          closeForm={() => setIsCreateRoleFormOpen(false)}
+          onCreate={onCreateRole}
+        />
+
+        <Form
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 12 }}
+          size="large"
+          className="flex flex-col p-8"
+          onFinish={onSubmit}
         >
-          <Select
-            showSearch
-            placeholder="Type to search for a company"
-            options={companyOptionsWithAdd}
-            onSelect={(value: string, { company }: CompanyAutocompleteOption) => onSelectCompany(company)}
-            onSearch={onSearchCompany}
-            filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
-            value={companyOptions.find((option) => option.company?.id === selectedCompany?.id)?.value}
-            loading={!companiesData}
-          />
-        </Form.Item>
-        <Form.Item
-          label={'Role'}
-          required
-          validateStatus={shouldShowValidationErrors && !selectedRole ? 'error' : 'validating'}
-          help={
-            !selectedCompany
-              ? 'Please select a company first!'
-              : shouldShowValidationErrors && !selectedRole
-              ? 'Please select a role!'
-              : ''
-          }
-        >
-          <Select
-            showSearch
-            placeholder={selectedCompany ? 'Type to search for a role' : ''}
-            disabled={!selectedCompany}
-            options={roleOptionsWithAdd}
-            onSelect={(value: string, { role }: RoleAutocompleteOption) => onSelectRole(role)}
-            onSearch={onSearchRole}
-            filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
-            value={roleOptions.find((option) => option.role?.id === selectedRole?.id)?.value}
-            loading={!rolesData}
-          />
-        </Form.Item>
-        <Form.Item label="Date Applied" required>
-          <DatePicker
-            allowClear={false}
-            defaultValue={applicationDate ?? undefined}
-            onChange={(dateMoment) => {
-              setApplicationDate(dateMoment);
-            }}
-            className="w-full"
-          />
-        </Form.Item>
-        <Form.Item className="self-center">
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    </motion.div>
+          <Form.Item
+            label={'Company'}
+            required
+            validateStatus={shouldShowValidationErrors && !selectedCompany ? 'error' : 'validating'}
+            help={shouldShowValidationErrors && !selectedCompany ? 'Please select a company!' : ''}
+          >
+            <Select
+              showSearch
+              placeholder="Type to search for a company"
+              options={companyOptionsWithAdd}
+              onSelect={(value: string, { company }: CompanyAutocompleteOption) => onSelectCompany(company)}
+              onSearch={onSearchCompany}
+              filterOption={false} // Options are already filtered by the API, and we want to show the "Add new company" option
+              value={companyOptions.find((option) => option.company?.id === selectedCompany?.id)?.value}
+              loading={!companiesData}
+            />
+          </Form.Item>
+          <Form.Item
+            label={'Role'}
+            required
+            validateStatus={shouldShowValidationErrors && !selectedRole ? 'error' : 'validating'}
+            help={
+              !selectedCompany
+                ? 'Please select a company first!'
+                : shouldShowValidationErrors && !selectedRole
+                ? 'Please select a role!'
+                : ''
+            }
+          >
+            <Select
+              showSearch
+              placeholder={selectedCompany ? 'Type to search for a role' : ''}
+              disabled={!selectedCompany}
+              options={roleOptionsWithAdd}
+              onSelect={(value: string, { role }: RoleAutocompleteOption) => onSelectRole(role)}
+              onSearch={onSearchRole}
+              filterOption={false} // Options are already filtered by the API, and we want to show the "Add new role" option
+              value={roleOptions.find((option) => option.role?.id === selectedRole?.id)?.value}
+              loading={!rolesData}
+            />
+          </Form.Item>
+          <Form.Item label="Date Applied" required>
+            <DatePicker
+              allowClear={false}
+              defaultValue={applicationDate ?? undefined}
+              onChange={(dateMoment) => {
+                setApplicationDate(dateMoment);
+              }}
+              className="w-full"
+            />
+          </Form.Item>
+          <Form.Item className="self-center">
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </motion.div>
+    </div>
   );
 }
 
