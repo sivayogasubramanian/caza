@@ -1,24 +1,29 @@
 import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { ApplicationStageType, RoleType } from '@prisma/client';
 import { Button, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
+import { User } from 'firebase/auth';
 import { motion } from 'framer-motion';
-import { ChangeEventHandler, UIEvent, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
 import useSWR from 'swr';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
 import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
 import ApplicationListCard from '../components/cards/ApplicationListCard';
 import ApplicationStagesSelect from '../components/forms/ApplicationStagesSelect';
 import RoleTypesSelect from '../components/forms/RoleTypesSelect';
+import RandomKawaii from '../components/notFound/RandomKawaii';
 import AuthContext from '../context/AuthContext';
-import { APPLICATIONS_API_ENDPOINT } from '../frontendApis/applicationsApi';
+import applicationsApi from '../frontendApis/applicationsApi';
 import useDebounce from '../hooks/useDebounce';
 import { ApiResponse } from '../types/apiResponse';
 import { ApplicationListData, ApplicationQueryParams } from '../types/application';
-import { DEBOUNCE_DELAY } from '../utils/constants';
+import { log } from '../utils/analytics';
+import { CREATE_APPLICATION_ROUTE, DEBOUNCE_DELAY } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
   const { currentUser } = useContext(AuthContext);
+  const router = useRouter();
 
   const [searchParams, setSearchParams] = useState<ApplicationQueryParams>({
     searchWords: [],
@@ -56,18 +61,15 @@ function Applications() {
     setSearchParams({ ...searchParams, stageTypeWords: stageTypes });
   };
 
-  const { data: applicationListData, mutate: mutateApplicationListData } = useSWR<ApiResponse<ApplicationListData[]>>([
-    APPLICATIONS_API_ENDPOINT,
-    debouncedSearchParams,
-  ]);
+  const { data: applicationListData, isValidating: isLoading } = useSWR<ApiResponse<ApplicationListData[]>>(
+    [currentUser, debouncedSearchParams],
+    (user: User, params: ApplicationQueryParams) =>
+      user.getIdToken().then((token) => applicationsApi.getApplications(params, token)),
+  );
 
   const applications: ApplicationListData[] = Array.isArray(applicationListData?.payload)
     ? (applicationListData?.payload as ApplicationListData[])
     : [];
-
-  useEffect(() => {
-    mutateApplicationListData();
-  }, [currentUser]);
 
   const exitSearch = () => {
     setIsSearchHidden(true);
@@ -157,10 +159,22 @@ function Applications() {
         className="p-4 h-full pb-32 overflow-y-auto"
         onScroll={handleScroll}
       >
-        <Spin spinning={!applicationListData}>
-          {applications.map((application, index) => (
-            <ApplicationListCard key={index} application={application} />
-          ))}
+        <Spin spinning={isLoading}>
+          {isLoading || applications.length > 0 ? (
+            applications.map((application, index) => <ApplicationListCard key={index} application={application} />)
+          ) : (
+            <div className="mt-4 flex flex-col justify-around items-center gap-2">
+              <RandomKawaii isHappy={true} />
+              <Button
+                onClick={() => {
+                  log('click-create-application-kawaii');
+                  router.push(CREATE_APPLICATION_ROUTE);
+                }}
+              >
+                Create an application
+              </Button>
+            </div>
+          )}
         </Spin>
       </motion.div>
     </div>

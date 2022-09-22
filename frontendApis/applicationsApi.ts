@@ -10,8 +10,14 @@ import api from './api';
 export const APPLICATIONS_API_ENDPOINT = 'applications';
 
 class ApplicationsApi {
-  public getApplications(applicationQueryParams: ApplicationQueryParams): ApiPromise<ApplicationListData[]> {
-    return api.get(APPLICATIONS_API_ENDPOINT, { params: applicationQueryParams });
+  public getApplications(
+    applicationQueryParams: ApplicationQueryParams,
+    token: string,
+  ): ApiPromise<ApplicationListData[]> {
+    return api.get(APPLICATIONS_API_ENDPOINT, {
+      params: applicationQueryParams,
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 
   public getApplication(applicationId: number): ApiPromise<ApplicationData> {
