@@ -7,9 +7,10 @@ module.exports = {
         background: '#FFFFFF',
         primary: {
           one: '#2593FC',
-          two: '#1A49A6',
+          two: '#FFFFFF',
           three: '#CEEDFF',
           four: '#185ADB',
+          five: '#67A2E8',
         },
       },
       boxShadow: {

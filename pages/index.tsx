@@ -98,20 +98,20 @@ function Applications() {
 
         {/* Search and Filters */}
         {isShowingSearch && (
-          <Form>
+          <Form className="pt-4">
             <Row gutter={[16, 16]}>
               <Col xs={24} md={18}>
                 <Input.Group className="flex items-center justify-items-stretch">
                   <Tooltip title="Exit search">
                     <ArrowLeftOutlined
-                      style={{ color: '#FFFFFF', fontSize: '15px', paddingRight: '2%' }}
+                      style={{ fontSize: '15px', paddingRight: '2%' }}
                       onClick={() => setIsSearchHidden(true)}
                     />
                   </Tooltip>
                   <Input
                     value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
                     placeholder="Search by roles or company..."
-                    className="bg-primary-two text-white"
+                    className="bg-primary-two"
                     bordered={false}
                     onChange={onSearchBarChange}
                   />
