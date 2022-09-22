@@ -81,12 +81,16 @@ function Application() {
   return (
     <Spin
       spinning={isLoading}
-      wrapperClassName={`h-full ${isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''}`}
+      wrapperClassName={`h-full [&>div]:h-full overflow-clip ${
+        isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''
+      }`}
     >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 mt-2 h-full pb-32 overflow-y-scroll">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
         {hasSuccessfullyFetchedApplication && (
-          <div className="flex items-center justify-between">
-            <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
+          <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
+            <div className="flex items-center justify-between">
+              <Title>{`${application.role.title} @ ${application.role.company.name}`}</Title>
+            </div>
           </div>
         )}
 
@@ -131,31 +135,33 @@ function Application() {
         )}
 
         {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
-          <Timeline className="m-4" reverse={true}>
-            {timelineItems.map((item, index) => (
-              <Timeline.Item key={index} dot={getTimelineIcon(item)}>
-                {item.type === TimelineType.STAGE ? (
-                  <ApplicationStageTimelineCard
-                    applicationStage={item.data as ApplicationStageApplicationData}
-                    onClick={() => {
-                      log('click_application_stage_timeline_card');
-                      setSelectedStage(item.data as ApplicationStageApplicationData);
-                    }}
-                  />
-                ) : (
-                  <ApplicationTaskTimelineCard
-                    applicationId={applicationId}
-                    task={item.data as TaskData}
-                    mutateApplicationData={mutateApplicationData}
-                    onClick={() => {
-                      log('click_application_task_timeline_card');
-                      setSelectedTask(item.data as TaskData);
-                    }}
-                  />
-                )}
-              </Timeline.Item>
-            ))}
-          </Timeline>
+          <div className="p-4 h-full pb-32 overflow-y-auto">
+            <Timeline reverse={true}>
+              {timelineItems.map((item, index) => (
+                <Timeline.Item key={index} dot={getTimelineIcon(item)}>
+                  {item.type === TimelineType.STAGE ? (
+                    <ApplicationStageTimelineCard
+                      applicationStage={item.data as ApplicationStageApplicationData}
+                      onClick={() => {
+                        log('click_application_stage_timeline_card');
+                        setSelectedStage(item.data as ApplicationStageApplicationData);
+                      }}
+                    />
+                  ) : (
+                    <ApplicationTaskTimelineCard
+                      applicationId={applicationId}
+                      task={item.data as TaskData}
+                      mutateApplicationData={mutateApplicationData}
+                      onClick={() => {
+                        log('click_application_task_timeline_card');
+                        setSelectedTask(item.data as TaskData);
+                      }}
+                    />
+                  )}
+                </Timeline.Item>
+              ))}
+            </Timeline>
+          </div>
         )}
 
         {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
