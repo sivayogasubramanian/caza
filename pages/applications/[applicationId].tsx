@@ -143,110 +143,112 @@ function Application() {
       <Head>
         <title>{title}</title>
       </Head>
-      <Spin
-        spinning={isLoading}
-        wrapperClassName={`h-full [&>div]:h-full overflow-clip ${
-          isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''
-        }`}
-      >
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
-          {hasSuccessfullyFetchedApplication && (
-            <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center justify-start gap-2">
-                  <div className="text-2xl font-bold text-primary-four">{title}</div>
-                  <div className="hidden md:flex">{getRoleStatsButton()}</div>
+      <main>
+        <Spin
+          spinning={isLoading}
+          wrapperClassName={`h-full [&>div]:h-full overflow-clip ${
+            isLoading ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-x-1/2' : ''
+          }`}
+        >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
+            {hasSuccessfullyFetchedApplication && (
+              <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center justify-start gap-2">
+                    <div className="text-2xl font-bold text-primary-four">{title}</div>
+                    <div className="hidden md:flex">{getRoleStatsButton()}</div>
+                  </div>
+
+                  <div className="hidden md:flex flex items-center justify-end gap-2">
+                    {getAddStageButton()}
+                    {getAddTaskButton()}
+                    {getDeleteButton()}
+                  </div>
                 </div>
 
-                <div className="hidden md:flex flex items-center justify-end gap-2">
+                <div className="md:hidden pt-2 w-full flex items-center justify-start gap-2">
+                  {getRoleStatsButton()}
                   {getAddStageButton()}
                   {getAddTaskButton()}
                   {getDeleteButton()}
                 </div>
               </div>
+            )}
 
-              <div className="md:hidden pt-2 w-full flex items-center justify-start gap-2">
-                {getRoleStatsButton()}
-                {getAddStageButton()}
-                {getAddTaskButton()}
-                {getDeleteButton()}
+            {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
+              <div className="flex justify-center text-center text-gray-300">
+                This application seems very empty. Add your first stage or task now!
               </div>
-            </div>
-          )}
+            )}
 
-          {hasSuccessfullyFetchedApplication && timelineItems.length === 0 && (
-            <div className="flex justify-center text-center text-gray-300">
-              This application seems very empty. Add your first stage or task now!
-            </div>
-          )}
+            {isAddingNewStage && (
+              <NewStageModal
+                applicationId={applicationId}
+                setIsAddingNewStage={setIsAddingNewStage}
+                mutateApplicationData={mutateApplicationData}
+              />
+            )}
 
-          {isAddingNewStage && (
-            <NewStageModal
-              applicationId={applicationId}
-              setIsAddingNewStage={setIsAddingNewStage}
-              mutateApplicationData={mutateApplicationData}
-            />
-          )}
+            {selectedStage && (
+              <EditStageModal
+                applicationId={applicationId}
+                initialStage={selectedStage}
+                setSelectedStage={setSelectedStage}
+                mutateApplicationData={mutateApplicationData}
+              />
+            )}
 
-          {selectedStage && (
-            <EditStageModal
-              applicationId={applicationId}
-              initialStage={selectedStage}
-              setSelectedStage={setSelectedStage}
-              mutateApplicationData={mutateApplicationData}
-            />
-          )}
+            {isAddingNewTask && (
+              <NewTaskModal
+                applicationId={applicationId}
+                setIsAddingNewTask={setIsAddingNewTask}
+                mutateApplicationData={mutateApplicationData}
+              />
+            )}
 
-          {isAddingNewTask && (
-            <NewTaskModal
-              applicationId={applicationId}
-              setIsAddingNewTask={setIsAddingNewTask}
-              mutateApplicationData={mutateApplicationData}
-            />
-          )}
+            {selectedTask && (
+              <EditTaskModal
+                applicationId={applicationId}
+                initialTask={selectedTask}
+                setSelectedTask={setSelectedTask}
+                mutateApplicationData={mutateApplicationData}
+              />
+            )}
 
-          {selectedTask && (
-            <EditTaskModal
-              applicationId={applicationId}
-              initialTask={selectedTask}
-              setSelectedTask={setSelectedTask}
-              mutateApplicationData={mutateApplicationData}
-            />
-          )}
+            {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
+              <div className="p-4 h-full pb-32 overflow-y-auto">
+                <Timeline reverse={true}>
+                  {timelineItems.map((item, index) => (
+                    <Timeline.Item key={index} dot={getTimelineIcon(item)}>
+                      {item.type === TimelineType.STAGE ? (
+                        <ApplicationStageTimelineCard
+                          applicationStage={item.data as ApplicationStageApplicationData}
+                          onClick={() => {
+                            log('click_application_stage_timeline_card');
+                            setSelectedStage(item.data as ApplicationStageApplicationData);
+                          }}
+                        />
+                      ) : (
+                        <ApplicationTaskTimelineCard
+                          applicationId={applicationId}
+                          task={item.data as TaskData}
+                          mutateApplicationData={mutateApplicationData}
+                          onClick={() => {
+                            log('click_application_task_timeline_card');
+                            setSelectedTask(item.data as TaskData);
+                          }}
+                        />
+                      )}
+                    </Timeline.Item>
+                  ))}
+                </Timeline>
+              </div>
+            )}
 
-          {hasSuccessfullyFetchedApplication && timelineItems.length > 0 && (
-            <div className="p-4 h-full pb-32 overflow-y-auto">
-              <Timeline reverse={true}>
-                {timelineItems.map((item, index) => (
-                  <Timeline.Item key={index} dot={getTimelineIcon(item)}>
-                    {item.type === TimelineType.STAGE ? (
-                      <ApplicationStageTimelineCard
-                        applicationStage={item.data as ApplicationStageApplicationData}
-                        onClick={() => {
-                          log('click_application_stage_timeline_card');
-                          setSelectedStage(item.data as ApplicationStageApplicationData);
-                        }}
-                      />
-                    ) : (
-                      <ApplicationTaskTimelineCard
-                        applicationId={applicationId}
-                        task={item.data as TaskData}
-                        mutateApplicationData={mutateApplicationData}
-                        onClick={() => {
-                          log('click_application_task_timeline_card');
-                          setSelectedTask(item.data as TaskData);
-                        }}
-                      />
-                    )}
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-            </div>
-          )}
-
-          {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
-        </motion.div>
-      </Spin>
+            {!hasSuccessfullyFetchedApplication && !isLoading && <NotFound message="The application was not found." />}
+          </motion.div>
+        </Spin>
+      </main>
     </div>
   );
 }

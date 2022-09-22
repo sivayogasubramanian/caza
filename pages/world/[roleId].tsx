@@ -30,9 +30,11 @@ const RoleWorldPage: NextPage = () => {
       <Head>
         <title>{title}</title>
       </Head>
-      <Spin spinning={!data} wrapperClassName="h-full [&>div]:h-full">
-        {data && <RoleSankey data={data.payload} />}
-      </Spin>
+      <main>
+        <Spin spinning={!data} wrapperClassName="h-full [&>div]:h-full">
+          {data && <RoleSankey data={data.payload} />}
+        </Spin>
+      </main>
     </div>
   );
 };

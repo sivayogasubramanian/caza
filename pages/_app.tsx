@@ -79,14 +79,16 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <Head>
                   <title>Caza</title>
                 </Head>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Lottie className="h-screen w-60 m-auto" autoPlay loop animationData={splash} />
-                </motion.div>
+                <main>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Lottie className="h-screen w-60 m-auto" autoPlay loop animationData={splash} />
+                  </motion.div>
+                </main>
               </div>
             )}
           </AnimatePresence>
