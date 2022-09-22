@@ -2,7 +2,7 @@ import { Button, Modal, Spin, Timeline } from 'antd';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
-import { APPLICATIONS_API_ENDPOINT } from '../../frontendApis/applicationsApi';
+import applicationsApi, { APPLICATIONS_API_ENDPOINT } from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
 import ApplicationTaskTimelineCard from '../../components/cards/ApplicationTaskTimelineCard';
 import TaskIcon from '../../components/icons/timeline/TaskIcon';
