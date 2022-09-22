@@ -107,7 +107,6 @@ interface SyncEvent extends ExtendableEvent {
 }
 
 interface ExtendableMessageEvent extends ExtendableEvent {
-  origin: string;
   data: any;
   source: Client | Object;
 }
