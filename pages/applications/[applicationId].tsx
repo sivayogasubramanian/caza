@@ -144,7 +144,7 @@ function Application() {
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
         {hasSuccessfullyFetchedApplication && (
-          <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
+          <div className="mt-2 p-2 pb-4 bg-primary-three rounded-b-3xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-start">
                 <div className="text-2xl font-bold text-primary-four">{`${application.role.title} @ ${application.role.company.name}`}</div>
