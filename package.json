@@ -10,11 +10,7 @@
     "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix './**'",
     "postinstall": "husky install",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
-    "vercel-reset": "prisma generate && prisma migrate reset && next build",
-    "docker-postgres": "docker run --rm -itd --name test-instance -p 5433:5432  -e POSTGRES_PASSWORD=password postgres && echo 'Allow a few seconds for the database to set up.'",
-    "docker-postgres-migrate": "psql postgresql://postgres:password@localhost:5433 -c 'CREATE DATABASE caza' && yarn run prisma migrate reset",
-    "docker-postgres-stop": "docker stop test-instance || true ",
-    "test": "jest --watch --config=.jest.config.js --runInBand"
+    "vercel-reset": "prisma generate && prisma migrate reset && next build"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -32,14 +28,13 @@
     "prisma": "^4.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-kawaii": "^0.17.0",
     "react-google-charts": "^4.0.0",
+    "react-kawaii": "^0.17.0",
     "swr": "^1.3.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
-    "@types/jest": "^29.0.0",
     "@types/node": "18.7.14",
     "@types/react": "18.0.18",
     "@types/react-dom": "18.0.6",
@@ -53,8 +48,6 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.4",
     "husky": "^8.0.1",
-    "jest": "^29.0.2",
-    "jest-environment-jsdom": "^29.0.2",
     "postcss": "^8.4.16",
     "prettier": "^2.7.1",
     "tailwindcss": "^3.1.8",
