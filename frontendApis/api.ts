@@ -67,14 +67,14 @@ export function processRequest<D extends Payload>(
 
 function makeApiErrorResponse<D extends Payload>(error: AxiosError<ApiResponse<D>>): ApiResponse<D> {
   if (!error?.response?.data?.messages) {
-    const errorMessage = {
-      type: StatusMessageType.ERROR,
-      message: 'Request failed, please check your internet connection or refresh the page and try again.',
-    };
-    openNotification(errorMessage);
     return {
       payload: {},
-      messages: [errorMessage],
+      messages: [
+        {
+          type: StatusMessageType.ERROR,
+          message: 'Request failed, please check your internet connection or refresh the page and try again.',
+        },
+      ],
     };
   }
 
