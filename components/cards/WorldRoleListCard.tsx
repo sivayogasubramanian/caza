@@ -30,7 +30,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
 
   return (
     <div
-      className={`bg-white flex flex-col gap-2 shadow-around mt-2 rounded-lg p-3 cursor-pointer transition-shadow duration-500 hover:shadow-bigAround ${
+      className={`bg-white flex flex-col shadow-around mt-2 rounded-lg p-3 cursor-pointer transition-shadow duration-500 hover:shadow-bigAround ${
         shouldBlur ? 'bg-white blur-sm pointer-events-none' : ''
       }`}
       onClick={onClick}
@@ -38,7 +38,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
       <div className="flex items-center xs-12 md-4 p-4">
         <CompanyLogo company={role.company} className="rounded-full max-w-[3rem]" />
 
-        <div className="ml-5 w-[100%] flex flex-col gap-0.5">
+        <div className="ml-5 w-[100%] flex flex-col">
           <div className="font-bold">{role.title}</div>
 
           <div className="text-gray-500 text-xs">{`${role.company.name}, ${roleTypeToDisplayStringMap.get(
@@ -48,7 +48,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
       </div>
 
       {/* Stacked Bar Chart */}
-      <div className="flex rounded-lg overflow-hidden text-center">
+      <div className="flex rounded-lg overflow-hidden text-center mt-2">
         {sumOfStageCounts > 0 ? (
           stageColors.map(({ stage, color }) => {
             const stageCount = role.applicationStages.find((s) => s.type === stage)?.count ?? 0;
@@ -70,12 +70,12 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
       </div>
 
       {/* Stage Color Legend */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center">
         {stageColors
           .filter(({ stage }) => role.applicationStages.some(({ type }) => stage === type))
           .map(({ stage, color }) => (
-            <div key={stage} className="flex gap-2">
-              <div className="w-4 h-4 rounded-md" style={{ backgroundColor: color }}>
+            <div key={stage} className="flex items-center mt-2 mr-1">
+              <div className="w-4 h-4 rounded-md mr-1" style={{ backgroundColor: color }}>
                 &nbsp;
               </div>
               <div>{stageTypeToDisplayStringMap.get(stage)}</div>
@@ -83,7 +83,7 @@ function WorldRoleListCard({ role, shouldBlur }: Props) {
           ))}
       </div>
 
-      <div className="text-gray-500 text-xs">Total applications: {sumOfStageCounts}</div>
+      <div className="text-gray-500 text-xs mt-2">Total applications: {sumOfStageCounts}</div>
     </div>
   );
 }

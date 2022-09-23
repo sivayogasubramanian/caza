@@ -84,16 +84,16 @@ function Applications() {
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
         <div className="flex items-center justify-between">
-          <div className="flex items-center justify-start gap-2">
-            <div className="text-2xl font-bold text-primary-four">My Applications</div>
+          <div className="flex items-center justify-start">
+            <div className="text-2xl font-bold text-primary-four mr-2">My Applications</div>
             <GoToWorldViewButton />
           </div>
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end">
             {isSearchHidden && (
               <Tooltip title="search">
                 <Button
-                  className="bg-transparent border-primary-four focus:bg-transparent"
+                  className="bg-transparent border-primary-four focus:bg-transparent mr-2"
                   shape="circle"
                   onClick={() => setIsSearchHidden(false)}
                   icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
@@ -101,7 +101,7 @@ function Applications() {
               </Tooltip>
             )}
 
-            <div className="hidden md:flex items-center justify-between gap-2">
+            <div className="hidden md:flex items-center justify-between">
               <CreateApplicationButton />
             </div>
           </div>
@@ -165,9 +165,10 @@ function Applications() {
           {isLoading || applications.length > 0 ? (
             applications.map((application, index) => <ApplicationListCard key={index} application={application} />)
           ) : (
-            <div className="mt-4 flex flex-col justify-around items-center gap-2">
+            <div className="mt-4 flex flex-col justify-around items-center">
               <RandomKawaii isHappy={true} />
               <Button
+                className="mt-2"
                 onClick={() => {
                   log('click-create-application-kawaii');
                   router.push(CREATE_APPLICATION_ROUTE);

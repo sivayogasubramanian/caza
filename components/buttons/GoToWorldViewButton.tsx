@@ -15,7 +15,7 @@ function GoToWorldViewButton() {
   return (
     <Button
       icon={<GlobeIcon fillColor="#185ADB" isActive={false} />}
-      className="hidden md:flex items-center gap-1 text-primary-four border-primary-four rounded-md bg-transparent"
+      className="hidden md:flex items-center [&>span]:ml-1 text-primary-four border-primary-four rounded-md bg-transparent"
       onClick={onClick}
     >
       Go To World View

@@ -41,7 +41,7 @@ function ApplicationListCard({ application }: Props) {
       <div className="p-4 flex items-center">
         <CompanyLogo company={application.role.company} className="rounded-full max-w-[3rem]" />
 
-        <div className="ml-5 w-[100%] flex flex-col gap-0.5">
+        <div className="ml-5 w-[100%] flex flex-col">
           <div className="flex items-start justify-between">
             <div className="font-bold">{application.role.title}</div>
             <Badge count={application.taskNotificationCount} />
@@ -54,11 +54,11 @@ function ApplicationListCard({ application }: Props) {
           <div className="flex justify-between items-center mt-0.5">
             {application.latestStage && (
               <>
-                <div className="flex gap-1">
+                <div className="flex">
                   {getApplicationStageBadge(application.latestStage.type)}
 
                   {application.latestStage.emojiUnicodeHex && (
-                    <span role="img" aria-label="emoji">
+                    <span className="ml-1" role="img" aria-label="emoji">
                       {String.fromCodePoint(parseInt(application.latestStage.emojiUnicodeHex, 16))}
                     </span>
                   )}

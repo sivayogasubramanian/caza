@@ -14,11 +14,11 @@ function ApplicationStageTimelineCard({ applicationStage, onClick }: Props) {
   return (
     <div className="bg-white shadow-around rounded-lg cursor-pointer hover:shadow-bigAround" onClick={onClick}>
       <div className="p-2">
-        <div className="grid grid-cols-4 gap-2">
-          <div className="font-bold flex items-start col-span-3 gap-1">
+        <div className="grid grid-cols-4">
+          <div className="font-bold flex items-start col-span-3">
             {stageTypeToDisplayStringMap.get(applicationStage.type)}
             {applicationStage.emojiUnicodeHex && (
-              <span role="img" aria-label="emoji">
+              <span className="ml-1" role="img" aria-label="emoji">
                 {String.fromCodePoint(parseInt(applicationStage.emojiUnicodeHex, 16))}
               </span>
             )}
@@ -27,7 +27,7 @@ function ApplicationStageTimelineCard({ applicationStage, onClick }: Props) {
           {date && <div className="flex items-start justify-end text-xs">{makeDisplayDate(date)}</div>}
         </div>
 
-        <div className="flex justify-start items-start gap-2">
+        <div className="flex justify-start items-start">
           {applicationStage.remark && <div className="text-gray-700 text-sm">{applicationStage.remark}</div>}
         </div>
       </div>

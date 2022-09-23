@@ -39,24 +39,24 @@ function ApplicationTaskTimelineCard({ applicationId, task, mutateApplicationDat
       onClick={onClick}
     >
       <div className="p-2">
-        <div className="grid grid-cols-4 gap-2">
-          <div className="flex items-center gap-2 col-span-3">
+        <div className="grid grid-cols-4">
+          <div className="flex items-center col-span-3">
             <Checkbox
               className="rounded-full"
               checked={task.isDone}
               onChange={onToggleCheckbox}
               onClick={(e) => e.stopPropagation()}
             />
-            <div className="font-bold">{task.title}</div>
+            <div className="font-bold ml-1">{task.title}</div>
           </div>
 
           {dueDate && <div className="flex items-start justify-end text-xs">{makeDisplayDate(dueDate)}</div>}
         </div>
 
         {notificationDateTime && dueDate && (
-          <div className="mt-2 flex justify-end items-center gap-1">
+          <div className="mt-2 flex justify-end items-center">
             <NotificationBell />
-            <div className="text-xs text-gray-700">
+            <div className="text-xs text-gray-700 ml-1">
               {makeDisplayNotificationDatetime(notificationDateTime, dueDate)}
             </div>
           </div>
