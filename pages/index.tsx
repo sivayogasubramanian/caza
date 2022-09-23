@@ -83,9 +83,9 @@ function Applications() {
   return (
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
-        <div className="flex items-center justify-between">
+        <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center justify-start">
-            <div className="text-2xl font-bold text-primary-four mr-2">My Applications</div>
+            <div className="text-2xl font-bold text-primary-four">My Applications</div>
             <GoToWorldViewButton />
           </div>
 
@@ -109,7 +109,7 @@ function Applications() {
 
         {/* Search and Filters */}
         {isShowingSearch && (
-          <Form className="pt-4">
+          <Form>
             <Row gutter={[16, 16]}>
               <Col xs={24} md={18}>
                 <Input.Group className="flex items-center justify-items-stretch">

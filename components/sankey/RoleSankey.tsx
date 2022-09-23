@@ -97,7 +97,7 @@ type RoleCardProps = { role: RoleApplicationListData };
 
 const RoleCard: FC<RoleCardProps> = ({ role }) => {
   return (
-    <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
+    <div className="mt-2 p-2 pb-4 bg-primary-three rounded-b-3xl">
       <div className="text-2xl font-bold text-primary-four">{`${role.title} @ ${role.company.name}`}</div>
     </div>
   );
