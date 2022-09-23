@@ -15,6 +15,10 @@ import useFirebaseLogin from '../hooks/useFirebaseLogin';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    document.title = 'Caza';
+  }, []);
+
   const initFirebase = useCallback(async () => {
     const app = initializeApp({
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

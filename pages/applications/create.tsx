@@ -1,7 +1,7 @@
 import { Form, DatePicker, Select, Button, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../frontendApis/applicationsApi';
 import companiesApi, { COMPANIES_API_ENDPOINT } from '../../frontendApis/companiesApi';
@@ -47,6 +47,10 @@ const addNewRoleOption: RoleAutocompleteOption = {
 };
 
 function ApplicationCreate() {
+  useEffect(() => {
+    document.title = 'Create an Application';
+  }, []);
+
   const router = useRouter();
   const { currentUser } = useContext(AuthContext);
 
