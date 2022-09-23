@@ -28,16 +28,16 @@ function makeApplicationCreateInput(
 ): Prisma.ApplicationUncheckedCreateInput[] {
   const applications: Prisma.ApplicationUncheckedCreateInput[] = [];
 
-  const latestStageArr: ApplicationStageType[] = [];
+  const latestStageArr: { stage: ApplicationStageType; isRejected: boolean }[] = [];
 
   for (const [stage, count] of Object.entries(latestStageBreakdown)) {
     for (let i = 0; i < count; i++) {
-      latestStageArr.push(stage as ApplicationStageType);
+      latestStageArr.push({ stage: stage as ApplicationStageType, isRejected: count > 10 && i >= count / 2 });
     }
   }
 
   for (let userId = 1; userId <= 100; userId++) {
-    const latestStageForUser = latestStageArr[userId - 1];
+    const { stage, isRejected } = latestStageArr[userId - 1];
     const stages: Prisma.ApplicationStageUncheckedCreateWithoutApplicationInput[] = [];
     let prevDate = new Date();
     for (let i = 0; i < processes.length; i++) {
@@ -47,9 +47,16 @@ function makeApplicationCreateInput(
         date: prevDate,
       });
 
-      if (processes[i].stage === latestStageForUser) {
+      if (processes[i].stage === stage) {
         break;
       }
+    }
+
+    if (stage !== ApplicationStageType.ACCEPTED && isRejected) {
+      stages.push({
+        type: ApplicationStageType.REJECTED,
+        date: randomDate(prevDate, 8),
+      });
     }
 
     applications.push({
@@ -143,10 +150,10 @@ async function main() {
   });
 
   const googleSweApplications = makeApplicationCreateInput(2, {
-    [ApplicationStageType.APPLIED]: 10,
-    [ApplicationStageType.ONLINE_ASSESSMENT]: 64,
-    [ApplicationStageType.TECHNICAL]: 18,
-    [ApplicationStageType.OFFERED]: 2,
+    [ApplicationStageType.APPLIED]: 53,
+    [ApplicationStageType.ONLINE_ASSESSMENT]: 30,
+    [ApplicationStageType.TECHNICAL]: 8,
+    [ApplicationStageType.OFFERED]: 3,
     [ApplicationStageType.ACCEPTED]: 6,
   });
 
