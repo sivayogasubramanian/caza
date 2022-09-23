@@ -67,9 +67,9 @@ function Header() {
       return;
     }
 
-    signOut(auth).finally(() =>
-      openNotification({ type: StatusMessageType.SUCCESS, message: 'Logged out successfully!' }),
-    );
+    signOut(auth)
+      .then(() => setShouldShowProfileMenu(false))
+      .finally(() => openNotification({ type: StatusMessageType.SUCCESS, message: 'Logged out successfully!' }));
   };
 
   return (
