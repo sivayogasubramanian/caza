@@ -91,14 +91,12 @@ function Applications() {
 
           <div className="flex items-center justify-end">
             {isSearchHidden && (
-              <Tooltip title="search">
-                <Button
-                  className="bg-transparent border-primary-four focus:bg-transparent mr-2"
-                  shape="circle"
-                  onClick={() => setIsSearchHidden(false)}
-                  icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
-                />
-              </Tooltip>
+              <Button
+                className="bg-transparent border-primary-four focus:bg-transparent mr-2"
+                shape="circle"
+                onClick={() => setIsSearchHidden(false)}
+                icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
+              />
             )}
 
             <div className="hidden md:flex items-center justify-between">
