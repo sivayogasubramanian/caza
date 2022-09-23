@@ -4,7 +4,6 @@ import { precacheAllUserApplications } from './applications';
 declare let self: ServiceWorkerGlobalScope;
 
 self.addEventListener('message', (event?: ExtendableMessageEvent) => {
-  console.log('Service worker received a message:', event);
   if (!event) {
     return;
   }
