@@ -123,7 +123,7 @@ function Applications() {
                         </Tooltip>
                         <Input
                           value={searchParams.searchWords.length === 0 ? undefined : searchParams.searchWords.join(' ')}
-                          placeholder="Search by roles or company..."
+                          placeholder="Search by role or company..."
                           className="bg-primary-two"
                           bordered={false}
                           onChange={onSearchBarChange}
