@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export function makeDisplayDate(date: Date) {
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 }
@@ -22,23 +24,10 @@ export function getCountOfDaysTillTodayFrom(date: Date): number {
   return calculateDaysOffset(date, new Date());
 }
 
-const NUMBER_OF_MILLISECONDS_IN_A_DAY = 1000 * 3600 * 24;
-
 export function calculateDaysOffset(currentDate: Date, referenceDate: Date) {
-  const startOfDay = new Date(referenceDate);
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date(referenceDate);
-  endOfDay.setHours(23, 59, 59, 999);
-
-  const [diffFromStart, diffFromEnd] = [startOfDay, endOfDay].map((d) => d.getTime() - currentDate.getTime());
-
-  // currentDate is between startOfDay and endOfDay
-  if (diffFromEnd * diffFromStart < 0) {
-    return 0;
-  }
-
-  return Math.ceil(Math.min(diffFromEnd, diffFromStart) / NUMBER_OF_MILLISECONDS_IN_A_DAY);
+  const currentDateMoment = moment(currentDate);
+  const referenceDateMoment = moment(referenceDate);
+  return referenceDateMoment.diff(currentDateMoment, 'days');
 }
 
 // Formats the time portion in datetime into hh:mm AM/PM format
