@@ -1,34 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<p align="center"><img src="public/apple-splash-1334-750.jpg" width="50%"/></p>
 
-## Getting Started
+<h1 align="center">Caza</h1>
 
-First, run the development server:
+<p align="center">
+<img src="https://github.com/sivayogasubramanian/caza/actions/workflows/ci.yml/badge.svg" />
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+<h3 align="center"><a href='Get started here!'>Get started here!</a></h3>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<br/>
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Overview
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+University students have a lot on their plate, and for those who aspire to break into software engineering, the internship season can be quite the headache. Caza reduces their burden by helping students track their internship applications.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Caza is an internship or job application tracker for Computer Science (CS) students. It allows users to track the progress of the applications, note down tasks, and access global statistics of application statuses for various job roles.
 
-## Learn More
+## Team Members
 
-To learn more about Next.js, take a look at the following resources:
+This progressive web app is made as a assignment 3 project in CS3216. Made with ❤️ by:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Member                                           | Role                   |
+| ------------------------------------------------ | ---------------------- |
+| Bharath Chandra Sudheer (A0218550J)              | Full-stack, Firebase   |
+| Gan Hong Yao (A0217912H)                         | Full-stack, Database   |
+| Han Geng Ning (A0222055U)                        | Full-stack, UI         |
+| Ruppa Nagarajan Sivayoga Subramanian (A0217379U) | Full-stack, Deployment |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Getting started with local development
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Install nvm by following the instructions [here](https://github.com/nvm-sh/nvm#install--update-script).
+1. Then, install the node version in `.nvmrc` by running `nvm install <VERSION>`.
+1. Install yarn by following the instructions [here](https://classic.yarnpkg.com/en/docs/install).
+1. Make a copy of `.env.example` as `.env` file in the root directory of the project.
+1. Create a firebase project and enable the following services:
+   - Authentication (Anonymous and Github OAuth)
+1. Add the firebase enviroment variables.
+1. Setup Postgresql database and add the database credentials to the `.env` file.
+1. Run `yarn install` to install all the dependencies.
+1. Run `yarn prisma migrate dev` to migrate the database.
+1. Run `yarn dev` to start the development server.
+1. Navigate to `http://localhost:3000/` to view the app. Happy Hacking! 😃
