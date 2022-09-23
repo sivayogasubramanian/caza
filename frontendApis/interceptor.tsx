@@ -17,10 +17,18 @@ const AxiosInterceptor = ({ children }: Props) => {
   const [isIntercepted, setIsIntercepted] = useState<boolean>(false);
 
   const refreshToken = () => {
-    currentUser?.getIdTokenResult(true).then((result) => {
-      setJwtToken(result.token);
-      setJwtExpiry(new Date(result.expirationTime));
-    });
+    currentUser
+      ?.getIdTokenResult(true)
+      .then((result) => {
+        setJwtToken(result.token);
+        setJwtExpiry(new Date(result.expirationTime));
+      })
+      .catch((error) => {
+        if (error?.message === 'Firebase: Error (auth/network-request-failed).') {
+          return;
+        }
+        throw error;
+      });
   };
 
   const millisecondsToExpiry = jwtExpiry?.getTime() ?? 0 - new Date().getTime();
