@@ -84,7 +84,7 @@ function Applications() {
     <div className={`h-full overflow-clip ${isShowingSearch ? 'pb-24' : ''}`}>
       <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
         <div className="mb-2 flex items-center justify-between">
-          <div className="flex items-center justify-start">
+          <div className="flex items-center justify-center">
             <div className="text-2xl font-bold text-primary-four mr-2">My Applications</div>
             <GoToWorldViewButton />
           </div>
@@ -92,14 +92,14 @@ function Applications() {
           <div className="flex items-center justify-end">
             {isSearchHidden && (
               <Button
-                className="bg-transparent border-primary-four focus:bg-transparent mr-2"
+                className="bg-transparent border-primary-four focus:bg-transparent"
                 shape="circle"
                 onClick={() => setIsSearchHidden(false)}
                 icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
               />
             )}
 
-            <div className="hidden md:flex items-center justify-between">
+            <div className="hidden md:flex items-center justify-between ml-2">
               <CreateApplicationButton />
             </div>
           </div>
