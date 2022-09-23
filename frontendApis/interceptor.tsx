@@ -24,6 +24,7 @@ const AxiosInterceptor = ({ children }: Props) => {
         setJwtExpiry(new Date(result.expirationTime));
       })
       .catch((error) => {
+        // In offline mode, the PWA will still try to getIdToken. This catches network errors from that step.
         if (error?.message === 'Firebase: Error (auth/network-request-failed).') {
           return;
         }
