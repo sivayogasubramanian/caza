@@ -85,7 +85,7 @@ function getNumberOfDaysToToday(date: Date) {
   const daySingularOrPlural = `day${Math.abs(countOfDaysTillToday) > 1 ? 's' : ''}`;
   return countOfDaysTillToday > 0
     ? `in ${countOfDaysTillToday} ${daySingularOrPlural}`
-    : `${countOfDaysTillToday} ${daySingularOrPlural} ago`;
+    : `${-1 * countOfDaysTillToday} ${daySingularOrPlural} ago`;
 }
 
 export default ApplicationListCard;
