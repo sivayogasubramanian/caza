@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, StatusMessageType } from '../../../../types/apiResponse';
+import { ApiResponse } from '../../../../types/apiResponse';
 import { withVerified } from '../../../../utils/auth/jwtHelpers';
 import { createJsonResponse, HttpMethod, HttpStatus, rejectHttpMethod } from '../../../../utils/http/httpHelpers';
 import { canBecomeInteger } from '../../../../utils/numbers/validations';
