@@ -65,7 +65,7 @@ function ApplicationListCard({ application }: Props) {
                 </div>
 
                 {latestStageDate && (
-                  <div className="text-xs text-gray-400">{`${getCountOfDaysTillTodayFrom(latestStageDate)}d`}</div>
+                  <div className="text-xs text-gray-400">{`${getNumberOfDaysToToday(latestStageDate)}`}</div>
                 )}
               </>
             )}
@@ -74,6 +74,14 @@ function ApplicationListCard({ application }: Props) {
       </div>
     </div>
   );
+}
+
+function getNumberOfDaysToToday(date: Date) {
+  const countOfDaysTillToday = getCountOfDaysTillTodayFrom(date);
+  if (countOfDaysTillToday === 0) {
+    return 'Today';
+  }
+  return countOfDaysTillToday > 0 ? `in ${countOfDaysTillToday} days` : `${countOfDaysTillToday} days ago`;
 }
 
 export default ApplicationListCard;
