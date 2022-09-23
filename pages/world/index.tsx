@@ -99,14 +99,14 @@ function RolesWorld() {
           <div className="flex items-center justify-end">
             {isSearchHidden && (
               <Button
-                className="bg-transparent border-primary-four focus:bg-transparent mr-2"
+                className="bg-transparent border-primary-four focus:bg-transparent"
                 shape="circle"
                 onClick={() => setIsSearchHidden(false)}
                 icon={<SearchOutlined style={{ color: '#185ADB', borderColor: '#185ADB' }} />}
               />
             )}
 
-            <div className="hidden md:flex items-center justify-between">
+            <div className="hidden md:flex items-center justify-between ml-2">
               <CreateApplicationButton />
             </div>
           </div>
