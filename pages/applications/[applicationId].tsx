@@ -1,6 +1,6 @@
 import { Button, Modal, Spin, Timeline } from 'antd';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi, { APPLICATIONS_API_ENDPOINT } from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
@@ -23,6 +23,7 @@ import { motion } from 'framer-motion';
 import { log, logException } from '../../utils/analytics';
 import { HOMEPAGE_ROUTE, WORLD_ROUTE } from '../../utils/constants';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import AuthContext from '../../context/AuthContext';
 
 function getTimelineIcon(item: TimelineData) {
   if (item.type === TimelineType.TASK) {
@@ -39,6 +40,8 @@ function Application() {
   useEffect(() => {
     document.title = 'Your Applications';
   }, []);
+
+  const { currentUser } = useContext(AuthContext);
 
   const router = useRouter();
   const applicationId = canBecomeInteger(router.query.applicationId) ? Number(router.query.applicationId) : undefined;
@@ -107,7 +110,8 @@ function Application() {
   );
 
   const getRoleStatsButton = () =>
-    application.role.isVerified && (
+    application.role.isVerified &&
+    !currentUser?.isAnonymous && (
       <Button
         className="flex items-center text-primary-four border-primary-four rounded-md bg-transparent"
         onClick={() => {

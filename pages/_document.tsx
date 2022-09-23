@@ -8,6 +8,10 @@ export default function Document() {
         <meta name="theme-color" content="#fff" />
         <link rel="apple-touch-icon" href="apple-icon-180.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="description"
+          content="Caza is an internship or job application tracker for Computer Science (CS) students.  It allows users to track the progress of the applications, note down tasks, and access global statistics of application statuses for various job roles."
+        />
         <link
           rel="apple-touch-startup-image"
           href="apple-splash-2048-2732.jpg"
