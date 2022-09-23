@@ -86,7 +86,7 @@ function TaskForm({ initialValues, shouldShowMarkDone, isSubmitting, setIsSubmit
         <div className="flex">
           {shouldShowNotificationDaysOffsetInput && (
             <Form.Item name="notificationDaysOffset" rules={[{ required: true, message: 'Please enter a number.' }]}>
-              <InputNumber precision={0} />
+              <InputNumber precision={0} min={0} max={10000} />
             </Form.Item>
           )}
 

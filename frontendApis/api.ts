@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
 import { ApiPromise, ApiResponse, Payload, StatusMessageType } from '../types/apiResponse';
-import { openNotification } from '../components/notification/Notifier';
 
 class BaseApi {
   client = axios.create({
