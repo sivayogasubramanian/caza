@@ -25,8 +25,8 @@ export function getCountOfDaysTillTodayFrom(date: Date): number {
 }
 
 export function calculateDaysOffset(currentDate: Date, referenceDate: Date) {
-  const currentDateMoment = moment(currentDate);
-  const referenceDateMoment = moment(referenceDate);
+  const currentDateMoment = moment(currentDate).startOf('day');
+  const referenceDateMoment = moment(referenceDate).startOf('day');
   return referenceDateMoment.diff(currentDateMoment, 'days');
 }
 
