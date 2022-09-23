@@ -1,7 +1,7 @@
 import { RoleType } from '@prisma/client';
 import { Alert, Button, Checkbox, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
+import { ChangeEventHandler, UIEvent, useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { WORLD_API_ENDPOINT } from '../../frontendApis/worldApi';
 import CreateApplicationButton from '../../components/buttons/CreateApplicationButton';
@@ -21,6 +21,10 @@ import useDebounce from '../../hooks/useDebounce';
 import { DEBOUNCE_DELAY } from '../../utils/constants';
 
 function RolesWorld() {
+  useEffect(() => {
+    document.title = 'World View';
+  }, []);
+
   const { currentUser } = useContext(AuthContext);
 
   if (!currentUser) {

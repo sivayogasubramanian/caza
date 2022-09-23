@@ -4,7 +4,7 @@ import { Button, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
 import { User } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { ChangeEventHandler, UIEvent, useContext, useState } from 'react';
+import { ChangeEventHandler, UIEvent, useContext, useEffect, useState } from 'react';
 import useSWR from 'swr';
 import CreateApplicationButton from '../components/buttons/CreateApplicationButton';
 import GoToWorldViewButton from '../components/buttons/GoToWorldViewButton';
@@ -22,6 +22,10 @@ import { CREATE_APPLICATION_ROUTE, DEBOUNCE_DELAY } from '../utils/constants';
 import { splitByWhitespaces } from '../utils/strings/formatters';
 
 function Applications() {
+  useEffect(() => {
+    document.title = 'Your Applications';
+  }, []);
+
   const { currentUser } = useContext(AuthContext);
   const router = useRouter();
 
