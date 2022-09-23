@@ -6,15 +6,15 @@
 <img src="https://github.com/sivayogasubramanian/caza/actions/workflows/ci.yml/badge.svg" />
 </p>
 
-<h3 align="center"><a href='Get started here!'>Get started here!</a></h3>
-
-<br/>
+<h2 align="center"><a href='https://caza.sivarn.com/'>Get started here!</a></h2>
 
 ## Overview
 
 University students have a lot on their plate, and for those who aspire to break into software engineering, the internship season can be quite the headache. Caza reduces their burden by helping students track their internship applications.
 
-Caza is an internship or job application tracker for Computer Science (CS) students. It allows users to track the progress of the applications, note down tasks, and access global statistics of application statuses for various job roles.
+Applying for internships sucks. Tracking these applications suck more. Most people right now use Excel sheets, note-taking applications or other general purpose organizing solutions. With any of these options, they need to configure and force the application to fit their requirements. With Caza, they will get an app and a beautiful interface built specifically for their needs. It even comes with additional useful features like seeing user statistics on roles they’ve applied to.
+
+Caza is an internship or job application tracker for computing students. It allows users to track the progress of the applications, note down tasks, and access global statistics of applications for various job roles.
 
 ## Team Members
 
