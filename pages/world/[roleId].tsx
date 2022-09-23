@@ -15,7 +15,11 @@ const RoleWorldPage: NextPage = () => {
   const { currentUser } = useContext(AuthContext);
   const { query } = useRouter();
   if (!currentUser || currentUser.isAnonymous) {
-    return <NotFound message="The role page you are looking for cannot be found." />;
+    return (
+      <div className="h-full">
+        <NotFound message="The role page you are looking for cannot be found." />
+      </div>
+    );
   }
 
   const roleId = Number(query.roleId);
