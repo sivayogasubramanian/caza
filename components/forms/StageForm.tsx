@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, Select } from 'antd';
+import { Button, DatePicker, Form, Input, Select, Tooltip } from 'antd';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import AddEmojiIcon from '../icons/AddEmojiIcon';
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import { IEmojiData } from 'emoji-picker-react';
 import { Nullable } from '../../types/utils';
 import { ApplicationStageFormData } from '../../types/applicationStage';
 import { log } from '../../utils/analytics';
+import { ApplicationStageType } from '@prisma/client';
 
 interface Props {
   initialValues: ApplicationStageFormData;
@@ -56,13 +57,25 @@ function StageForm({ initialValues, isSubmitting, setIsSubmitting, setStageFormD
   return (
     <Form form={form} initialValues={initialValues} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} labelAlign="left">
       <Form.Item name="type" label="Stage" rules={[{ required: true, message: 'Please choose a stage.' }]}>
-        <Select placeholder="Select stage">
-          {stageTypeToDisplayStringMap.map((value, key) => (
-            <Select.Option key={key} value={key}>
-              {value}
-            </Select.Option>
-          ))}
-        </Select>
+        {initialValues.type === ApplicationStageType.APPLIED ? (
+          <Tooltip title="Every application must have an applied stage.">
+            <Select disabled defaultValue={ApplicationStageType.APPLIED}>
+              <Select.Option key={ApplicationStageType.APPLIED} value={ApplicationStageType.APPLIED}>
+                {stageTypeToDisplayStringMap.get(ApplicationStageType.APPLIED)}
+              </Select.Option>
+            </Select>
+          </Tooltip>
+        ) : (
+          <Select placeholder="Select stage">
+            {stageTypeToDisplayStringMap
+              .filter((value, key) => key !== ApplicationStageType.APPLIED)
+              .map((value, key) => (
+                <Select.Option key={key} value={key}>
+                  {value}
+                </Select.Option>
+              ))}
+          </Select>
+        )}
       </Form.Item>
 
       <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please select a date.' }]}>
