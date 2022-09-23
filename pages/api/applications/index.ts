@@ -186,22 +186,22 @@ async function handlePost(userId: string, req: NextApiRequest, res: NextApiRespo
 }
 
 function parseGetQueryParams(req: NextApiRequest): ApplicationQueryParams {
-  const { roleTypes, stageTypes, searchWords } = req.query;
+  const { roleTypeWords, stageTypeWords, searchWords } = req.query;
 
   const searchWordsArr = convertQueryParamToStringArray(searchWords, splitByWhitespaces);
-  const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypes, splitByCommaRemovingWhitespacesAround);
+  const roleTypeUncheckedWords = convertQueryParamToStringArray(roleTypeWords, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
-  const roleTypeWords: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
+  const roleTypeWordsArr: RoleType[] = roleTypeUncheckedWords.filter((word) => word in RoleType) as RoleType[];
 
-  const stageTypeUncheckedWords = convertQueryParamToStringArray(stageTypes, splitByCommaRemovingWhitespacesAround);
+  const stageTypeUncheckedWords = convertQueryParamToStringArray(stageTypeWords, splitByCommaRemovingWhitespacesAround);
 
   // Safe to typecast due to the filter check.
-  const stageTypeWords: ApplicationStageType[] = stageTypeUncheckedWords.filter(
+  const stageTypeWordsArr: ApplicationStageType[] = stageTypeUncheckedWords.filter(
     (word) => word in ApplicationStageType,
   ) as ApplicationStageType[];
 
-  return { searchWords: searchWordsArr, roleTypeWords, stageTypeWords };
+  return { searchWords: searchWordsArr, roleTypeWords: roleTypeWordsArr, stageTypeWords: stageTypeWordsArr };
 }
 
 function validatePostRequest(req: NextApiRequest): Nullable<MessageType> {
