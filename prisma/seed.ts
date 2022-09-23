@@ -1,18 +1,68 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { ApplicationStageType, Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({ log: ['query'] });
 
-const users: Prisma.UserCreateInput[] = [
-  { uid: '1', isVerified: true },
-  { uid: '2', isVerified: true },
-  { uid: '3', isVerified: true },
-  { uid: '4', isVerified: true },
-  { uid: '5', isVerified: true },
-  { uid: 'devUserWithData' },
-  { uid: 'devUserWithoutData' },
-  { uid: 'devUserVerifiedWithData', isVerified: true },
-  { uid: 'devUserVerifiedWithoutData', isVerified: true },
+function makeUserCreateInput(): Prisma.UserCreateInput[] {
+  const users: Prisma.UserCreateInput[] = [];
+  for (let uid = 1; uid <= 100; uid++) {
+    users.push({ uid: uid.toString(), isVerified: true });
+  }
+  return users;
+}
+
+const processes = [
+  { stage: ApplicationStageType.APPLIED, daysAfterPrevStage: 0 },
+  { stage: ApplicationStageType.ONLINE_ASSESSMENT, daysAfterPrevStage: 7 },
+  { stage: ApplicationStageType.TECHNICAL, daysAfterPrevStage: 14 },
+  { stage: ApplicationStageType.OFFERED, daysAfterPrevStage: 5 },
+  { stage: ApplicationStageType.ACCEPTED, daysAfterPrevStage: 2 },
 ];
+
+function randomDate(start: Date, daysAfterPrevStage: number) {
+  return new Date(start.getTime() + (0.5 + Math.random()) * (daysAfterPrevStage * 24 * 60 * 60 * 1000));
+}
+
+function makeApplicationCreateInput(
+  roleId: number,
+  latestStageBreakdown: { [stage: string]: number },
+): Prisma.ApplicationUncheckedCreateInput[] {
+  const applications: Prisma.ApplicationUncheckedCreateInput[] = [];
+
+  const latestStageArr: ApplicationStageType[] = [];
+
+  for (const [stage, count] of Object.entries(latestStageBreakdown)) {
+    for (let i = 0; i < count; i++) {
+      latestStageArr.push(stage as ApplicationStageType);
+    }
+  }
+
+  for (let userId = 1; userId <= 100; userId++) {
+    const latestStageForUser = latestStageArr[userId - 1];
+    const stages: Prisma.ApplicationStageUncheckedCreateWithoutApplicationInput[] = [];
+    let prevDate = new Date();
+    for (let i = 0; i < processes.length; i++) {
+      prevDate = randomDate(prevDate, processes[i].daysAfterPrevStage);
+      stages.push({
+        type: processes[i].stage,
+        date: prevDate,
+      });
+
+      if (processes[i].stage === latestStageForUser) {
+        break;
+      }
+    }
+
+    applications.push({
+      userId: userId.toString(),
+      roleId,
+      applicationStages: {
+        create: stages,
+      },
+    });
+  }
+
+  return applications;
+}
 
 const companies: Prisma.CompanyCreateInput[] = [
   {
@@ -23,12 +73,6 @@ const companies: Prisma.CompanyCreateInput[] = [
       create: [
         {
           title: 'Software Engineer Intern',
-          type: 'SUMMER_INTERNSHIP',
-          year: 2023,
-          isVerified: true,
-        },
-        {
-          title: 'Enterprise Engineer Intern',
           type: 'SUMMER_INTERNSHIP',
           year: 2023,
           isVerified: true,
@@ -62,172 +106,6 @@ const companies: Prisma.CompanyCreateInput[] = [
           type: 'SUMMER_INTERNSHIP',
           year: 2023,
           isVerified: true,
-          applications: {
-            create: [
-              {
-                userId: '1',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 8, 1),
-                      emojiUnicodeHex: '1f628', // 😨
-                    },
-                    {
-                      type: 'ONLINE_ASSESSMENT',
-                      date: new Date(2022, 8, 7),
-                      emojiUnicodeHex: '1f604', // 😄
-                      remark: 'Passed all test cases!',
-                    },
-                    {
-                      type: 'OFFERED',
-                      date: new Date(2022, 9, 1),
-                      emojiUnicodeHex: '1f604', // 😄
-                      remark: 'OFFER!!.',
-                    },
-                    {
-                      type: 'ACCEPTED',
-                      date: new Date(2022, 9, 1),
-                    },
-                    {
-                      type: 'NON_TECHNICAL',
-                      date: new Date(2022, 8, 20),
-                      remark: 'Think it went well, was able to devise and implement optimal solution.',
-                    },
-                    {
-                      type: 'TECHNICAL',
-                      date: new Date(2022, 8, 20),
-                      remark: 'Think it went well, was able to devise and implement optimal solution.',
-                    },
-                  ],
-                },
-                tasks: {
-                  create: [
-                    {
-                      title: 'Revise bit manipulation',
-                      dueDate: new Date(2022, 8, 5),
-                      notificationDateTime: new Date(2022, 8, 4),
-                      isDone: true,
-                    },
-                    {
-                      title: 'Prepare questions to ask engineer',
-                      dueDate: new Date(2022, 8, 19),
-                      notificationDateTime: new Date(2022, 8, 18),
-                      isDone: false,
-                    },
-                  ],
-                },
-              },
-              {
-                userId: '2',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 7, 22),
-                    },
-                    {
-                      type: 'ONLINE_ASSESSMENT',
-                      date: new Date(2022, 8, 7),
-                    },
-                    {
-                      type: 'REJECTED',
-                      date: new Date(2022, 8, 12),
-                    },
-                  ],
-                },
-              },
-              {
-                userId: '3',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 7, 23),
-                    },
-                    {
-                      type: 'ONLINE_ASSESSMENT',
-                      date: new Date(2022, 8, 7),
-                    },
-                    {
-                      type: 'REJECTED',
-                      date: new Date(2022, 8, 10),
-                    },
-                  ],
-                },
-              },
-              {
-                userId: '4',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 7, 30),
-                    },
-                    {
-                      type: 'REJECTED',
-                      date: new Date(2022, 8, 3),
-                    },
-                  ],
-                },
-              },
-              {
-                userId: '5',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 7, 28),
-                    },
-                  ],
-                },
-              },
-              {
-                userId: 'devUserWithData',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 5, 28),
-                    },
-                    {
-                      type: 'ONLINE_ASSESSMENT',
-                      date: new Date(2022, 6, 7),
-                    },
-                    {
-                      type: 'REJECTED',
-                      date: new Date(2022, 6, 10),
-                    },
-                  ],
-                },
-              },
-              {
-                userId: 'devUserVerifiedWithData',
-                applicationStages: {
-                  create: [
-                    {
-                      type: 'APPLIED',
-                      date: new Date(2022, 6, 28),
-                    },
-                    {
-                      type: 'ONLINE_ASSESSMENT',
-                      date: new Date(2022, 6, 30),
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        {
-          title: 'Customer Engineering Intern, Google Cloud, 2023',
-          type: 'FALL_INTERNSHIP',
-          year: 2023,
-        },
-        {
-          title: 'Data Center Technician Intern, 2023',
-          type: 'SUMMER_INTERNSHIP',
-          year: 2023,
         },
       ],
     },
@@ -241,7 +119,7 @@ const companies: Prisma.CompanyCreateInput[] = [
 
 async function main() {
   await Promise.all(
-    users.map(async (user) => {
+    makeUserCreateInput().map(async (user) => {
       await prisma.user.create({
         data: user,
       });
@@ -255,6 +133,35 @@ async function main() {
       });
     }),
   );
+
+  const facebookSweApplications = makeApplicationCreateInput(1, {
+    [ApplicationStageType.APPLIED]: 40,
+    [ApplicationStageType.ONLINE_ASSESSMENT]: 33,
+    [ApplicationStageType.TECHNICAL]: 15,
+    [ApplicationStageType.OFFERED]: 5,
+    [ApplicationStageType.ACCEPTED]: 7,
+  });
+
+  const googleSweApplications = makeApplicationCreateInput(2, {
+    [ApplicationStageType.APPLIED]: 10,
+    [ApplicationStageType.ONLINE_ASSESSMENT]: 64,
+    [ApplicationStageType.TECHNICAL]: 18,
+    [ApplicationStageType.OFFERED]: 2,
+    [ApplicationStageType.ACCEPTED]: 6,
+  });
+
+  await Promise.all([
+    facebookSweApplications.map(async (application) => {
+      await prisma.application.create({
+        data: application,
+      });
+    }),
+    googleSweApplications.map(async (application) => {
+      await prisma.application.create({
+        data: application,
+      });
+    }),
+  ]);
 }
 
 main()
