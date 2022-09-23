@@ -10,7 +10,7 @@
     "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix './**'",
     "postinstall": "husky install",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
-    "vercel-reset": "prisma generate && prisma migrate reset && next build"
+    "vercel-reset": "prisma generate && prisma migrate reset -f && next build"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
