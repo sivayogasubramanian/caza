@@ -1,6 +1,7 @@
 import { ApplicationStageType } from '@prisma/client';
 import { Nullable } from '../../types/utils';
 import { StatusMessageType } from '../../types/apiResponse';
+import { stageTypeToDisplayStringMap } from './applicationStageUtils';
 
 export enum ChronologicalValidationError {
   MORE_THAN_ONE_FINAL_STAGE,
@@ -16,28 +17,29 @@ const FINAL_STAGES: string[] = [
   ApplicationStageType.WITHDRAWN,
 ];
 
+const USER_FACING_APPLIED_STAGE = stageTypeToDisplayStringMap.get(ApplicationStageType.APPLIED);
+const USER_FACING_FINAL_STAGES = FINAL_STAGES.map((x) => stageTypeToDisplayStringMap.get(x)).join(', ');
+
 export const chronologicalErrorMessages = Object.freeze({
   [ChronologicalValidationError.MORE_THAN_ONE_FINAL_STAGE]: {
     type: StatusMessageType.ERROR,
-    message: `There can only be at most one final stage out of these: ${FINAL_STAGES.join(
-      ', ',
-    )}. Please delete the other final stage first.`,
+    message: `There can only be at most one final stage out of these: ${USER_FACING_FINAL_STAGES}. Please delete the other final stage first.`,
   },
   [ChronologicalValidationError.FINAL_STAGE_OUT_OF_ORDER]: {
     type: StatusMessageType.ERROR,
-    message: `The final stages ${FINAL_STAGES.join(', ')} must be the latest in the timeline.`,
+    message: `The final stages ${USER_FACING_FINAL_STAGES} must be the latest in the timeline.`,
   },
   [ChronologicalValidationError.FIRST_STAGE_OUT_OF_ORDER]: {
     type: StatusMessageType.ERROR,
-    message: `The stage ${ApplicationStageType.APPLIED} must be the earliest in the timeline.`,
+    message: `The stage ${USER_FACING_APPLIED_STAGE} must be the earliest in the timeline.`,
   },
   [ChronologicalValidationError.MORE_THAN_ONE_FIRST_STAGE]: {
     type: StatusMessageType.ERROR,
-    message: `The stage ${ApplicationStageType.APPLIED} already exists.`,
+    message: `The stage ${USER_FACING_APPLIED_STAGE} already exists.`,
   },
   [ChronologicalValidationError.MISSING_FIRST_STAGE]: {
     type: StatusMessageType.ERROR,
-    message: `The stage ${ApplicationStageType.APPLIED} must be present.`,
+    message: `The stage ${USER_FACING_APPLIED_STAGE} must be present.`,
   },
 });
 
