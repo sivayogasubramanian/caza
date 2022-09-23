@@ -1,6 +1,6 @@
 export const precacheAllUserApplications = async (token: string) => {
   const applicationsResponse = await getApplicationList(token);
-  const { payload, messages } = await applicationsResponse.json();
+  const { payload } = await applicationsResponse.json();
   if (!Array.isArray(payload)) {
     return;
   }
