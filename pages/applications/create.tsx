@@ -1,7 +1,7 @@
 import { Form, DatePicker, Select, Button, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi from '../../frontendApis/applicationsApi';
 import companiesApi, { COMPANIES_API_ENDPOINT } from '../../frontendApis/companiesApi';
@@ -16,12 +16,14 @@ import { Nullable } from '../../types/utils';
 import { splitByWhitespaces } from '../../utils/strings/formatters';
 import moment from 'moment';
 import { roleTypeToDisplayStringMap } from '../../utils/role/roleUtils';
-import { DEBOUNCE_DELAY, HOMEPAGE_ROUTE } from '../../utils/constants';
+import { APPLICATIONS_ROUTE, DEBOUNCE_DELAY } from '../../utils/constants';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { log } from '../../utils/analytics';
 import Head from 'next/head';
 import useDebounce from '../../hooks/useDebounce';
+import { precacheAllUserApplications } from '../../worker/applications';
+import AuthContext from '../../context/AuthContext';
 
 const addNewCompanyOption: CompanyAutocompleteOption = {
   company: null,
@@ -47,6 +49,7 @@ const addNewRoleOption: RoleAutocompleteOption = {
 
 function ApplicationCreate() {
   const router = useRouter();
+  const { currentUser } = useContext(AuthContext);
 
   const [isCreateCompanyFormOpen, setIsCreateCompanyFormOpen] = useState<boolean>(false);
   const [isCreateRoleFormOpen, setIsCreateRoleFormOpen] = useState<boolean>(false);
@@ -146,8 +149,11 @@ function ApplicationCreate() {
         roleId: selectedRole.id,
         applicationDate: applicationDate.toISOString(),
       })
-      .then(() => {
-        router.push(HOMEPAGE_ROUTE);
+      .then((resp) => {
+        const applicationId = resp.payload.id;
+        router.push(`${APPLICATIONS_ROUTE}/${applicationId}`);
+
+        currentUser?.getIdToken().then((token) => precacheAllUserApplications(token));
       });
   };
 
