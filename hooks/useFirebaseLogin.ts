@@ -19,7 +19,7 @@ export default function useFirebaseLogin() {
   const handleAuthStateChanged = useCallback(
     async (user: Nullable<User>) => {
       if (user) {
-        await user.getIdToken().then(precacheUserData);
+        user.getIdToken().then(precacheUserData);
       } else {
         const auth = getAuth();
         const newUser = await signInAnonymously(auth);
