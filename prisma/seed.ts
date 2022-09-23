@@ -3,15 +3,15 @@ import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient({ log: ['query'] });
 
 const users: Prisma.UserCreateInput[] = [
-  { uid: '1' },
-  { uid: '2' },
-  { uid: '3' },
-  { uid: '4' },
-  { uid: '5' },
+  { uid: '1', isVerified: true },
+  { uid: '2', isVerified: true },
+  { uid: '3', isVerified: true },
+  { uid: '4', isVerified: true },
+  { uid: '5', isVerified: true },
   { uid: 'devUserWithData' },
   { uid: 'devUserWithoutData' },
-  { uid: 'devUserVerifiedWithData' },
-  { uid: 'devUserVerifiedWithoutData' },
+  { uid: 'devUserVerifiedWithData', isVerified: true },
+  { uid: 'devUserVerifiedWithoutData', isVerified: true },
 ];
 
 const companies: Prisma.CompanyCreateInput[] = [
