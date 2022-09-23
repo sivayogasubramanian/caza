@@ -38,8 +38,8 @@ const messages = Object.freeze({
   },
   [MessageType.OLD_USER_VERIFIED]: { type: StatusMessageType.ERROR, message: 'Account is already linked.' },
   [MessageType.NEW_USER_EXISTS]: {
-    type: StatusMessageType.ERROR,
-    message: 'There is already an account associated with this Github profile.',
+    type: StatusMessageType.SUCCESS,
+    message: 'Logged in with new Github account.',
   },
   [MessageType.OLD_USER_NOT_FOUND]: {
     type: StatusMessageType.ERROR,
@@ -115,7 +115,7 @@ async function handlePostWithOldToken(
 
   switch (result) {
     case MessageType.NEW_USER_EXISTS:
-      return res.status(HttpStatus.CONFLICT).json(createJsonResponse({}, messages[MessageType.NEW_USER_EXISTS]));
+      return res.status(HttpStatus.OK).json(createJsonResponse({}, messages[MessageType.NEW_USER_EXISTS]));
 
     case MessageType.OLD_USER_NOT_FOUND:
       return res.status(HttpStatus.NOT_FOUND).json(createJsonResponse({}, messages[MessageType.OLD_USER_NOT_FOUND]));
