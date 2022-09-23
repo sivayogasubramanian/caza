@@ -156,7 +156,9 @@ function Applications() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-4 h-full pb-32 overflow-y-auto"
+        className={`p-4 h-full pb-32 overflow-y-auto ${
+          applications.length === 0 ? 'flex justify-center items-center' : ''
+        }`}
         onScroll={handleScroll}
       >
         <Spin spinning={isLoading}>
