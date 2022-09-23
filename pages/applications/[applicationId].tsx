@@ -159,7 +159,7 @@ function Application() {
                     <div className="hidden md:flex">{getRoleStatsButton()}</div>
                   </div>
 
-                  <div className="hidden md:flex flex items-center justify-end gap-2">
+                  <div className="hidden md:flex items-center justify-end gap-2">
                     {getAddStageButton()}
                     {getAddTaskButton()}
                     {getDeleteButton()}
