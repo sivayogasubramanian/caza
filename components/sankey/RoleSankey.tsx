@@ -5,27 +5,20 @@ import { WorldRoleStatsData } from '../../types/role';
 import { stageTypeToDisplayStringMap } from '../../utils/applicationStage/applicationStageUtils';
 import { ApplicationStageType } from '@prisma/client';
 import { TAILWIND_MD_BREAKPOINT_PIXELS } from '../../utils/constants';
+import NotFound from '../notFound/NotFound';
+import { EmptyPayload } from '../../types/apiResponse';
 
 const HAIR_SPACE = ' ';
 const ZERO_WIDTH_SPACE = '​';
 const INVISIBLE_TOOLTIP = `<div style="width: 0; height: 0;"></div>`;
 
-export type RoleSankeyProps = { data: WorldRoleStatsData };
+export type RoleSankeyProps = { data: WorldRoleStatsData | EmptyPayload | undefined };
 
 const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const [edgeIndex, setEdgeIndex] = useState<number>(-1);
 
-  if (!data) {
-    return null;
-  }
-
-  if (data.edges.length === 0) {
-    return (
-      <div className="w-full h-40">
-        <RoleCard role={data.role} />
-        <div className="text-2xl">The role you have selected does not have enough data to be displayed.</div>
-      </div>
-    );
+  if (!data || !data.edges || data.edges.length === 0) {
+    return <NotFound message="The role page you are looking for cannot be found." />;
   }
 
   const correctedData: WorldRoleStatsData = {
