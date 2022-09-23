@@ -14,12 +14,13 @@ export const precacheAllUserApplications = async (token: string) => {
 const getApplicationList = async (token: string) => {
   const listRequest = new Request('/api/applications', { headers: { Authorization: `Bearer ${token}` } });
   const response = await fetch(listRequest);
+  const responseCopy = response.clone();
 
   caches.open('apis').then((cache) => {
-    cache.put(listRequest, response.clone());
+    cache.put(listRequest, responseCopy);
   });
 
-  return response.clone();
+  return response;
 };
 
 const getIndividualApplication = async (token: string, applicationId: number) => {
