@@ -105,7 +105,7 @@ function Application() {
   const getRoleStatsButton = () =>
     application.role.isVerified && (
       <Button
-        className="flex items-center gap-1 text-primary-four border-primary-four rounded-md bg-transparent"
+        className="flex items-center text-primary-four border-primary-four rounded-md bg-transparent"
         onClick={() => {
           log('click_role_stats_button');
           router.push(`${WORLD_ROUTE}/${application.role.id}`);
@@ -145,20 +145,20 @@ function Application() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full">
         {hasSuccessfullyFetchedApplication && (
           <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center justify-start gap-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-start">
                 <div className="text-2xl font-bold text-primary-four">{`${application.role.title} @ ${application.role.company.name}`}</div>
-                <div className="hidden md:flex">{getRoleStatsButton()}</div>
+                <div className="hidden md:flex pl-2">{getRoleStatsButton()}</div>
               </div>
 
-              <div className="hidden md:flex flex items-center justify-end gap-2">
+              <div className="hidden md:flex items-center justify-end [&>button]:mr-2">
                 {getAddStageButton()}
                 {getAddTaskButton()}
                 {getDeleteButton()}
               </div>
             </div>
 
-            <div className="md:hidden pt-2 w-full flex items-center justify-start gap-2">
+            <div className="md:hidden pt-2 w-full flex items-center justify-start [&>button]:mr-2">
               {getRoleStatsButton()}
               {getAddStageButton()}
               {getAddTaskButton()}

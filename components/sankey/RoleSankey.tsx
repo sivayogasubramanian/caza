@@ -70,7 +70,7 @@ const RoleSankey: FC<RoleSankeyProps> = ({ data }) => {
   const width = getSankeyWidth();
   const getChart = (width: number) => {
     return (
-      <div className="flex-col h-full w-full gap-2 p-4 items-center">
+      <div className="flex-col h-full w-full p-4 items-center">
         <Chart
           chartType="Sankey"
           className="h-full w-full rotate-90 md:rotate-0"
