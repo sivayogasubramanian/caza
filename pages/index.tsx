@@ -85,7 +85,7 @@ function Applications() {
       <div className="mt-2 p-2 bg-primary-three rounded-b-3xl">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center justify-start">
-            <div className="text-2xl font-bold text-primary-four">My Applications</div>
+            <div className="text-2xl font-bold text-primary-four mr-2">My Applications</div>
             <GoToWorldViewButton />
           </div>
 
