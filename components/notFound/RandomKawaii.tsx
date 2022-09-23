@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Backpack,
   Browser,
-  Cat,
   CreditCard,
   File,
   Ghost,
