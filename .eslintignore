@@ -11,3 +11,4 @@ prisma/migrations/
 prisma/schema.prisma
 coverage/
 __tests__/
+group-2-lighthouse.html
