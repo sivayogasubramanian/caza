@@ -1,6 +1,6 @@
 import { Button, Modal, Spin, Timeline } from 'antd';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import applicationsApi, { APPLICATIONS_API_ENDPOINT } from '../../frontendApis/applicationsApi';
 import ApplicationStageTimelineCard from '../../components/cards/ApplicationStageTimelineCard';
@@ -36,6 +36,10 @@ function getTimelineIcon(item: TimelineData) {
 }
 
 function Application() {
+  useEffect(() => {
+    document.title = 'Your Applications';
+  }, []);
+
   const router = useRouter();
   const applicationId = canBecomeInteger(router.query.applicationId) ? Number(router.query.applicationId) : undefined;
   const hasValidApplicationId = applicationId !== undefined;

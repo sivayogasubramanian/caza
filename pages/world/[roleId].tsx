@@ -1,7 +1,7 @@
 import { Spin } from 'antd';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import useSWR from 'swr';
 import AuthContext from '../../context/AuthContext';
 import dynamic from 'next/dynamic';
@@ -12,6 +12,10 @@ import { ApiResponse } from '../../types/apiResponse';
 const RoleSankey = dynamic(() => import('../../components/sankey/RoleSankey'), { ssr: false });
 
 const RoleWorldPage: NextPage = () => {
+  useEffect(() => {
+    document.title = 'World View';
+  }, []);
+
   const { currentUser } = useContext(AuthContext);
   const { query } = useRouter();
   if (!currentUser || currentUser.isAnonymous) {
