@@ -10,6 +10,7 @@
     "lint:fix": "eslint --no-error-on-unmatched-pattern --ext .js, .ts, .jsx, .tsx --fix './**'",
     "postinstall": "husky install",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-reset": "prisma generate && prisma migrate reset && next build",
     "docker-postgres": "docker run --rm -itd --name test-instance -p 5433:5432  -e POSTGRES_PASSWORD=password postgres && echo 'Allow a few seconds for the database to set up.'",
     "docker-postgres-migrate": "psql postgresql://postgres:password@localhost:5433 -c 'CREATE DATABASE caza' && yarn run prisma migrate reset",
     "docker-postgres-stop": "docker stop test-instance || true ",
