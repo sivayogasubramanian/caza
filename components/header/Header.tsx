@@ -74,7 +74,13 @@ function Header() {
 
   return (
     <div className="bg-primary-three w-full fixed top-0 p-2 mb-2 flex justify-between items-center z-50">
-      <img src={logo.src} alt="logo" height="30px" onClick={() => router.push(HOMEPAGE_ROUTE)} />
+      <img
+        src={logo.src}
+        alt="logo"
+        height="30px"
+        className="cursor-pointer"
+        onClick={() => router.push(HOMEPAGE_ROUTE)}
+      />
 
       {currentUser?.isAnonymous && (
         <Button
@@ -93,7 +99,7 @@ function Header() {
             <img
               src={githubProviderData?.photoURL}
               height="30px"
-              className="rounded-full"
+              className="rounded-full cursor-pointer"
               onClick={() => setShouldShowProfileMenu(!shouldShowProfileMenu)}
             />
           )}
