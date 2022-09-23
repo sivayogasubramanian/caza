@@ -19,7 +19,7 @@ const getApplicationList = async (token: string) => {
     cache.put(listRequest, response.clone());
   });
 
-  return response;
+  return response.clone();
 };
 
 const getIndividualApplication = async (token: string, applicationId: number) => {
